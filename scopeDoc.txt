@@ -1,0 +1,16 @@
+Money N Property
+
+Monopoly is a boring game of property buying and rent paying. This is a beautiful new take on the old game.
+Technically right now its a complete clone.
+
+Board - tiles of property to own or pay rent, tiles for special events: Draw event card or community chest, tile for jail
+Players - Money, properties, CC cards, Request trade.
+Properties - owned, upgrades, cost/rent
+
+Dice - two d6's determine movement
+
+project plan
+
+classes - board - player - properties - UI
+assets - board - player pieces - cards
+
