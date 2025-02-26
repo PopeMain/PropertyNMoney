@@ -5,37 +5,43 @@ class GameBoard
 abstract class Tile
 abstract class Player
 abstract class Property
-class CardDraw
+class Card
 class User
 class AutomatedPlayer
 class Land
 class Utility
+class Bank
 
 Player <|-- User
 Player <|-- AutomatedPlayer
 Player .. Property
+Player <|-- Bank
 Property <|-- Land
 Property <|-- Utility
 
-GameBoard <|-- Tile
+GameBoard .. Tile
+GameBoard .. Card
 Tile <|-- Property
 
 class GameBoard{
--HashMap<> tiles
+-Tile[40] tiles
+-Card[] chance
+-Card[] commuintyChest
 }
 
 abstract class Tile{
--Tile previousTile
 -Player[] playersOnTile
--getNextTile()
--getPreviousTile()
+-enum tileType
 }
-class CardDraw{
--Cards[] deck
--getTopCard()
+class Card{
+-String title
+-String text
+-String type
+#getType()
 }
 abstract class Player {
-#Object[] properties
+#int[] properties
+#int gameLocationIndex
 #ImageIcon token
 #int money
 #String name
@@ -47,7 +53,6 @@ abstract class Player {
 abstract class Property {
 #String name
 #int value
-#String playerName
 #bool purchased
 -purchase()
 -mortgage()
@@ -65,5 +70,9 @@ class Land{
 }
 
 class Utility{
+}
+
+class Bank{
+#sellProperty()
 }
 @enduml
