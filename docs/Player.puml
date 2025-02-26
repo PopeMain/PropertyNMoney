@@ -21,7 +21,7 @@ GameBoard <|-- Tile
 Tile <|-- Property
 
 class GameBoard{
--CircularNodeGraph tiles
+-HashMap<> tiles
 }
 
 abstract class Tile{
