@@ -20,6 +20,7 @@ public class GameController {
         gameJFrame.setSize(gameWindowWidth, gameWindowHeight);
         gameJFrame.setLocation(gameWindowX, gameWindowY);
         gameJFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameJFrame.setIconImage(new ImageIcon("icon32.png").getImage());
 
         // no layout, will use absolute system
         Container gameContentPane = gameJFrame.getContentPane();
