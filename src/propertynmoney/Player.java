@@ -1,4 +1,10 @@
 package propertynmoney;
+/*
+Auth: Frank Pope
+GroupID: The Capitalists
+Notes: This is Bullshit Code that can be used to store info specific to each player.
+ */
+
 
 public class Player {
     int money;
@@ -7,6 +13,9 @@ public class Player {
     boolean inJail;
 
     public Player(int money, String name) {
+        /*
+        The Player only stores the information for each indivdual payer.
+         */
         this.money = money;
         this.name = name;
         this.position = 0;
