@@ -1,18 +1,31 @@
 package propertynmoney;
 
-import java.util.Random;
+import java.awt.*;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class GameController {
-    static final Random rand = new Random();
+
 
     public static void main(String[] args) {
-        GameController gc = new GameController();
-        int roll1 = gc.rollD6();
-        System.out.println(Integer.toString(roll1));
-
+        new GameController("Property N Money", 50, 50, 800, 800);
     }
 
-    public static int rollD6() {
-        return rand.nextInt(1,6);
+    private final JFrame gameJFrame;
+
+    public GameController(String passedInWindowTitle, int gameWindowX, int gameWindowY, int gameWindowWidth, int gameWindowHeight) {
+        gameJFrame = new JFrame(passedInWindowTitle);
+        gameJFrame.setSize(gameWindowWidth, gameWindowHeight);
+        gameJFrame.setLocation(gameWindowX, gameWindowY);
+        gameJFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // no layout, will use absolute system
+        Container gameContentPane = gameJFrame.getContentPane();
+        gameContentPane.setLayout(null);
+        gameContentPane.setBackground(Color.CYAN);
+        gameJFrame.setVisible(true);
     }
+
 }
