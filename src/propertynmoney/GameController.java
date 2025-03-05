@@ -22,10 +22,14 @@ public class GameController {
         gameJFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameJFrame.setIconImage(new ImageIcon("icon32.png").getImage());
 
+        Canvas tile = new Canvas();
+        tile.setBackground(Color.BLACK);
+
         // no layout, will use absolute system
         Container gameContentPane = gameJFrame.getContentPane();
-        gameContentPane.setLayout(new GridLayout(10,10,25,25));
+        gameContentPane.setLayout(new GridLayout(10,10,5,5));
         gameContentPane.setBackground(Color.CYAN);
+        gameContentPane.add(tile);
         gameJFrame.setVisible(true);
     }
 
