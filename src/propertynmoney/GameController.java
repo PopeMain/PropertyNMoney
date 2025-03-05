@@ -24,7 +24,7 @@ public class GameController {
 
         // no layout, will use absolute system
         Container gameContentPane = gameJFrame.getContentPane();
-        gameContentPane.setLayout(null);
+        gameContentPane.setLayout(new GridLayout(10,10,25,25));
         gameContentPane.setBackground(Color.CYAN);
         gameJFrame.setVisible(true);
     }
