@@ -1,0 +1,57 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+GUI <- Gameboard
+
+class JFrame extends GUI
+
+class GUI {
+-GameBoard gameBoard
+-Player[] players
+
+-JPanel boardPanel
+-JPanel playerPanel
+-JPanel actionPanel
+
+-JButton rollDiceButton
+-JButton buyPropertyButton
+-JButton mortgageButton
+-JButton endTurnButton
+-JButton[] buttons
+
+-JLabel playerName
+-JLabel playerMoney
+-JButton showPlayerPropertiesButton
+
+-BufferedImage boardImage
+
+-paintGameBoardFrame()
+-clearGameBoardFrame()
+-paintPlayerSideFrame()
+-paintAuctionSideFrame()
+-clearSideFrame()
+-paintStandardButtonFrame()
+-paintAuctionButtonFrame()
+-paintBuyHouseButtonFrame()
+-paintMortgageButtonFrame()
+-clearButtonFrame()
+
+-showPlayerProperties()
+
+-buyPoperty()
+
+-buyHouse()
+-sellHouse()
+
+-mortgageProperty()
+-unmortgageProperty()
+
+-rollDie()
+-nextTurn()
+
+-toggleButton()
+
+}
+
+@enduml
