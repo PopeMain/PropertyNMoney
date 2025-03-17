@@ -8,19 +8,23 @@ public class GUI extends JFrame {
     private final JPanel boardPanel;
     private final JPanel sideBarPanel;
     private final JPanel actionPanel;
-    private final ImageIcon gameBoard = new ImageIcon("/GameBoard.png");
 
     GUI() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Property N Money");
-        this.setSize(500, 500);
+        this.setSize(1000, 900);
         this.setLocationRelativeTo(null);
 
         this.setLayout(new BorderLayout());
+        final ImageIcon gameBoard = new ImageIcon("src/GameBoard.png");
 
         // Construct Board Panel
         boardPanel = new JPanel();
         JLabel boardLabel = new JLabel("Board");
+        boardLabel.setIcon(gameBoard);
+        boardLabel.setBounds(0, 0, gameBoard.getIconWidth(), gameBoard.getIconHeight());
+        System.out.println(gameBoard.getIconWidth());
+        boardLabel.setVisible(true);
         boardPanel.add(boardLabel);
 
         this.add(boardPanel, BorderLayout.CENTER);
