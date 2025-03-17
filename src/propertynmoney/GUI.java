@@ -8,6 +8,7 @@ public class GUI extends JFrame {
     private final JPanel boardPanel;
     private final JPanel sideBarPanel;
     private final JPanel actionPanel;
+    private final ImageIcon gameBoard = new ImageIcon("/GameBoard.png");
 
     GUI() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
