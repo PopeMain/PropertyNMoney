@@ -6,7 +6,7 @@ import java.awt.*;
 public class GUI extends JFrame {
 
     private final JPanel boardPanel;
-    private final JPanel playerPanel;
+    private final JPanel sideBarPanel;
     private final JPanel actionPanel;
 
     GUI() {
@@ -17,26 +17,64 @@ public class GUI extends JFrame {
 
         this.setLayout(new BorderLayout());
 
+        // Construct Board Panel
         boardPanel = new JPanel();
         JLabel boardLabel = new JLabel("Board");
         boardPanel.add(boardLabel);
 
         this.add(boardPanel, BorderLayout.CENTER);
 
-        playerPanel = new JPanel();
-        JLabel playerLabel = new JLabel("Player");
-        playerPanel.add(playerLabel);
+        // Construct Side Bar Panel
+        sideBarPanel = new JPanel();
+        sideBarPanel.setLayout(new BoxLayout(sideBarPanel, BoxLayout.Y_AXIS));
+        paintPlayerSidePanel();
 
-        this.add(playerPanel, BorderLayout.EAST);
+        this.add(sideBarPanel, BorderLayout.EAST);
 
+        // Construct Action Panel
         actionPanel = new JPanel();
-        JLabel actionLabel = new JLabel("Actions");
-        actionPanel.add(actionLabel);
+        actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
+        paintStandardButtonFrame();
 
         this.add(actionPanel, BorderLayout.SOUTH);
 
-
         this.setVisible(true);
+    }
+
+    private void paintPlayerSidePanel() {
+        clearSideBarPanel();
+
+        JLabel playerNameLabel = new JLabel("Player Name:");
+        JLabel playerMoneyLabel = new JLabel("Player Money:");
+        JButton propertiesButton = new JButton("Properties");
+
+        sideBarPanel.add(playerNameLabel);
+        sideBarPanel.add(playerMoneyLabel);
+        sideBarPanel.add(propertiesButton);
+
+    }
+
+    private void clearSideBarPanel() {
+        sideBarPanel.removeAll();
+    }
+
+    private void paintStandardButtonFrame() {
+        clearActionPanel();
+
+        JButton rollDiceButton = new JButton("Roll Dice");
+        JButton buyHousesButton = new JButton("Buy Houses");
+        JButton mortgageButton = new JButton("Mortgage");
+        JButton endTurnButton = new JButton("End Turn");
+
+        actionPanel.add(rollDiceButton);
+        actionPanel.add(buyHousesButton);
+        actionPanel.add(mortgageButton);
+        actionPanel.add(endTurnButton);
+
+    }
+
+    private void clearActionPanel() {
+        actionPanel.removeAll();
     }
 
     public static void main(String[] args) {

@@ -15,7 +15,7 @@ class GUI {
 -JPanel actionPanel
 
 -JButton rollDiceButton
--JButton buyPropertyButton
+-JButton buyHouseButton
 -JButton mortgageButton
 -JButton endTurnButton
 -JButton[] buttons
@@ -35,7 +35,7 @@ class GUI {
 -paintAuctionButtonFrame()
 -paintBuyHouseButtonFrame()
 -paintMortgageButtonFrame()
--clearButtonFrame()
+-clearActionPanel()
 
 -showPlayerProperties()
 
