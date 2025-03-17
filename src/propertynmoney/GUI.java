@@ -51,11 +51,13 @@ public class GUI extends JFrame {
 
         JLabel playerNameLabel = new JLabel("Player Name:");
         JLabel playerMoneyLabel = new JLabel("Player Money:");
-        JButton propertiesButton = new JButton("Properties");
+        //JButton propertiesButton = new JButton("Properties");
+        //JList propertiesList = new JList();
 
         sideBarPanel.add(playerNameLabel);
         sideBarPanel.add(playerMoneyLabel);
-        sideBarPanel.add(propertiesButton);
+        //We need to add the properties list to the player panel
+        //sideBarPanel.add(propertiesList);
 
     }
 
