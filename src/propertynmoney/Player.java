@@ -1,8 +1,11 @@
 package propertynmoney;
+import propertynmoney.Property;
+
+import java.util.ArrayList;
 /*
 Auth: Frank Pope
 GroupID: The Capitalists
-Notes: This is Bullshit Code that can be used to store info specific to each player.
+Notes: This is currently Bullshit Code that can be used to store info specific to each player.
  */
 
 
@@ -11,6 +14,7 @@ public class Player {
     int position;
     String name;
     boolean inJail;
+    ArrayList<Property> properties;
 
     public Player(int money, String name) {
         /*

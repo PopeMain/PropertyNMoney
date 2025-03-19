@@ -1,11 +1,14 @@
 package propertynmoney;
 
 public class Property {
-    int value;
+    int buyValue;
     String name;
+    String color;
 
-    public Property(int value, String name) {
-        this.value = value;
+
+    public Property(int value, String name, String color) {
         this.name = name;
+        this.color = color;
+        this.buyValue = value;
     }
 }
