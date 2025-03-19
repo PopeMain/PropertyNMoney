@@ -2,6 +2,7 @@ package propertynmoney;
 import propertynmoney.Property;
 
 import java.util.ArrayList;
+import java.util.List;
 /*
 Auth: Frank Pope
 GroupID: The Capitalists
@@ -14,7 +15,7 @@ public class Player {
     int position;
     String name;
     boolean inJail;
-    ArrayList<Property> properties;
+    List<Property> properties;
 
     public Player(int money, String name) {
         /*
@@ -24,6 +25,7 @@ public class Player {
         this.name = name;
         this.position = 0;
         this.inJail = false;
+        this.properties = new ArrayList<Property>();
     }
 
     public int getMoney() {return money;}
