@@ -84,6 +84,49 @@ public class GUI extends JFrame {
         actionPanel.removeAll();
     }
 
+    private void paintPlayerSidePanel() {
+        clearSideBarPanel();
+
+        JLabel playerNameLabel = new JLabel("Player Name:");
+        JLabel playerMoneyLabel = new JLabel("Player Money:");
+
+        // Example properties (replace with your actual property list)
+        Property[] properties = {
+                new Property(100, Property.Name.MEDITERRANEAN_AVE, Property.PropertyColor.BROWN),
+                new Property(200, Property.Name.BALTIC_AVE, Property.PropertyColor.CYAN),
+                new Property(300, Property.Name.ORIENTAL_AVE, Property.PropertyColor.MAGENTA),
+                new Property(400, Property.Name.VERMONT_AVE, Property.PropertyColor.ORANGE),
+        };
+
+        // Create the JList of properties
+        JList<Property> propertiesList = new JList<>(properties);
+
+        // Set a custom cell renderer for the list
+        propertiesList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component renderer = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                if (renderer instanceof JLabel && value instanceof Property) {
+                    JLabel label = (JLabel) renderer;
+                    Property property = (Property) value;
+
+                    // Set property name as the text
+                    label.setText(property.getName());
+
+                    // Add a colored icon to represent the property color
+                    label.setIcon(new ColorIcon(property.getColor()));
+                }
+
+                return renderer;
+            }
+        });
+
+        // Add the components to the sidebar
+        sideBarPanel.add(playerNameLabel);
+        sideBarPanel.add(playerMoneyLabel);
+        sideBarPanel.add(new JScrollPane(propertiesList)); // Add the JList inside a scroll pane
+    }
     public static void main(String[] args) {
         new GUI();
     }

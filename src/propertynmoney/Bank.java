@@ -20,7 +20,7 @@ public class Bank {
     }
 
     private void fillProperties() {
-        properties.add( new Property(100,Property.Name.MEDITERRANEAN_AVE, Property.Color.BROWN));
+        properties.add( new Property(100,Property.Name.MEDITERRANEAN_AVE, Property.PropertyColor.BROWN));
     }
 
     public List<Property> getProperties() {return properties;}
