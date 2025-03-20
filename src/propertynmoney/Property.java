@@ -1,26 +1,35 @@
 package propertynmoney;
 
 import java.awt.Color;
+import propertynmoney.PropertyColors;
+import propertynmoney.PropertyNames;
 
 public class Property {
     int buyValue;
-    enum PropertyColor {
-        BROWN(Color.BROWN),
-        CYAN(Color.CYAN),
-        MAGENTA(Color.MAGENTA),
-        ORANGE(Color.ORANGE),
-        RED(Color.RED),
-        YELLOW(Color.YELLOW),
-        GREEN(Color.GREEN),
-        PURPLE(new Color(128, 0, 128))}
-    enum Name {MEDITERRANEAN_AVE, BALTIC_AVE, ORIENTAL_AVE, VERMONT_AVE, CONNECTICUT_AVE,
-        ST_CHARLES_PL, STATES_AVE, VIRGINIA_AVE, ST_JAMES_PL, TENNESSEE_AVE, NEW_YORK_AVE, KENTUCKY_AVE,
-        INDIANA_AVE, ILLINOIS_AVE, ATLANTIC_AVE, VENTNOR_AVE, MARVIN_GAR, PACIFIC_AVE, NORTH_CAROLINA_AVE,
-        PENNSYLVANIA_AVE, PARK_PL, BOARDWALK}
+    private final PropertyNames name;
+    private final PropertyColors color;
+
     enum Houses {MORTGAGE, ZERO, ONE, TWO, THREE, FOUR, HOTEL}
 
-    public Property(int value, Name name, PropertyColor color) {
+    public Property(int value, PropertyNames name, PropertyColors color) {
         this.buyValue = value;
+        this.name = name;
+        this.color = color;
+    }
+    public String getName() {
+        return name.toString();
     }
 
+    public PropertyColors getColorEnum() {
+        return color;
+    }
+
+    public java.awt.Color getColor() {
+        return color.getColor();
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

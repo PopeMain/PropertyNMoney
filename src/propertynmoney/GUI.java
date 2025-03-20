@@ -33,6 +33,7 @@ public class GUI extends JFrame {
         sideBarPanel = new JPanel();
         sideBarPanel.setLayout(new BoxLayout(sideBarPanel, BoxLayout.Y_AXIS));
         paintPlayerSidePanel();
+        repaintPlayerSidePanel();
 
         this.add(sideBarPanel, BorderLayout.EAST);
 
@@ -84,7 +85,7 @@ public class GUI extends JFrame {
         actionPanel.removeAll();
     }
 
-    private void paintPlayerSidePanel() {
+    private void repaintPlayerSidePanel() {
         clearSideBarPanel();
 
         JLabel playerNameLabel = new JLabel("Player Name:");
@@ -92,10 +93,10 @@ public class GUI extends JFrame {
 
         // Example properties (replace with your actual property list)
         Property[] properties = {
-                new Property(100, Property.Name.MEDITERRANEAN_AVE, Property.PropertyColor.BROWN),
-                new Property(200, Property.Name.BALTIC_AVE, Property.PropertyColor.CYAN),
-                new Property(300, Property.Name.ORIENTAL_AVE, Property.PropertyColor.MAGENTA),
-                new Property(400, Property.Name.VERMONT_AVE, Property.PropertyColor.ORANGE),
+                new Property(100, PropertyNames.MEDITERRANEAN_AVE, PropertyColors.BROWN),
+                new Property(200, PropertyNames.BALTIC_AVE, PropertyColors.CYAN),
+                new Property(300, PropertyNames.ORIENTAL_AVE, PropertyColors.MAGENTA),
+                new Property(400, PropertyNames.VERMONT_AVE, PropertyColors.ORANGE),
         };
 
         // Create the JList of properties
