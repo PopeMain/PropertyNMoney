@@ -1,1 +1,5 @@
+The Capitalists: Frank and Nevin
 We Will develop a video game that allows our players to buy and sell virtual property in competition with other players. The Game, Property N Money, is a virtual board game like monopoly. This game will be fun and engaging for the players to explore the fun and dangers of monopolies and late stage capitalism. Unlike Hasbros' Game of monopoly, our game will not be thrown across tables, and cheaters will lose. Our Product will let players decide how to win unlike regular monopoly.
+
+Written By: Frank Pope
+

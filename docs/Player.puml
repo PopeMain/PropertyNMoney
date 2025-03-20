@@ -1,21 +1,47 @@
 @startuml
 'https://plantuml.com/class-diagram
 
+class GameBoard
+abstract class Tile
 abstract class Player
 abstract class Property
+class Card
 class User
 class AutomatedPlayer
 class Land
 class Utility
+class Bank
 
 Player <|-- User
 Player <|-- AutomatedPlayer
 Player .. Property
+Bank .. Player
 Property <|-- Land
 Property <|-- Utility
 
+GameBoard .. Tile
+GameBoard .. Card
+Tile <|-- Property
+
+class GameBoard{
+-Tile[40] tiles
+-Card[] chance
+-Card[] commuintyChest
+}
+
+abstract class Tile{
+-Player[] playersOnTile
+-enum tileType
+}
+class Card{
+-String title
+-String text
+-String type
+#getType()
+}
 abstract class Player {
-#Object[] properties
+#int[] properties
+#int gameLocationIndex
 #ImageIcon token
 #int money
 #String name
@@ -27,8 +53,9 @@ abstract class Player {
 abstract class Property {
 #String name
 #int value
+#bool purchased
 -purchase()
--mortage()
+-mortgage()
 }
 
 class User {
@@ -43,5 +70,11 @@ class Land{
 }
 
 class Utility{
+}
+
+class Bank{
+-Player[] players
+#sellProperty()
+#auction()
 }
 @enduml
