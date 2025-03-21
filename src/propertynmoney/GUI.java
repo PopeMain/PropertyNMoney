@@ -9,23 +9,30 @@ public class GUI extends JFrame {
     private final JPanel sideBarPanel;
     private final JPanel actionPanel;
 
+    private Player[] players;
+    private Player currentPlayer;
+
     GUI() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Property N Money");
         this.setSize(1000, 900);
         this.setLocationRelativeTo(null);
-
         this.setLayout(new BorderLayout());
+
         final ImageIcon gameBoard = new ImageIcon("src/GameBoard.png");
+        players = new Player[8];
+        players[0] = new Player(1500, "Nevin"); // Testing
 
         // Construct Board Panel
         boardPanel = new JPanel();
-        JLabel boardLabel = new JLabel("Board");
+        JLabel boardLabel = new JLabel();
+        boardPanel.setLayout(new BorderLayout());
         boardLabel.setIcon(gameBoard);
         boardLabel.setBounds(0, 0, gameBoard.getIconWidth(), gameBoard.getIconHeight());
         System.out.println(gameBoard.getIconWidth());
         boardLabel.setVisible(true);
-        boardPanel.add(boardLabel);
+        boardPanel.add(boardLabel, BorderLayout.CENTER);
+        paintBoardPanel();
 
         this.add(boardPanel, BorderLayout.CENTER);
 
@@ -45,6 +52,25 @@ public class GUI extends JFrame {
         this.add(actionPanel, BorderLayout.SOUTH);
 
         this.setVisible(true);
+    }
+
+    private void paintBoardPanel() {
+        JPanel southPanel = new JPanel();
+        JPanel eastPanel = new JPanel();
+
+        southPanel.setLayout(new GridLayout(1, 9));
+        eastPanel.setLayout(new GridLayout(1, 9));
+
+        boardPanel.add(eastPanel, BorderLayout.EAST);
+        for (Player player : players) {
+            if (player == null) {
+                break;
+            }
+            else if (player.getPosition() < 10) {
+                JLabel playerLabel = new JLabel(player.getName());
+                eastPanel.add(playerLabel, 9);
+            }
+        }
     }
 
     private void paintPlayerSidePanel() {
