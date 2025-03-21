@@ -59,7 +59,7 @@ public class GUI extends JFrame {
         JPanel eastPanel = new JPanel();
 
         southPanel.setLayout(new GridLayout(1, 9));
-        eastPanel.setLayout(new GridLayout(1, 9));
+        eastPanel.setLayout(new GridLayout(9, 1));
 
         boardPanel.add(eastPanel, BorderLayout.EAST);
         for (Player player : players) {
@@ -68,7 +68,8 @@ public class GUI extends JFrame {
             }
             else if (player.getPosition() < 10) {
                 JLabel playerLabel = new JLabel(player.getName());
-                eastPanel.add(playerLabel, 9);
+                playerLabel.setPreferredSize(new Dimension(100, 50));
+                eastPanel.add(playerLabel, 0);
             }
         }
     }
