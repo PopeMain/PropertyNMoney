@@ -2,12 +2,15 @@ package propertynmoney;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GUI extends JFrame {
 
     private final JPanel boardPanel;
     private final JPanel sideBarPanel;
     private final JPanel actionPanel;
+    private final Bank theBank = new Bank();
 
     GUI() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -92,15 +95,10 @@ public class GUI extends JFrame {
         JLabel playerMoneyLabel = new JLabel("Player Money:");
 
         // Example properties (replace with your actual property list)
-        Property[] properties = {
-                new Property(100, PropertyNames.MEDITERRANEAN_AVE, PropertyColors.BROWN),
-                new Property(200, PropertyNames.BALTIC_AVE, PropertyColors.CYAN),
-                new Property(300, PropertyNames.ORIENTAL_AVE, PropertyColors.MAGENTA),
-                new Property(400, PropertyNames.VERMONT_AVE, PropertyColors.ORANGE),
-        };
-
+        List<Property> properties = new ArrayList<Property>();
+        properties = theBank.getProperties();
         // Create the JList of properties
-        JList<Property> propertiesList = new JList<>(properties);
+        JList<Object> propertiesList = new JList<>(properties.toArray());
 
         // Set a custom cell renderer for the list
         propertiesList.setCellRenderer(new DefaultListCellRenderer() {
