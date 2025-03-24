@@ -3,7 +3,7 @@ package propertynmoney;
 import java.awt.*;
 
 public enum PropertyColors {
-    BROWN(new Color(150,75,0)),
+    BROWN(new Color(150,75,20)),
     CYAN(Color.CYAN),
     MAGENTA(Color.MAGENTA),
     ORANGE(Color.ORANGE),

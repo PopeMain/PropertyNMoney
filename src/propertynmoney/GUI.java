@@ -36,7 +36,6 @@ public class GUI extends JFrame {
         sideBarPanel = new JPanel();
         sideBarPanel.setLayout(new BoxLayout(sideBarPanel, BoxLayout.Y_AXIS));
         paintPlayerSidePanel();
-        repaintPlayerSidePanel();
 
         this.add(sideBarPanel, BorderLayout.EAST);
 
@@ -55,13 +54,39 @@ public class GUI extends JFrame {
 
         JLabel playerNameLabel = new JLabel("Player Name:");
         JLabel playerMoneyLabel = new JLabel("Player Money:");
-        //JButton propertiesButton = new JButton("Properties");
-        //JList propertiesList = new JList();
+
+        List<Property> properties = new ArrayList<Property>();
+
+        //UPDATE to Current Player
+        //...........VVVVVVV......
+        properties = theBank.getProperties();
+        // Create the JList of properties
+        JList<Object> propertiesList = new JList<>(properties.toArray());
+
+        // Set a custom cell renderer for the list
+        propertiesList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component renderer = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                if (renderer instanceof JLabel && value instanceof Property) {
+                    JLabel label = (JLabel) renderer;
+                    Property property = (Property) value;
+
+                    // Set property name as the text
+                    label.setText(property.getName());
+
+                    // Add a colored icon to represent the property color
+                    label.setIcon(new ColorIcon(property.getColor()));
+                }
+
+                return renderer;
+            }
+        });
 
         sideBarPanel.add(playerNameLabel);
         sideBarPanel.add(playerMoneyLabel);
-        //We need to add the properties list to the player panel
-        //sideBarPanel.add(propertiesList);
+        sideBarPanel.add(new JScrollPane(propertiesList));
 
     }
 
@@ -88,44 +113,6 @@ public class GUI extends JFrame {
         actionPanel.removeAll();
     }
 
-    private void repaintPlayerSidePanel() {
-        clearSideBarPanel();
-
-        JLabel playerNameLabel = new JLabel("Player Name:");
-        JLabel playerMoneyLabel = new JLabel("Player Money:");
-
-        // Example properties (replace with your actual property list)
-        List<Property> properties = new ArrayList<Property>();
-        properties = theBank.getProperties();
-        // Create the JList of properties
-        JList<Object> propertiesList = new JList<>(properties.toArray());
-
-        // Set a custom cell renderer for the list
-        propertiesList.setCellRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                Component renderer = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-                if (renderer instanceof JLabel && value instanceof Property) {
-                    JLabel label = (JLabel) renderer;
-                    Property property = (Property) value;
-
-                    // Set property name as the text
-                    label.setText(property.getName());
-
-                    // Add a colored icon to represent the property color
-                    label.setIcon(new ColorIcon(property.getColor()));
-                }
-
-                return renderer;
-            }
-        });
-
-        // Add the components to the sidebar
-        sideBarPanel.add(playerNameLabel);
-        sideBarPanel.add(playerMoneyLabel);
-        sideBarPanel.add(new JScrollPane(propertiesList)); // Add the JList inside a scroll pane
-    }
     public static void main(String[] args) {
         new GUI();
     }
