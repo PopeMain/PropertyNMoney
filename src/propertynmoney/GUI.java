@@ -3,6 +3,11 @@ package propertynmoney;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Constructs and displays the GUI **TODO**
+ * @author Nevin Fullerton and Frank Pope
+ */
+
 public class GUI extends JFrame {
 
     private final JPanel boardPanel;
@@ -12,6 +17,9 @@ public class GUI extends JFrame {
     private Player[] players;
     private Player currentPlayer;
 
+    /**
+     * @author Nevin Fullerton
+     */
     GUI() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Property N Money");
@@ -54,26 +62,52 @@ public class GUI extends JFrame {
         this.setVisible(true);
     }
 
+    /**
+     * Paints the board Panel and updates the positions of players on the board when they move
+     * @author: Nevin Fullerton
+     * @return: Void
+     */
     private void paintBoardPanel() {
+        JPanel northPanel = new JPanel();
+        JPanel westPanel = new JPanel();
         JPanel southPanel = new JPanel();
         JPanel eastPanel = new JPanel();
 
-        southPanel.setLayout(new GridLayout(1, 9));
-        eastPanel.setLayout(new GridLayout(9, 1));
+        JPanel eastPanelHolder = new JPanel();
+        eastPanelHolder.setLayout(new BorderLayout());
+        eastPanelHolder.add(eastPanel, BorderLayout.NORTH);
 
-        boardPanel.add(eastPanel, BorderLayout.EAST);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.ipady = 100;
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+
+
+        southPanel.setLayout(new GridBagLayout());
+        eastPanel.setLayout(new GridBagLayout());
+
+
+        boardPanel.add(eastPanelHolder, BorderLayout.EAST);
+
         for (Player player : players) {
             if (player == null) {
                 break;
             }
-            else if (player.getPosition() < 10) {
+            else if (player.getPosition() < 10) { // TESTING
                 JLabel playerLabel = new JLabel(player.getName());
                 playerLabel.setPreferredSize(new Dimension(100, 50));
-                eastPanel.add(playerLabel, 0);
+                eastPanel.add(playerLabel, gbc);
+                gbc.gridy++;
+                eastPanel.add(new JLabel("Test"), gbc);
+
             }
         }
     }
 
+    /**
+     * @author Nevin Fullerton
+     */
     private void paintPlayerSidePanel() {
         clearSideBarPanel();
 
@@ -89,10 +123,16 @@ public class GUI extends JFrame {
 
     }
 
+    /**
+     * @author Nevin Fullerton
+     */
     private void clearSideBarPanel() {
         sideBarPanel.removeAll();
     }
 
+    /**
+     * @author Nevin Fullerton
+     */
     private void paintStandardButtonFrame() {
         clearActionPanel();
 
@@ -108,6 +148,9 @@ public class GUI extends JFrame {
 
     }
 
+    /**
+     * @author Nevin Fullerton
+     */
     private void clearActionPanel() {
         actionPanel.removeAll();
     }
