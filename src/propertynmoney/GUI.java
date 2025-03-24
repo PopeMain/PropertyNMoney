@@ -70,9 +70,6 @@ public class GUI extends JFrame {
      * @return: Void
      */
     private void paintBoardPanel() {
-        // Make these global variables???
-        JPanel northPanel = new JPanel();
-        JPanel westPanel = new JPanel();
         JPanel southPanel = new JPanel();
         JPanel eastPanel = new JPanel();
 
