@@ -12,14 +12,14 @@ public enum PropertyColors {
     GREEN(Color.GREEN),
     PURPLE(new Color(128, 0, 128));
 
-    private Color color;
+    private final Color pcolor;
 
     PropertyColors(Color awtcolor) {
-        this.color = awtcolor;
+        this.pcolor = awtcolor;
     }
 
     public Color getColor() {
-        return color;
+        return pcolor;
     }
 
 }

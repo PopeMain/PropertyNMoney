@@ -74,7 +74,7 @@ public class GUI extends JFrame {
                     Property property = (Property) value;
 
                     // Set property name as the text
-                    label.setText(property.getName());
+                    label.setText(property.toString());
 
                     // Add a colored icon to represent the property color
                     label.setIcon(new ColorIcon(property.getColor()));
