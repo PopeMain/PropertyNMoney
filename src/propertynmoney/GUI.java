@@ -2,8 +2,11 @@ package propertynmoney;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Constructs and displays the GUI **TODO**
@@ -20,6 +23,19 @@ public class GUI extends JFrame {
     private Player[] players;
     private Player currentPlayer;
 
+    // Panels that hold the icons of each player, to show their location on the board
+    private JPanel northPanel;
+    private JPanel northPanelHolder;
+    private JPanel southPanel;
+    private JPanel southPanelHolder;
+    private JPanel eastPanel;
+    private JPanel eastPanelHolder;
+    private JPanel westPanel;
+    private JPanel westPanelHolder;
+
+    private final int IMAGEHEIGHT;
+    private final int IMAGEWIDTH;
+
     /**
      * @author Nevin Fullerton
      */
@@ -30,11 +46,40 @@ public class GUI extends JFrame {
         this.setLocationRelativeTo(null);
         this.setLayout(new BorderLayout());
 
-        final ImageIcon gameBoard = new ImageIcon("src/GameBoard.png");
+        final ImageIcon gameBoard = new ImageIcon("src/GameBoard_Resized.png");
         players = new Player[8];
         players[0] = new Player(1500, "Nevin"); // Testing ** Remove when done
         players[1] = new Player(1500, "Frank");
-        players[0].movePosition(5); // Testing ** Remove when done
+        players[2] = new Player(1500, "Nathan");
+        players[0].movePosition(1); // Testing ** Remove when done
+        players[1].movePosition(9);
+
+        currentPlayer = players[0];
+
+        IMAGEHEIGHT = gameBoard.getIconHeight(); // TODO TESTING
+        IMAGEWIDTH = gameBoard.getIconWidth();
+
+        // Construct player holders
+        northPanel = new JPanel();
+        northPanel.setLayout(new GridBagLayout());
+        northPanelHolder = new JPanel();
+        northPanelHolder.setLayout(new BorderLayout());
+        northPanelHolder.add(northPanel, BorderLayout.WEST);
+        southPanel = new JPanel();
+        southPanel.setLayout(new GridBagLayout());
+        southPanelHolder = new JPanel();
+        southPanelHolder.setLayout(new BorderLayout());
+        southPanelHolder.add(southPanel, BorderLayout.WEST);
+        eastPanel = new JPanel();
+        eastPanelHolder = new JPanel();
+        eastPanelHolder.setLayout(new BorderLayout());
+        eastPanelHolder.add(eastPanel, BorderLayout.NORTH);
+        eastPanel.setLayout(new GridBagLayout());
+        westPanel = new JPanel();
+        westPanel.setLayout(new GridBagLayout());
+        westPanelHolder = new JPanel();
+        westPanelHolder.setLayout(new BorderLayout());
+        westPanelHolder.add(westPanel, BorderLayout.NORTH);
 
         // Construct Board Panel
         boardPanel = new JPanel();
@@ -42,9 +87,15 @@ public class GUI extends JFrame {
         boardPanel.setLayout(new BorderLayout());
         boardLabel.setIcon(gameBoard);
         boardLabel.setBounds(0, 0, gameBoard.getIconWidth(), gameBoard.getIconHeight());
-        System.out.println(gameBoard.getIconWidth());
+        System.out.println(gameBoard.getIconHeight());
         boardLabel.setVisible(true);
         boardPanel.add(boardLabel, BorderLayout.CENTER);
+
+        boardPanel.add(northPanelHolder, BorderLayout.NORTH);
+        boardPanel.add(southPanelHolder, BorderLayout.SOUTH);
+        boardPanel.add(eastPanelHolder, BorderLayout.EAST);
+        boardPanel.add(westPanelHolder, BorderLayout.WEST);
+
         paintBoardPanel();
 
         this.add(boardPanel, BorderLayout.CENTER);
@@ -67,45 +118,108 @@ public class GUI extends JFrame {
     }
 
     /**
+     * @author Nevin Fullerton
+     * @return void
+     */
+    private void rollDice() {
+        Random diceRand = new Random();
+        int dice1 = diceRand.nextInt(1,6);
+        int dice2 = diceRand.nextInt(1,6);
+        currentPlayer.movePosition(1);
+        System.out.println(dice1 + dice2);
+        System.out.println(currentPlayer.getPosition());
+        // TODO Doubles
+        paintBoardPanel();
+    }
+
+    /**
      * Paints the board Panel and updates the positions of players on the board when they move
      * @author: Nevin Fullerton
-     * @return: Void
      */
     private void paintBoardPanel() {
-        JPanel southPanel = new JPanel();
-        JPanel eastPanel = new JPanel();
-
-        JPanel eastPanelHolder = new JPanel();
-        eastPanelHolder.setLayout(new BorderLayout());
-        eastPanelHolder.add(eastPanel, BorderLayout.NORTH);
+        northPanel.removeAll();
+        southPanel.removeAll();
+        eastPanel.removeAll();
+        westPanel.removeAll();
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.ipady = 100;
-        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
 
+        // 7 1/16 inch - 15/16 = 6.125 = 86.7% of board
+        // Assign player labels to respective panel based on position
+        // 9/16
+        int adjustedHeight = (int) (IMAGEHEIGHT * 0.867); //Adjusted to remove last square on side
+        int adjustedWidth = (int) (IMAGEWIDTH * 0.867);
 
-        southPanel.setLayout(new GridBagLayout());
-        eastPanel.setLayout(new GridBagLayout());
+        // North Panel Filler
+        for (int i = 0; i < 9; i++) {
+            GridBagConstraints northPanelConstraints = new GridBagConstraints();
+            northPanelConstraints.gridx = i;
+            if (i == 0) {
+                northPanelConstraints.insets = new Insets(0, (int) (IMAGEWIDTH * (0.153)), 0,  0); // 0.153
+            } else {
+                northPanelConstraints.insets = new Insets(0, (int) (IMAGEWIDTH * (0.08 / 2)), 0, (int) (IMAGEWIDTH * (0.08 / 2))); // 0.0918
+            }
+            northPanel.add(Box.createHorizontalBox(), northPanelConstraints);
+        }
 
+        // South Panel Filler
+        for (int i = 0; i < 9; i++) {
+            GridBagConstraints southPanelConstraints = new GridBagConstraints();
+            southPanelConstraints.gridx = i;
+            if (i == 0) {
+                southPanelConstraints.insets = new Insets(0, (int) (IMAGEWIDTH * (0.153) * 2.50), 0,  0); // 0.153
+            } else if (i == 8) {
+                southPanelConstraints.insets = new Insets(0, 0, 0, 0); // 0.153
+            } else {
+                southPanelConstraints.insets = new Insets(0, (int) (IMAGEWIDTH * (0.08 / 2)), 0, (int) (IMAGEWIDTH * (0.08 / 2))); // 0.0918
+            }
+            southPanel.add(Box.createHorizontalBox(), southPanelConstraints.clone());
+        }
 
-        boardPanel.add(eastPanelHolder, BorderLayout.EAST);
+        for (int i = 0; i < 9; i++) {
+            GridBagConstraints westPanelConstraints = new GridBagConstraints();
+            westPanelConstraints.gridy = i;
+
+            if (i == 0) {
+
+            } else {
+                westPanelConstraints.insets = new Insets((int) (IMAGEWIDTH * (0.08 / 2)), 0, (int) (IMAGEWIDTH * (0.08 / 2)), 0); // 0.0918
+            }
+
+            eastPanel.add(Box.createHorizontalGlue(), westPanelConstraints);
+            westPanel.add(Box.createHorizontalGlue(), westPanelConstraints);
+        }
 
         for (Player player : players) {
-            if (player == null) {
-                break;
-            }
-            else if (player.getPosition() < 10) { // TESTING
-                JLabel playerLabel = new JLabel(player.getName());
-                System.out.println(player.getPosition());
-                gbc.gridy = player.getPosition();
-                playerLabel.setPreferredSize(new Dimension(100, 50));
-                eastPanel.add(playerLabel, gbc);
-                eastPanel.add(new JLabel("Test"), gbc);
+            if (player == null) break;
+            JLabel playerLabel = new JLabel(player.getName());
+            playerLabel.setPreferredSize(new Dimension(80, 20));
 
+            int pos = player.getPosition();
+            if (pos >= 0 && pos <= 9) { // Bottom (South Panel)
+                gbc.gridx = 9 - pos;
+                southPanel.add(playerLabel, gbc);
+            } else if (pos >= 10 && pos <= 19) { // Left (West Panel)
+                gbc.gridy = (19 - pos) % 10;
+                westPanel.add(playerLabel, gbc);
+            } else if (pos >= 20 && pos <= 29) { // Top (North Panel)
+                gbc.gridx = pos % 10;
+                northPanel.add(playerLabel, gbc);
+            } else if (pos >= 30 && pos <= 39) { // Right (East Panel)
+                gbc.gridy = pos % 10;
+                eastPanel.add(playerLabel, gbc);
             }
         }
+
+        // Refresh panels
+        northPanel.revalidate();
+        northPanel.repaint();
+        southPanel.revalidate();
+        southPanel.repaint();
+        eastPanel.revalidate();
+        eastPanel.repaint();
+        westPanel.revalidate();
+        westPanel.repaint();
     }
 
     /**
@@ -166,6 +280,14 @@ public class GUI extends JFrame {
         clearActionPanel();
 
         JButton rollDiceButton = new JButton("Roll Dice");
+        rollDiceButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                rollDice();
+            }
+        });
+
         JButton buyHousesButton = new JButton("Buy Houses");
         JButton mortgageButton = new JButton("Mortgage");
         JButton endTurnButton = new JButton("End Turn");
