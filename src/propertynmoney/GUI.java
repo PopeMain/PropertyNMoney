@@ -34,7 +34,6 @@ public class GUI extends JFrame {
     private JPanel westPanel;
     private JPanel westPanelHolder;
 
-    private final int IMAGEHEIGHT;
     private final int IMAGEWIDTH;
 
     /**
@@ -57,8 +56,7 @@ public class GUI extends JFrame {
 
         currentPlayer = players[0];
 
-        IMAGEHEIGHT = gameBoard.getIconHeight();
-        IMAGEWIDTH = gameBoard.getIconWidth();
+        IMAGEWIDTH = gameBoard.getIconWidth(); // Width same as
 
         // Construct player holders
         northPanel = new JPanel();
@@ -144,24 +142,20 @@ public class GUI extends JFrame {
         eastPanel.removeAll();
         westPanel.removeAll();
 
-        GridBagConstraints gbc = new GridBagConstraints();
 
-        // 7 1/16 inch - 15/16 = 6.125 = 86.7% of board
-        // Assign player labels to respective panel based on position
-        // 9/16
-        int adjustedHeight = (int) (IMAGEHEIGHT * 0.867); //Adjusted to remove last square on side
-        int adjustedWidth = (int) (IMAGEWIDTH * 0.867);
-
-        // North Panel Filler
+        // North Panel Filler - Needed so that there is always space between grid positions
         for (int i = 0; i < 10; i++) {
             GridBagConstraints northPanelConstraints = new GridBagConstraints();
             northPanelConstraints.gridx = i;
+
+            //Set spacing between grid spaces
             if (i == 0) {
                 northPanelConstraints.insets = new Insets(0, (int) (IMAGEWIDTH * (0.153) + 80), 0,  0); // 0.153
             } else {
                 northPanelConstraints.insets = new Insets(0, (int) (IMAGEWIDTH * (0.08 / 2)), 0, (int) (IMAGEWIDTH * (0.08 / 2))); // 0.0918
             }
-            northPanel.add(Box.createHorizontalBox(), northPanelConstraints);
+
+            northPanel.add(Box.createHorizontalBox(), northPanelConstraints); // Empty space
         }
 
         // South Panel Filler
@@ -169,17 +163,16 @@ public class GUI extends JFrame {
             GridBagConstraints southPanelConstraints = new GridBagConstraints();
             southPanelConstraints.gridx = i;
 
+            //
             if (i == 0) {
-//                southPanelConstraints.anchor = GridBagConstraints.EAST;
                 southPanelConstraints.insets = new Insets(0, 0, 0,  (int) (IMAGEWIDTH * (0.153) + 125)); // 0.153
             } else if (i == 9) {
                 southPanelConstraints.insets = new Insets(0, 0, 0, 0); // 0.0918
             } else {
-//                southPanelConstraints.anchor = GridBagConstraints.EAST;
                 southPanelConstraints.insets = new Insets(0, (int) (IMAGEWIDTH * (0.06 / 2)), 0, (int) (IMAGEWIDTH * (0.06 / 2))); // 0.0918
             }
 
-            southPanel.add(Box.createHorizontalBox(), southPanelConstraints);
+            southPanel.add(Box.createHorizontalBox(), southPanelConstraints); // Empty space
         }
 
         // West Panel Filler
@@ -211,6 +204,8 @@ public class GUI extends JFrame {
             eastPanel.add(Box.createHorizontalGlue(), eastPanelConstraints);
         }
 
+        GridBagConstraints gbc = new GridBagConstraints();
+
         gbc.gridy = 11;
         gbc.gridx = 0;
         gbc.insets = new Insets(0, 80, 0, 0); // Forces left side to always be 80 width
@@ -218,7 +213,7 @@ public class GUI extends JFrame {
         gbc.insets = new Insets(0, 0, 0, 0);
 
         for (Player player : players) {
-            if (player == null) break;
+            if (player == null) break; // TODO Make this take account of player out
             JLabel playerLabel = new JLabel(player.getName());
             playerLabel.setPreferredSize(new Dimension(80, 20));
 
