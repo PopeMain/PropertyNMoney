@@ -19,7 +19,7 @@ public class Bank {
         List<PropertyColors> colors = asList(PropertyColors.values());
         for(PropertyNames p : PropertyNames.values() ){
             if(counter > differentcolors[index]) {index++; counter = 1;}
-            properties.add(new Property(100,p, colors.get(index)));
+            properties.add(new Property(p.getBuyValue(),p, colors.get(index)));
             counter++;
         }
     }

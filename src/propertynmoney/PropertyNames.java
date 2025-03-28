@@ -12,7 +12,7 @@ package propertynmoney;
  * <p>
  * - A unique display name representing the property's name.
  * <p>
- * - The Color assoicated with the property
+ * - The Color associated with the property
  * <p>
  * - The purchase value of the property.
  * <p>
@@ -57,7 +57,7 @@ public enum PropertyNames {
     INDIANA_AVE("Indiana Ave", 220),
     /** INDIANA_AVE - "Illisnois Ave" -RED- 240 */
     ILLINOIS_AVE("Illisnois Ave", 240),
-    /** ATLANTIC_AVE - "Atlanic Ave" -YELLOW'- 260 */
+    /** ATLANTIC_AVE - "Atlanic Ave" -YELLOW- 260 */
     ATLANTIC_AVE("Atlanic Ave", 260),
     /** VENTNOR_AVE - "Ventor Ave" -YELLOW- 260 */
     VENTNOR_AVE("Ventor Ave", 260),
@@ -82,11 +82,19 @@ public enum PropertyNames {
         this.buyValue = buyVal;
     }
 
+    /**
+     * toString: gets the display name for the property
+     * @return displayName
+     */
     @Override
     public String toString(){
         return displayName;
     }
 
+    /**
+     * getBuyValue: gets the predetermined value for the property
+     * @return buyValue
+     */
     public int getBuyValue() {
         return buyValue;
     }
