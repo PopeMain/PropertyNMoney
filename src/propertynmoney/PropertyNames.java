@@ -1,8 +1,9 @@
 package propertynmoney;
 
 /**
- * @author: Frank Pope and Nevin Fullerton
- * @enum: PropertyNames:
+ * @author Frank Pope
+ * @author Nevin Fullerton
+ * @enum PropertyNames:
  * <p>
  * The PropertyNames enum is the collection of properties by Name.
  * Each property name is associated with its display name, property color,
@@ -77,14 +78,20 @@ public enum PropertyNames {
     private final String displayName;
     private final int buyValue;
 
+    /**
+     * TODO Finish JAva Doc for Constructor
+     * TODO Add PRoperty Colors to this
+     * @param displayName- the string name of the property
+     * @param buyVal- the int value to buy the property
+     */
     PropertyNames(String displayName, int buyVal){
         this.displayName = displayName;
         this.buyValue = buyVal;
     }
 
     /**
-     * toString: gets the display name for the property
-     * @return displayName
+     * Gets the display name for the property
+     * @return Name of the Property
      */
     @Override
     public String toString(){
@@ -92,8 +99,8 @@ public enum PropertyNames {
     }
 
     /**
-     * getBuyValue: gets the predetermined value for the property
-     * @return buyValue
+     * Gets the predetermined value for the property
+     * @return The value of the property
      */
     public int getBuyValue() {
         return buyValue;

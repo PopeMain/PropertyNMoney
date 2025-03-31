@@ -3,13 +3,11 @@ import propertynmoney.Property;
 
 import java.util.ArrayList;
 import java.util.List;
-/*
-Auth: Frank Pope
-GroupID: The Capitalists
-Notes: This is currently Bullshit Code that can be used to store info specific to each player.
+/**
+ * @author Frank Pope
+ *
+ * Notes: This is currently Bullshit Code that can be used to store info specific to each player.
  */
-
-
 public class Player {
     int money;
     int position;
