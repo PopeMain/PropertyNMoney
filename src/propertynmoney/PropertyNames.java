@@ -1,5 +1,7 @@
 package propertynmoney;
 
+import java.awt.*;
+
 /**
  * @author Frank Pope
  * @author Nevin Fullerton
@@ -31,62 +33,64 @@ package propertynmoney;
  */
 public enum PropertyNames {
     /** MEDITERRANEAN_AVE - "Mediterranean Ave" -BROWN- 60 */
-    MEDITERRANEAN_AVE("Mediterranean Ave",60),
+    MEDITERRANEAN_AVE("Mediterranean Ave", PropertyColors.BROWN,60),
     /** BALTIC_AVE - "Baltic Ave" -BROWN- 60 */
-    BALTIC_AVE("Baltic Ave",60),
+    BALTIC_AVE("Baltic Ave", PropertyColors.BROWN,60),
     /** ORIENTAL_AVE - "Oriental Ave" -CYAN- 100 */
-    ORIENTAL_AVE("Oriental Ave", 100),
+    ORIENTAL_AVE("Oriental Ave", PropertyColors.CYAN,100),
     /** VERMONT_AVE - "Vermont Ave" -CYAN- 100 */
-    VERMONT_AVE("Vermont Ave", 100),
+    VERMONT_AVE("Vermont Ave", PropertyColors.CYAN,100),
     /** CONNECTICUT_AVE - "Connecticut Ave" -CYAN- 120 */
-    CONNECTICUT_AVE("Connecticut Ave", 120),
+    CONNECTICUT_AVE("Connecticut Ave", PropertyColors.CYAN,120),
     /** ST_CHARLES_PL - "St. Charles Pl" -MAGENTA- 140 */
-    ST_CHARLES_PL("St. Charles Pl", 140),
+    ST_CHARLES_PL("St. Charles Pl", PropertyColors.MAGENTA,140),
     /** STATES_AVE - "States Ave" -MAGENTA- 140 */
-    STATES_AVE("States Ave", 140),
+    STATES_AVE("States Ave", PropertyColors.MAGENTA,140),
     /** VIRGINIA_AVE - "Virginia Ave" -MAGENTA- 160 */
-    VIRGINIA_AVE("Virginia Ave", 160),
+    VIRGINIA_AVE("Virginia Ave", PropertyColors.MAGENTA,160),
     /** ST_JAMES_PL - "St. James Pl" -ORANGE- 180 */
-    ST_JAMES_PL("St. James Pl", 180),
+    ST_JAMES_PL("St. James Pl", PropertyColors.ORANGE,180),
     /** TENNESSEE_AVE - "Tennessee Ave" -ORANGE- 180 */
-    TENNESSEE_AVE("Tennessee Ave", 180),
+    TENNESSEE_AVE("Tennessee Ave", PropertyColors.ORANGE,180),
     /** NEW_YORK_AVE - "New York Ave" -ORANGE- 200 */
-    NEW_YORK_AVE("New York Ave", 200),
+    NEW_YORK_AVE("New York Ave", PropertyColors.ORANGE,200),
     /** KENTUCKY_AVE - "Kentucky Ave" -RED- 220 */
-    KENTUCKY_AVE("Kentucky Ave", 220),
+    KENTUCKY_AVE("Kentucky Ave", PropertyColors.RED,220),
     /** INDIANA_AVE - "Indiana Ave" -RED- 220 */
-    INDIANA_AVE("Indiana Ave", 220),
+    INDIANA_AVE("Indiana Ave", PropertyColors.RED,220),
     /** INDIANA_AVE - "Illisnois Ave" -RED- 240 */
-    ILLINOIS_AVE("Illisnois Ave", 240),
+    ILLINOIS_AVE("Illisnois Ave", PropertyColors.RED,240),
     /** ATLANTIC_AVE - "Atlanic Ave" -YELLOW- 260 */
-    ATLANTIC_AVE("Atlanic Ave", 260),
+    ATLANTIC_AVE("Atlanic Ave", PropertyColors.YELLOW,260),
     /** VENTNOR_AVE - "Ventor Ave" -YELLOW- 260 */
-    VENTNOR_AVE("Ventor Ave", 260),
+    VENTNOR_AVE("Ventor Ave", PropertyColors.YELLOW,260),
     /** MARVIN_GAR - "Marvin Gardens" -YELLOW- 280 */
-    MARVIN_GAR("Marvin Gardens", 280),
+    MARVIN_GAR("Marvin Gardens", PropertyColors.YELLOW,280),
     /** PACIFIC_AVE - "Pacific Ave" -GREEN- 300 */
-    PACIFIC_AVE("Pacific Ave", 300),
+    PACIFIC_AVE("Pacific Ave", PropertyColors.GREEN,300),
     /** NORTH_CAROLINA_AVE - "North Carolina Ave" -GREEN- 300 */
-    NORTH_CAROLINA_AVE("North Carolina Ave", 300),
+    NORTH_CAROLINA_AVE("North Carolina Ave", PropertyColors.GREEN,300),
     /** PENNSYLVANIA_AVE - "Pennsylvania Ave" -GREEN- 320 */
-    PENNSYLVANIA_AVE("Pennsylvania Ave", 320),
+    PENNSYLVANIA_AVE("Pennsylvania Ave", PropertyColors.GREEN,320),
     /** PARK_PL - "Park Pl" -PURPLE- 350 */
-    PARK_PL("Park Pl", 350),
+    PARK_PL("Park Pl", PropertyColors.PURPLE,350),
     /** BOARDWALK - "Boardwalk" -PURPLE- 400 */
-    BOARDWALK("Boardwalk", 400);
+    BOARDWALK("Boardwalk", PropertyColors.PURPLE,400);
 
     private final String displayName;
     private final int buyValue;
+    private final PropertyColors pColor;
 
     /**
-     * TODO Finish JAva Doc for Constructor
-     * TODO Add PRoperty Colors to this
+     * TODO Finish JAva Doc for Constructon
      * @param displayName- the string name of the property
+     * @param color the display color for the property from the PropertyColors Enum
      * @param buyVal- the int value to buy the property
      */
-    PropertyNames(String displayName, int buyVal){
+    PropertyNames(String displayName, PropertyColors color, int buyVal){
         this.displayName = displayName;
         this.buyValue = buyVal;
+        this.pColor = color;
     }
 
     /**
@@ -104,5 +108,13 @@ public enum PropertyNames {
      */
     public int getBuyValue() {
         return buyValue;
+    }
+
+    /**
+     * Gets the java.awt.Color from the PropertyColors Enum.
+     * @return the color from the property
+     */
+    public Color getColor(){
+        return pColor.getColor();
     }
 }

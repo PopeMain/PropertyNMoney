@@ -1,18 +1,18 @@
 package propertynmoney;
 
+import java.awt.*;
+
 public class Property {
     int buyValue;
     private final PropertyNames name;
-    private final PropertyColors color;
     private boolean purchased;
 
     enum Houses {MORTGAGE, ZERO, ONE, TWO, THREE, FOUR, HOTEL}
     private Houses homes;
 
-    public Property(int value, PropertyNames name, PropertyColors color) {
+    public Property(int value, PropertyNames name) {
         this.buyValue = value;
         this.name = name;
-        this.color = color;
         this.purchased = false;
         this.homes = Houses.ZERO;
     }
@@ -20,12 +20,8 @@ public class Property {
         return name.toString();
     }
 
-    public PropertyColors getColorEnum() {
-        return color;
-    }
-
-    public java.awt.Color getColor() {
-        return color.getColor();
+    public Color getColor(){
+        return name.getColor();
     }
 
     @Override
@@ -80,6 +76,24 @@ public class Property {
             }
         } else {
             homes = Houses.ZERO;
+        }
+    }
+
+    public void removeHomes() {
+        if (homes != Houses.MORTGAGE){
+            if (homes == Houses.HOTEL) {
+                homes = Houses.FOUR;
+            } else if (homes == Houses.FOUR) {
+                homes = Houses.THREE;
+            } else if (homes == Houses.THREE) {
+                homes = Houses.TWO;
+            } else if (homes == Houses.TWO) {
+                homes = Houses.ONE;
+            } else if (homes == Houses.ONE) {
+                homes = Houses.ZERO;
+            } else {
+                homes = Houses.MORTGAGE;
+            }
         }
     }
 }
