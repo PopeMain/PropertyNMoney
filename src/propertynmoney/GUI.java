@@ -133,12 +133,33 @@ public class GUI extends JFrame {
         Random diceRand = new Random();
         int dice1 = diceRand.nextInt(1,6);
         int dice2 = diceRand.nextInt(1,6);
-        players[currentPlayer].movePosition(dice1 + dice2);
+
+        boolean passedGo = players[currentPlayer].movePosition(dice1 + dice2);
+
         diceRolled = true;
+
+        if (passedGo) {
+            JOptionPane.showMessageDialog(this, "You passed go! Collect $200.");
+            players[currentPlayer].addMoney(200);
+        }
+
         // TODO Doubles
+        JOptionPane.showMessageDialog(this, "You rolled a " + dice1 + ", and a " + dice2);
         determineMovementResult();
         paintBoardPanel();
         paintPlayerSidePanel();
+    }
+
+    private boolean rollJailDice() {
+        Random diceRand = new Random();
+        int dice1 = diceRand.nextInt(1,6);
+        int dice2 = diceRand.nextInt(1,6);
+        players[currentPlayer].movePosition(dice1 + dice2);
+        diceRolled = true;
+
+        JOptionPane.showMessageDialog(this, "You rolled a " + dice1 + ", and a " + dice2);
+
+        return dice1 == dice2;
     }
 
     /**
@@ -147,6 +168,10 @@ public class GUI extends JFrame {
      * and position.
      */
     private void endTurn() {
+        if (players[currentPlayer].isInJail()) {
+            players[currentPlayer].setTurnsInJail(players[currentPlayer].getTurnsInJail() + 1);
+        }
+
         boolean nextPlayerFound = false;
         while (!nextPlayerFound) {
             if (currentPlayer == amountOfPlayers) {
@@ -162,7 +187,6 @@ public class GUI extends JFrame {
 
         diceRolled = false;
         paintPlayerSidePanel();
-
     }
 
     /**
@@ -219,16 +243,13 @@ public class GUI extends JFrame {
             TaxTile tax = (TaxTile) tile;
             JOptionPane.showMessageDialog(this, "You must pay a tax of " + tax.getTaxAmount() + ".");
             player.subMoney(tax.getTaxAmount());
+        } else if (tile.getTileType() == TileTypes.GOTOJAIL) {
+            JOptionPane.showMessageDialog(this, "You were caught breaking the law, go to jail. Do not collect 200$.");
+            player.setInJail(true);
+            player.moveSpecificPosition(10);
         }
 
         paintPlayerSidePanel();
-    }
-
-    /**
-     *
-     */
-    private void buyProperty() {
-
     }
 
     /**
@@ -266,7 +287,7 @@ public class GUI extends JFrame {
         tiles[27] = new Property(260, PropertyNames.VENTNOR_AVE, PropertyColors.YELLOW);
         tiles[28] = new Utility(150, "Water Works");
         tiles[29] = new Property(280, PropertyNames.MARVIN_GAR, PropertyColors.YELLOW);
-        tiles[30] = new Tile(TileTypes.GOTOJAIL); // Placeholder
+        tiles[30] = new Tile(TileTypes.GOTOJAIL);
         tiles[31] = new Property(300, PropertyNames.PACIFIC_AVE, PropertyColors.GREEN);
         tiles[32] = new Property(300, PropertyNames.NORTH_CAROLINA_AVE, PropertyColors.GREEN);
         tiles[33] = new Tile(TileTypes.COMMUNITYCHEST); // Placeholder
@@ -511,6 +532,64 @@ public class GUI extends JFrame {
         actionPanel.add(mortgageButton);
         actionPanel.add(endTurnButton);
 
+    }
+
+    private void paintJailButtonFrame() {
+        clearActionPanel();
+
+        JButton rollDiceButton = new JButton("Roll Doubles to get out");
+        rollDiceButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (diceRolled) {
+                    JOptionPane.showMessageDialog(boardPanel, "You have already rolled this turn.");
+                } else {
+                    boolean gotOut = rollJailDice();
+                }
+            }
+        });
+
+        JButton payFineButton = new JButton("Pay Fine and roll dice");
+        payFineButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(boardPanel, "You paid a fine of $50 to get out.");
+                players[currentPlayer].setInJail(false);
+                players[currentPlayer].setTurnsInJail(0);
+                players[currentPlayer].subMoney(50);
+
+                rollDice();
+                paintStandardButtonFrame();
+            }
+        });
+
+        JButton buyHousesButton = new JButton("Buy Houses");
+        JButton mortgageButton = new JButton("Mortgage");
+        JButton endTurnButton = new JButton("End Turn");
+        endTurnButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!diceRolled) {
+                    JOptionPane.showMessageDialog(boardPanel, "You must roll the dice before you end the turn.");
+                } else if (players[currentPlayer].getTurnsInJail() == 3) {
+                    JOptionPane.showMessageDialog(boardPanel, "You must pay fine and roll dice before you end the turn, or use other methods if available.");
+                } else {
+                    endTurn();
+                }
+            }
+
+        });
+
+        actionPanel.add(rollDiceButton);
+        actionPanel.add(payFineButton);
+        actionPanel.add(buyHousesButton);
+        actionPanel.add(mortgageButton);
+        actionPanel.add(endTurnButton);
+
+        actionPanel.revalidate();
+        actionPanel.repaint();
     }
 
     /**

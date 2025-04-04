@@ -1,6 +1,7 @@
 package propertynmoney;
 import propertynmoney.Property;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 /*
@@ -15,6 +16,7 @@ public class Player {
     int position;
     String name;
     boolean inJail;
+    int turnsInJail;
     boolean bankrupt;
     List<Property> properties;
     List<Utility> utilities;
@@ -27,6 +29,7 @@ public class Player {
         this.name = name;
         this.position = 0;
         this.inJail = false;
+        this.turnsInJail = 0;
         this.bankrupt = false;
         this.properties = new ArrayList<Property>();
         this.utilities =  new ArrayList<Utility>();
@@ -39,8 +42,21 @@ public class Player {
     public void subMoney(int money) {this.money -= money;}
 
     public int getPosition() {return position;}
-    public void movePosition(int rollValue){
+    public boolean movePosition(int rollValue){
+        int lastPosition = position;
         position = (position + rollValue) % 40;
+
+        return lastPosition + rollValue >= 40 && !inJail; // Check if player passed go, if true, give player $200
+    }
+    public boolean moveSpecificPosition(int position) {
+        int lastPosition = this.position;
+        this.position = position;
+
+        if (position > lastPosition)
+            return false;
+        else
+            return true;
+
     }
 
     public boolean isBankrupt() {return bankrupt;}
@@ -54,5 +70,8 @@ public class Player {
 
     public List<Utility> getUtilities() {return utilities;}
     public void addUtility(Utility utility) {this.utilities.add(utility);}
+
+    public int getTurnsInJail() {return turnsInJail;}
+    public void setTurnsInJail(int turns) {this.turnsInJail = turns;}
 
 }
