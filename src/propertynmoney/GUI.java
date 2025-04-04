@@ -150,6 +150,12 @@ public class GUI extends JFrame {
         paintPlayerSidePanel();
     }
 
+    /**
+     * Produces two different integer values, each from 1-6, checks if the dice share the same value. If true, get the
+     * player out of jail and move them by the sum of the dice, else keep the player in jail and do not move the player.
+     * It will then disable rolling for the current player, and allow them to end turn and other actions.
+     * @return A boolean that represents if the dice were double
+     */
     private boolean rollJailDice() {
         Random diceRand = new Random();
         int dice1 = diceRand.nextInt(1,6);
@@ -158,6 +164,8 @@ public class GUI extends JFrame {
         diceRolled = true;
 
         JOptionPane.showMessageDialog(this, "You rolled a " + dice1 + ", and a " + dice2);
+
+
 
         return dice1 == dice2;
     }
@@ -183,6 +191,12 @@ public class GUI extends JFrame {
             if (!players[currentPlayer].isBankrupt()) {
                 nextPlayerFound = true;
             }
+        }
+
+        if (players[currentPlayer].isInJail()) {
+            paintJailButtonFrame();
+        } else {
+            paintStandardButtonFrame();
         }
 
         diceRolled = false;
@@ -247,6 +261,7 @@ public class GUI extends JFrame {
             JOptionPane.showMessageDialog(this, "You were caught breaking the law, go to jail. Do not collect 200$.");
             player.setInJail(true);
             player.moveSpecificPosition(10);
+            paintJailButtonFrame();
         }
 
         paintPlayerSidePanel();
