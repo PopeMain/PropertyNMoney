@@ -55,8 +55,6 @@ public class GUI extends JFrame {
         players[0] = new Player(1500, "Nevin"); // Testing ** Remove when done
         players[1] = new Player(1500, "Frank");
         players[2] = new Player(1500, "Nathan");
-        players[0].movePosition(1); // Testing ** Remove when done
-        players[1].movePosition(9);
 
         currentPlayer = 0;
         amountOfPlayers = 2;
@@ -217,6 +215,10 @@ public class GUI extends JFrame {
                 }
 
             }
+        } else if (tile.getTileType() == TileTypes.TAX) {
+            TaxTile tax = (TaxTile) tile;
+            JOptionPane.showMessageDialog(this, "You must pay a tax of " + tax.getTaxAmount() + ".");
+            player.subMoney(tax.getTaxAmount());
         }
 
         paintPlayerSidePanel();
@@ -238,7 +240,7 @@ public class GUI extends JFrame {
         tiles[1] = new Property(60, PropertyNames.MEDITERRANEAN_AVE, PropertyColors.BROWN);
         tiles[2] = new Tile(TileTypes.COMMUNITYCHEST); // Placeholder
         tiles[3] = new Property(60, PropertyNames.BALTIC_AVE, PropertyColors.BROWN);
-        tiles[4] = new Tile(TileTypes.TAX); // Placeholder
+        tiles[4] = new TaxTile(200);
         tiles[5] = new Utility(200, "RailRoad 1");
         tiles[6] = new Property(100, PropertyNames.ORIENTAL_AVE, PropertyColors.CYAN);
         tiles[7] = new Tile(TileTypes.CHANCE); // Placeholder
@@ -272,7 +274,7 @@ public class GUI extends JFrame {
         tiles[35] = new Utility(200, "Railroad 4");
         tiles[36] = new Tile(TileTypes.CHANCE); // Placeholder
         tiles[37] = new Property(350, PropertyNames.PARK_PL, PropertyColors.BLUE);
-        tiles[38] = new Tile(TileTypes.TAX); // Placeholder
+        tiles[38] = new TaxTile(100);
         tiles[39] = new Property(400, PropertyNames.BOARDWALK, PropertyColors.BLUE);
     }
 
