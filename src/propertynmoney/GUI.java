@@ -9,7 +9,28 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Constructs and displays the GUI **TODO**
+ * Constructs, displays GUI, and manages the game. The GUI is separated into three parts, boardPanel, sideBarPanel, and
+ * actionPanel. Board Panel displays the game board and the locations of all players still in the game, sideBarPanel
+ * displays the current player's name, money amount, and a list of owned properties, actionPanel displays buttons of that
+ * the current player is able to do. Any information that needs to be displayed to the player are displayed using
+ * JOptionPanes. At the start of the game, a box will appear which will ask the user or users how many players are in
+ * the game, then it will ask how many players are computer controlled, then the program will ask the name of each player
+ * one by one. Finally, the program will start up the game, giving each player $1500 and starting their position at the
+ * start. Starting with the first player, the player will have multiple buttons on the bottom to click on, rolling dice
+ * which will roll dice and move the current player by the sum of the dice, buy houses which will allow the player to buy
+ * houses on a property where they own all properties of one color by selecting the property in the side panel and clicking
+ * the button, the mortgage button allows the current player to select any property they own and get half of its value
+ * in to cash with the cost of having the property unable to collect rent until the mortgage is paid back, and the end
+ * turn button allows the player to end their turn after they have rolled the dice and allows the program to change the
+ * next player to the next player. Upon rolling dice, the program will move the player by the sum of the dice and will
+ * take the players position and check which tile they landed on in the tiles array. If property, the program will check
+ * if the property is owned, if false allow the user to purchase the property for the value of the house, if user purchases
+ * give the player the property and subtract the money from their account, else if the property is owned, the player must
+ * pay rent to the owner. If the player lands on a tax tile, they must pay the value of the tax. If the tile is a utility,
+ * the process is the same as property. If the player lands on a chance or community chest tile, pull a random card and
+ * put the effect on the player or players, which can include giving money, paying money, moving player, going to jail.
+ * If the player lands on the go-to jail tile, the player is put into jail. If the player lands or passes the GO tile,
+ * give the player $200.
  * @author Nevin Fullerton and Frank Pope
  */
 
@@ -20,13 +41,13 @@ public class GUI extends JFrame {
     private final JPanel actionPanel;
     private final Bank theBank = new Bank();
 
-    private Player[] players;
-    private int currentPlayer;
+    private Player[] players; // Holds the players in the game
+    private int currentPlayer; // The index of the current player in the array of players
     private int amountOfPlayers; // Amount of players - 1
-    private boolean diceRolled;
-    private int doubleAmount;
+    private boolean diceRolled; // If dice have been rolled this turn
+    private int doubleAmount; // Used to detect if player is speeding
 
-    private Tile[] tiles;
+    private Tile[] tiles; // When the player moves, the position will be used as an index to determine what should happen to player
 
     // Panels that hold the icons of each player, to show their location on the board
     private JPanel northPanel;
@@ -41,7 +62,7 @@ public class GUI extends JFrame {
     private final int IMAGEWIDTH;
 
     /**
-     * @author Nevin Fullerton
+     *
      */
     GUI() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -125,9 +146,9 @@ public class GUI extends JFrame {
 
     /**
      * Produces two different integer values, each from 1-6, and moves the current player by the sum of the dice.
-     * It will then disable rolling for the current player, and allow them to end turn and other actions If the two
-     * integers have equals values, allow player to roll dice again, but if the player has three doubles in a row,
-     * put them in jail for speeding.
+     * It will then disable rolling for the current player, and allow them to end turn and perform other actions.
+     * If the two integers have equals values, allow player to roll dice again, but if the player has three doubles
+     * in a row, put them in jail for speeding.
      */
     private void rollDice() {
         Random diceRand = new Random();
@@ -269,6 +290,7 @@ public class GUI extends JFrame {
 
     /**
      * Sets up the tile array manually so that when the player moves, the game can figure out actions to do afterward.
+     * Includes the information of each property, value, name, color,
      */
     private void setUpTiles() {
         tiles = new Tile[40];
@@ -315,7 +337,7 @@ public class GUI extends JFrame {
     }
 
     /**
-     * Paints the board Panel and updates the positions of players on the board when they move
+     * Paints the board Panel and updates the positions of players on the board when they move.
      */
     private void paintBoardPanel() {
         northPanel.removeAll();
@@ -444,8 +466,8 @@ public class GUI extends JFrame {
         JLabel playerMoneyLabel = new JLabel("Player Money: " + playerMoney);
         JLabel playerPositionLabel = new JLabel("Player Position: " + playerPosition);
 
-        List<Property> properties = new ArrayList<Property>();
-        List<Utility> utilities = new ArrayList<Utility>();
+        List<Property> properties;
+        List<Utility> utilities;
 
         properties = players[currentPlayer].getProperties();
         utilities = players[currentPlayer].getUtilities();
