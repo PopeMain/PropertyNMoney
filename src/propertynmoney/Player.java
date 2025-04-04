@@ -15,6 +15,7 @@ public class Player {
     int position;
     String name;
     boolean inJail;
+    boolean bankrupt;
     List<Property> properties;
 
     public Player(int money, String name) {
@@ -25,6 +26,7 @@ public class Player {
         this.name = name;
         this.position = 0;
         this.inJail = false;
+        this.bankrupt = false;
         this.properties = new ArrayList<Property>();
     }
 
@@ -39,5 +41,13 @@ public class Player {
         position = (position + rollValue) % 40;
     }
 
+    public boolean isBankrupt() {return bankrupt;}
+    public void setBankrupt(boolean bankrupt) {this.bankrupt = bankrupt;}
+
+    public boolean isInJail() {return inJail;}
+    public void setInJail(boolean inJail) {this.inJail = inJail;}
+
+    public List<Property> getProperties() {return properties;}
+    public void addProperty(Property property) {this.properties.add(property);}
 
 }

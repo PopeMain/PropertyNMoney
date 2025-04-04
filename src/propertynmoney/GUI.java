@@ -1,7 +1,6 @@
 package propertynmoney;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,7 +21,12 @@ public class GUI extends JFrame {
     private final Bank theBank = new Bank();
 
     private Player[] players;
-    private Player currentPlayer;
+    private int currentPlayer;
+    private int amountOfPlayers; // Amount of players - 1
+    private boolean diceRolled;
+    private int doubleAmount;
+
+    private Tile[] tiles;
 
     // Panels that hold the icons of each player, to show their location on the board
     private JPanel northPanel;
@@ -54,7 +58,8 @@ public class GUI extends JFrame {
         players[0].movePosition(1); // Testing ** Remove when done
         players[1].movePosition(9);
 
-        currentPlayer = players[0];
+        currentPlayer = 0;
+        amountOfPlayers = 2;
 
         IMAGEWIDTH = gameBoard.getIconWidth(); // Width same as
 
@@ -96,6 +101,7 @@ public class GUI extends JFrame {
         boardPanel.add(eastPanelHolder, BorderLayout.EAST);
         boardPanel.add(westPanelHolder, BorderLayout.WEST);
 
+        setUpTiles();
         paintBoardPanel();
 
         this.add(boardPanel, BorderLayout.CENTER);
@@ -120,21 +126,139 @@ public class GUI extends JFrame {
     }
 
     /**
-     * @author Nevin Fullerton
-     * @return void
+     * Produces two different integer values, each from 1-6, and moves the current player by the sum of the dice.
+     * It will then disable rolling for the current player, and allow them to end turn and other actions If the two
+     * integers have equals values, allow player to roll dice again, but if the player has three doubles in a row,
+     * put them in jail for speeding.
      */
     private void rollDice() {
         Random diceRand = new Random();
         int dice1 = diceRand.nextInt(1,6);
         int dice2 = diceRand.nextInt(1,6);
-        currentPlayer.movePosition(dice1 + dice2);
+        players[currentPlayer].movePosition(dice1 + dice2);
+        diceRolled = true;
         // TODO Doubles
+        determineMovementResult();
         paintBoardPanel();
+        paintPlayerSidePanel();
+    }
+
+    /**
+     * Will end the turn of the current player and pass onto the next player that is not eligible, making them the
+     * current player. The side panel is then updated to show the new current player's money, properties, name,
+     * and position.
+     */
+    private void endTurn() {
+        boolean nextPlayerFound = false;
+        while (!nextPlayerFound) {
+            if (currentPlayer == amountOfPlayers) {
+                currentPlayer = 0;
+            } else {
+                currentPlayer++;
+            }
+
+            if (!players[currentPlayer].isBankrupt()) {
+                nextPlayerFound = true;
+            }
+        }
+
+        diceRolled = false;
+        paintPlayerSidePanel();
+
+    }
+
+    /**
+     * Will determine which position the player is on, and will react accordingly to what type of tile the player is on,
+     * if property or utility either allow player to buy or make them pay rent to owner, if chance card
+     */
+    private void determineMovementResult() {
+        Player player = players[currentPlayer];
+        Tile tile = tiles[player.getPosition()];
+
+        if (tile.getTileType() == TileTypes.PROPERTY) {
+            Property property = (Property) tile;
+            if (property.isOwned()) {
+                JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue() + " to stay here.");
+                player.subMoney(property.getRentValue());
+            } else {
+                if (property.getBuyValue() > player.getMoney()) {
+                    JOptionPane.showMessageDialog(this, "You don't have enough money to buy this property.");
+                } else {
+                    int result = JOptionPane.showConfirmDialog(this, "Do you wish to buy property for " + property.getBuyValue() + " ?");
+                    if (result == JOptionPane.YES_OPTION) {
+                        JOptionPane.showMessageDialog(this, player.getName() +  " now owns " + property.getName());
+                        player.subMoney(property.getBuyValue());
+                        player.addProperty(property);
+                        property.setOwner(player);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "You don't wish to buy this property.");
+                    }
+                }
+
+            }
+        } else if (tile.getTileType() == TileTypes.UTILITY) {
+
+        }
+
+        paintPlayerSidePanel();
+    }
+
+    /**
+     *
+     */
+    private void buyProperty() {
+
+    }
+
+    /**
+     * Sets up the tile array manually so that when the player moves, the game can figure out actions to do afterward.
+     */
+    private void setUpTiles() {
+        tiles = new Tile[40];
+        tiles[0] = new Tile(TileTypes.PARKING);
+        tiles[1] = new Property(60, PropertyNames.MEDITERRANEAN_AVE, PropertyColors.BROWN);
+        tiles[2] = new Tile(TileTypes.COMMUNITYCHEST); // Placeholder
+        tiles[3] = new Property(60, PropertyNames.BALTIC_AVE, PropertyColors.BROWN);
+        tiles[4] = new Tile(TileTypes.TAX); // Placeholder
+        tiles[5] = new Tile(TileTypes.UTILITY); // Placeholder
+        tiles[6] = new Property(100, PropertyNames.ORIENTAL_AVE, PropertyColors.CYAN);
+        tiles[7] = new Tile(TileTypes.CHANCE); // Placeholder
+        tiles[8] = new Property(100, PropertyNames.VERMONT_AVE, PropertyColors.CYAN);
+        tiles[9] = new Property(120, PropertyNames.CONNECTICUT_AVE, PropertyColors.CYAN);
+        tiles[10] = new Tile(TileTypes.PARKING);
+        tiles[11] = new Property(140, PropertyNames.ST_CHARLES_PL, PropertyColors.MAGENTA);
+        tiles[12] = new Tile(TileTypes.UTILITY); // Placeholder
+        tiles[13] = new Property(140, PropertyNames.STATES_AVE, PropertyColors.MAGENTA);
+        tiles[14] = new Property(160, PropertyNames.VIRGINIA_AVE, PropertyColors.MAGENTA);
+        tiles[15] = new Tile(TileTypes.UTILITY); // Placeholder
+        tiles[16] = new Property(180, PropertyNames.ST_JAMES_PL, PropertyColors.ORANGE);
+        tiles[17] = new Tile(TileTypes.COMMUNITYCHEST); // Placeholder
+        tiles[18] = new Property(180, PropertyNames.TENNESSEE_AVE, PropertyColors.ORANGE);
+        tiles[19] = new Property(200, PropertyNames.NEW_YORK_AVE, PropertyColors.ORANGE);
+        tiles[20] = new Tile(TileTypes.PARKING);
+        tiles[21] = new Property(220, PropertyNames.KENTUCKY_AVE, PropertyColors.RED);
+        tiles[22] = new Tile(TileTypes.CHANCE); // Placeholder
+        tiles[23] = new Property(220, PropertyNames.INDIANA_AVE, PropertyColors.RED);
+        tiles[24] = new Property(240, PropertyNames.ILLINOIS_AVE, PropertyColors.RED);
+        tiles[25] = new Tile(TileTypes.UTILITY); // Placeholder
+        tiles[26] = new Property(260, PropertyNames.ATLANTIC_AVE, PropertyColors.YELLOW);
+        tiles[27] = new Property(260, PropertyNames.VENTNOR_AVE, PropertyColors.YELLOW);
+        tiles[28] = new Tile(TileTypes.UTILITY); // Placeholder
+        tiles[29] = new Property(280, PropertyNames.MARVIN_GAR, PropertyColors.YELLOW);
+        tiles[30] = new Tile(TileTypes.GOTOJAIL); // Placeholder
+        tiles[31] = new Property(300, PropertyNames.PACIFIC_AVE, PropertyColors.GREEN);
+        tiles[32] = new Property(300, PropertyNames.NORTH_CAROLINA_AVE, PropertyColors.GREEN);
+        tiles[33] = new Tile(TileTypes.COMMUNITYCHEST); // Placeholder
+        tiles[34] = new Property(320, PropertyNames.PENNSYLVANIA_AVE, PropertyColors.GREEN);
+        tiles[35] = new Tile(TileTypes.UTILITY); // Placeholder
+        tiles[36] = new Tile(TileTypes.CHANCE); // Placeholder
+        tiles[37] = new Property(350, PropertyNames.PARK_PL, PropertyColors.BLUE);
+        tiles[38] = new Tile(TileTypes.TAX); // Placeholder
+        tiles[39] = new Property(400, PropertyNames.BOARDWALK, PropertyColors.BLUE);
     }
 
     /**
      * Paints the board Panel and updates the positions of players on the board when they move
-     * @author: Nevin Fullerton
      */
     private void paintBoardPanel() {
         northPanel.removeAll();
@@ -250,23 +374,25 @@ public class GUI extends JFrame {
     }
 
     /**
-     * @author Nevin Fullerton
+     * Paints the player side panel on the right side of the screen, which includes the current player's name, money
+     * position, and a list of
      */
     private void paintPlayerSidePanel() {
         clearSideBarPanel();
 
-        JLabel playerNameLabel = new JLabel("Player Name:");
-        JLabel playerMoneyLabel = new JLabel("Player Money:");
-        JLabel playerPositionLabel = new JLabel("Player Position:");
+        String playerName = players[currentPlayer].getName();
+        int playerMoney = players[currentPlayer].getMoney();
+        int playerPosition = players[currentPlayer].getPosition();
+        JLabel playerNameLabel = new JLabel("Player Name: " + playerName);
+        JLabel playerMoneyLabel = new JLabel("Player Money: " + playerMoney);
+        JLabel playerPositionLabel = new JLabel("Player Position: " + playerPosition);
 
         List<Property> properties = new ArrayList<Property>();
 
-        //UPDATE to Current Player
-        //...........VVVVVVV......
-        properties = theBank.getProperties();
+        properties = players[currentPlayer].getProperties();
         // Create the JList of properties
         JList<Object> propertiesList = new JList<>(properties.toArray());
-
+        propertiesList.setFixedCellWidth(100); // Prevents JList from expanding to take up entire panel on the east side
         // Set a custom cell renderer for the list
         propertiesList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
@@ -293,6 +419,9 @@ public class GUI extends JFrame {
         sideBarPanel.add(playerPositionLabel);
         sideBarPanel.add(new JScrollPane(propertiesList));
 
+        sideBarPanel.revalidate();
+        sideBarPanel.repaint();
+
     }
 
     /**
@@ -313,13 +442,29 @@ public class GUI extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                rollDice();
+                if (diceRolled) {
+                    JOptionPane.showMessageDialog(boardPanel, "You have already rolled this turn.");
+                } else {
+                    rollDice();
+                }
             }
         });
 
         JButton buyHousesButton = new JButton("Buy Houses");
         JButton mortgageButton = new JButton("Mortgage");
         JButton endTurnButton = new JButton("End Turn");
+        endTurnButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!diceRolled) {
+                    JOptionPane.showMessageDialog(boardPanel, "You must roll the dice before you end the turn.");
+                } else {
+                    endTurn();
+                }
+            }
+
+        });
 
         actionPanel.add(rollDiceButton);
         actionPanel.add(buyHousesButton);
