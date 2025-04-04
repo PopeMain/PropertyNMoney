@@ -17,6 +17,7 @@ public class Player {
     boolean inJail;
     boolean bankrupt;
     List<Property> properties;
+    List<Utility> utilities;
 
     public Player(int money, String name) {
         /*
@@ -28,6 +29,7 @@ public class Player {
         this.inJail = false;
         this.bankrupt = false;
         this.properties = new ArrayList<Property>();
+        this.utilities =  new ArrayList<Utility>();
     }
 
     public int getMoney() {return money;}
@@ -49,5 +51,8 @@ public class Player {
 
     public List<Property> getProperties() {return properties;}
     public void addProperty(Property property) {this.properties.add(property);}
+
+    public List<Utility> getUtilities() {return utilities;}
+    public void addUtility(Utility utility) {this.utilities.add(utility);}
 
 }

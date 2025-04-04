@@ -197,7 +197,26 @@ public class GUI extends JFrame {
 
             }
         } else if (tile.getTileType() == TileTypes.UTILITY) {
+            Utility utility = (Utility) tile;
+            if (utility.isOwned()) {
+                JOptionPane.showMessageDialog(this, "You must pay " + utility.getRentValue() + " to stay here.");
+                player.subMoney(utility.getRentValue());
+            } else {
+                if (utility.getBuyValue() > player.getMoney()) {
+                    JOptionPane.showMessageDialog(this, "You don't have enough money to buy this utility.");
+                } else {
+                    int result = JOptionPane.showConfirmDialog(this, "Do you wish to buy the utility for " + utility.getBuyValue() + " ?");
+                    if (result == JOptionPane.YES_OPTION) {
+                        JOptionPane.showMessageDialog(this, player.getName() +  " now owns " + utility.getName());
+                        player.subMoney(utility.getBuyValue());
+                        player.addUtility(utility);
+                        utility.setOwner(player);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "You don't wish to buy this property.");
+                    }
+                }
 
+            }
         }
 
         paintPlayerSidePanel();
@@ -220,17 +239,17 @@ public class GUI extends JFrame {
         tiles[2] = new Tile(TileTypes.COMMUNITYCHEST); // Placeholder
         tiles[3] = new Property(60, PropertyNames.BALTIC_AVE, PropertyColors.BROWN);
         tiles[4] = new Tile(TileTypes.TAX); // Placeholder
-        tiles[5] = new Tile(TileTypes.UTILITY); // Placeholder
+        tiles[5] = new Utility(200, "RailRoad 1");
         tiles[6] = new Property(100, PropertyNames.ORIENTAL_AVE, PropertyColors.CYAN);
         tiles[7] = new Tile(TileTypes.CHANCE); // Placeholder
         tiles[8] = new Property(100, PropertyNames.VERMONT_AVE, PropertyColors.CYAN);
         tiles[9] = new Property(120, PropertyNames.CONNECTICUT_AVE, PropertyColors.CYAN);
         tiles[10] = new Tile(TileTypes.PARKING);
         tiles[11] = new Property(140, PropertyNames.ST_CHARLES_PL, PropertyColors.MAGENTA);
-        tiles[12] = new Tile(TileTypes.UTILITY); // Placeholder
+        tiles[12] = new Utility(150, "Electric Company");
         tiles[13] = new Property(140, PropertyNames.STATES_AVE, PropertyColors.MAGENTA);
         tiles[14] = new Property(160, PropertyNames.VIRGINIA_AVE, PropertyColors.MAGENTA);
-        tiles[15] = new Tile(TileTypes.UTILITY); // Placeholder
+        tiles[15] = new Utility(200, "Railroad 2");
         tiles[16] = new Property(180, PropertyNames.ST_JAMES_PL, PropertyColors.ORANGE);
         tiles[17] = new Tile(TileTypes.COMMUNITYCHEST); // Placeholder
         tiles[18] = new Property(180, PropertyNames.TENNESSEE_AVE, PropertyColors.ORANGE);
@@ -240,17 +259,17 @@ public class GUI extends JFrame {
         tiles[22] = new Tile(TileTypes.CHANCE); // Placeholder
         tiles[23] = new Property(220, PropertyNames.INDIANA_AVE, PropertyColors.RED);
         tiles[24] = new Property(240, PropertyNames.ILLINOIS_AVE, PropertyColors.RED);
-        tiles[25] = new Tile(TileTypes.UTILITY); // Placeholder
+        tiles[25] = new Utility(200, "Railroad 3");
         tiles[26] = new Property(260, PropertyNames.ATLANTIC_AVE, PropertyColors.YELLOW);
         tiles[27] = new Property(260, PropertyNames.VENTNOR_AVE, PropertyColors.YELLOW);
-        tiles[28] = new Tile(TileTypes.UTILITY); // Placeholder
+        tiles[28] = new Utility(150, "Water Works");
         tiles[29] = new Property(280, PropertyNames.MARVIN_GAR, PropertyColors.YELLOW);
         tiles[30] = new Tile(TileTypes.GOTOJAIL); // Placeholder
         tiles[31] = new Property(300, PropertyNames.PACIFIC_AVE, PropertyColors.GREEN);
         tiles[32] = new Property(300, PropertyNames.NORTH_CAROLINA_AVE, PropertyColors.GREEN);
         tiles[33] = new Tile(TileTypes.COMMUNITYCHEST); // Placeholder
         tiles[34] = new Property(320, PropertyNames.PENNSYLVANIA_AVE, PropertyColors.GREEN);
-        tiles[35] = new Tile(TileTypes.UTILITY); // Placeholder
+        tiles[35] = new Utility(200, "Railroad 4");
         tiles[36] = new Tile(TileTypes.CHANCE); // Placeholder
         tiles[37] = new Property(350, PropertyNames.PARK_PL, PropertyColors.BLUE);
         tiles[38] = new Tile(TileTypes.TAX); // Placeholder
@@ -388,10 +407,22 @@ public class GUI extends JFrame {
         JLabel playerPositionLabel = new JLabel("Player Position: " + playerPosition);
 
         List<Property> properties = new ArrayList<Property>();
+        List<Utility> utilities = new ArrayList<Utility>();
 
         properties = players[currentPlayer].getProperties();
+        utilities = players[currentPlayer].getUtilities();
+
+        List<Object> assets = new ArrayList<Object>();
+
+        for (Property property : properties)
+            assets.add(property.getName());
+
+        for (Utility utility : utilities)
+            assets.add(utility.getName());
+
         // Create the JList of properties
-        JList<Object> propertiesList = new JList<>(properties.toArray());
+        JList<Object> propertiesList = new JList<>(assets.toArray());
+
         propertiesList.setFixedCellWidth(100); // Prevents JList from expanding to take up entire panel on the east side
         // Set a custom cell renderer for the list
         propertiesList.setCellRenderer(new DefaultListCellRenderer() {
@@ -408,6 +439,13 @@ public class GUI extends JFrame {
 
                     // Add a colored icon to represent the property color
                     label.setIcon(new ColorIcon(property.getColor()));
+                } else if (renderer instanceof JLabel && value instanceof Utility) {
+                    JLabel label = (JLabel) renderer;
+                    Utility utility = (Utility) value;
+
+                    label.setText(utility.toString());
+
+                    label.setIcon(new ColorIcon(Color.GRAY));
                 }
 
                 return renderer;
