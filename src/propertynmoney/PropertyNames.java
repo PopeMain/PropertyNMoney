@@ -73,9 +73,9 @@ public enum PropertyNames {
     /** PENNSYLVANIA_AVE - "Pennsylvania Ave" -GREEN- 320 */
     PENNSYLVANIA_AVE("Pennsylvania Ave", PropertyColors.GREEN,320),
     /** PARK_PL - "Park Pl" -PURPLE- 350 */
-    PARK_PL("Park Pl", PropertyColors.PURPLE,350),
+    PARK_PL("Park Pl", PropertyColors.BLUE,350),
     /** BOARDWALK - "Boardwalk" -PURPLE- 400 */
-    BOARDWALK("Boardwalk", PropertyColors.PURPLE,400);
+    BOARDWALK("Boardwalk", PropertyColors.BLUE,400);
 
     private final String displayName;
     private final int buyValue;

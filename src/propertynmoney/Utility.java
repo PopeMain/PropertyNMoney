@@ -1,35 +1,23 @@
 package propertynmoney;
 
-import java.awt.*;
-
-public class Property extends Tile{
+public class Utility extends Tile {
     int buyValue;
     int rentValue;
-    private final PropertyNames name;
-    private final Color color;
+    private final String name;
     private Player owner;
 
     enum Houses {MORTGAGE, ZERO, ONE, TWO, THREE, FOUR, HOTEL}
 
-    public Property(PropertyNames name) {
-        super(TileTypes.PROPERTY);
-        this.buyValue = name.getBuyValue() ;
+    public Utility(int value, String name) {
+        super(TileTypes.UTILITY);
+        this.buyValue = value;
         this.name = name;
-        this.color = name.getColor();
         this.owner = null;
         this.rentValue = 20;
     }
 
     public String getName() {
         return name.toString();
-    }
-
-    public PropertyColors getColorEnum() {
-        return name.getColorEnum();
-    }
-
-    public java.awt.Color getColor() {
-        return color;
     }
 
     @Override
@@ -48,5 +36,6 @@ public class Property extends Tile{
     public Player getOwner() {return owner;}
     public void setOwner(Player owner) {this.owner = owner;}
 
-
 }
+
+

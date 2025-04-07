@@ -10,7 +10,7 @@ public enum PropertyColors {
     RED(Color.RED),
     YELLOW(Color.YELLOW),
     GREEN(Color.GREEN),
-    PURPLE(new Color(128, 0, 128));
+    BLUE(Color.BLUE);
 
     private final Color pcolor;
 
