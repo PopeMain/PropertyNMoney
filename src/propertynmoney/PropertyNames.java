@@ -117,4 +117,12 @@ public enum PropertyNames {
     public Color getColor(){
         return pColor.getColor();
     }
+
+    /**
+     * get's PropertyColors enum
+     * @return a value from the PropertyColors Enum
+     */
+    public PropertyColors getColorEnum() {
+        return pColor;
+    }
 }

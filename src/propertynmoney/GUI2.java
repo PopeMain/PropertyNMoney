@@ -34,6 +34,6 @@ public class GUI2 extends JFrame {
     }
 
     public static void main(String[] args) {
-            GUI2 gui = new GUI2();
+        new GUI2();
     }
 }
