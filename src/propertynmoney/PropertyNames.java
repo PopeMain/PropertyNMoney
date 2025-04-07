@@ -82,10 +82,10 @@ public enum PropertyNames {
     private final PropertyColors pColor;
 
     /**
-     * TODO Finish JAva Doc for Constructon
-     * @param displayName- the string name of the property
-     * @param color the display color for the property from the PropertyColors Enum
-     * @param buyVal- the int value to buy the property
+     * TODO Finish Java Doc for Constructor
+     * @param displayName String - the string name of the property
+     * @param color Java.awt.Color - the display color for the property from the PropertyColors Enum
+     * @param buyVal int - the value to buy the property
      */
     PropertyNames(String displayName, PropertyColors color, int buyVal){
         this.displayName = displayName;

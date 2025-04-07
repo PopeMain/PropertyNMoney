@@ -11,9 +11,9 @@ import java.util.Random;
 
 /**
  * Constructs and displays the GUI **TODO**
- * @author Nevin Fullerton and Frank Pope
+ * @author Nevin Fullerton
+ * @author Frank Pope
  */
-
 public class GUI extends JFrame {
 
     private final JPanel boardPanel;
