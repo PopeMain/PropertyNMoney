@@ -13,14 +13,8 @@ public class Bank {
     }
 
     private void fillProperties() {
-        int[] differentcolors = {2,3,3,3,3,3,3,2};
-        int counter = 1;
-        int index = 0;
-        List<PropertyColors> colors = asList(PropertyColors.values());
         for(PropertyNames p : PropertyNames.values() ){
-            if(counter > differentcolors[index]) {index++; counter = 1;}
-            properties.add(new Property(100,p, colors.get(index)));
-            counter++;
+            properties.add(new Property(p));
         }
     }
 
