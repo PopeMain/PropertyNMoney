@@ -59,7 +59,10 @@ public class GUI extends JFrame {
     private JPanel westPanel;
     private JPanel westPanelHolder;
 
+    private final Random diceRand; // Random number generation for dice rolls
+
     private final int IMAGEWIDTH;
+
 
     /**
      *
@@ -71,11 +74,13 @@ public class GUI extends JFrame {
         this.setLocationRelativeTo(null);
         this.setLayout(new BorderLayout());
 
+        diceRand = new Random();
         final ImageIcon gameBoard = new ImageIcon("src/GameBoard_Resized.png");
         players = new Player[8];
         players[0] = new Player(1500, "Nevin"); // Testing ** Remove when done
         players[1] = new Player(1500, "Frank");
         players[2] = new Player(1500, "Nathan");
+        players[0].moveSpecificPosition(29);
 
         currentPlayer = 0;
         amountOfPlayers = 2;
@@ -145,17 +150,17 @@ public class GUI extends JFrame {
     }
 
     /**
-     * Produces two different integer values, each from 1-6, and moves the current player by the sum of the dice.
-     * It will then disable rolling for the current player, and allow them to end turn and perform other actions.
-     * If the two integers have equals values, allow player to roll dice again, but if the player has three doubles
-     * in a row, put them in jail for speeding.
+     * Rolls two dice and moves the player by the sum of the dice. If the dice have equal value, the player can roll again,
+     * but if they roll three doubles in a row, they go to jail for speeding.
      */
     private void rollDice() {
-        Random diceRand = new Random();
         int dice1 = diceRand.nextInt(1,6);
         int dice2 = diceRand.nextInt(1,6);
 
-        boolean passedGo = players[currentPlayer].movePosition(dice1 + dice2);
+//        boolean passedGo = players[currentPlayer].movePosition(dice1 + dice2);
+
+        boolean passedGo = players[currentPlayer].movePosition(1);
+
 
         diceRolled = true;
 
@@ -166,33 +171,36 @@ public class GUI extends JFrame {
 
         // TODO Doubles
         JOptionPane.showMessageDialog(this, "You rolled a " + dice1 + ", and a " + dice2);
-        determineMovementResult();
         paintBoardPanel();
         paintPlayerSidePanel();
+        determineMovementResult();
+
     }
 
     /**
-     * Produces two different integer values, each from 1-6, checks if the dice share the same value. If true, get the
-     * player out of jail and move them by the sum of the dice, else keep the player in jail and do not move the player.
-     * It will then disable rolling for the current player, and allow them to end turn and other actions.
-     * @return A boolean that represents if the dice were double
+     * Rolls two dice, if they are of equal value, the player gets out of jail and moves by the sum of the dice, else
+     * player remains in jail.
      */
-    private boolean rollJailDice() {
+    private void rollJailDice() {
         Random diceRand = new Random();
         int dice1 = diceRand.nextInt(1,6);
         int dice2 = diceRand.nextInt(1,6);
-        players[currentPlayer].movePosition(dice1 + dice2);
         diceRolled = true;
 
         JOptionPane.showMessageDialog(this, "You rolled a " + dice1 + ", and a " + dice2);
 
+        if (dice1 == dice2) {
+            JOptionPane.showMessageDialog(this, "You rolled a double! You get out of jail and move by " + (dice1 + dice2));
+            players[currentPlayer].movePosition(dice1 + dice2);
+            paintBoardPanel();
+            paintPlayerSidePanel();
+            determineMovementResult();
+        }
 
-
-        return dice1 == dice2;
     }
 
     /**
-     * Will end the turn of the current player and pass onto the next player that is not eligible, making them the
+     * Will end the turn of the current player and pass onto the next eligible player, making them the
      * current player. The side panel is then updated to show the new current player's money, properties, name,
      * and position.
      */
@@ -234,58 +242,88 @@ public class GUI extends JFrame {
 
         if (tile.getTileType() == TileTypes.PROPERTY) {
             Property property = (Property) tile;
-            if (property.isOwned()) {
-                JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue() + " to stay here.");
-                player.subMoney(property.getRentValue());
-            } else {
-                if (property.getBuyValue() > player.getMoney()) {
-                    JOptionPane.showMessageDialog(this, "You don't have enough money to buy this property.");
-                } else {
-                    int result = JOptionPane.showConfirmDialog(this, "Do you wish to buy property for " + property.getBuyValue() + " ?");
-                    if (result == JOptionPane.YES_OPTION) {
-                        JOptionPane.showMessageDialog(this, player.getName() +  " now owns " + property.getName());
-                        player.subMoney(property.getBuyValue());
-                        player.addProperty(property);
-                        property.setOwner(player);
-                    } else {
-                        JOptionPane.showMessageDialog(this, "You don't wish to buy this property.");
-                    }
-                }
-
-            }
+            onProperty(property, player);
         } else if (tile.getTileType() == TileTypes.UTILITY) {
             Utility utility = (Utility) tile;
-            if (utility.isOwned()) {
-                JOptionPane.showMessageDialog(this, "You must pay " + utility.getRentValue() + " to stay here.");
-                player.subMoney(utility.getRentValue());
-            } else {
-                if (utility.getBuyValue() > player.getMoney()) {
-                    JOptionPane.showMessageDialog(this, "You don't have enough money to buy this utility.");
-                } else {
-                    int result = JOptionPane.showConfirmDialog(this, "Do you wish to buy the utility for " + utility.getBuyValue() + " ?");
-                    if (result == JOptionPane.YES_OPTION) {
-                        JOptionPane.showMessageDialog(this, player.getName() +  " now owns " + utility.getName());
-                        player.subMoney(utility.getBuyValue());
-                        player.addUtility(utility);
-                        utility.setOwner(player);
-                    } else {
-                        JOptionPane.showMessageDialog(this, "You don't wish to buy this property.");
-                    }
-                }
-
-            }
+            onUtility(utility, player);
         } else if (tile.getTileType() == TileTypes.TAX) {
             TaxTile tax = (TaxTile) tile;
             JOptionPane.showMessageDialog(this, "You must pay a tax of " + tax.getTaxAmount() + ".");
             player.subMoney(tax.getTaxAmount());
         } else if (tile.getTileType() == TileTypes.GOTOJAIL) {
-            JOptionPane.showMessageDialog(this, "You were caught breaking the law, go to jail. Do not collect 200$.");
-            player.setInJail(true);
-            player.moveSpecificPosition(10);
-            paintJailButtonFrame();
+            goToJail(player);
         }
 
         paintPlayerSidePanel();
+    }
+
+    /**
+     * The events that happen when the player lands on a property tile, either the option to buy the property or paying rent to the
+     * owner.
+     * @param property
+     * @param player
+     */
+    private void onProperty(Property property, Player player) {
+        if (property.isOwned()) {
+            JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue() + " to " + property.getOwner().toString() + "in order stay here.");
+            player.subMoney(property.getRentValue());
+            property.getOwner().addMoney(property.getRentValue());
+        } else {
+            if (property.getBuyValue() > player.getMoney()) {
+                JOptionPane.showMessageDialog(this, "You don't have enough money to buy this property.");
+            } else {
+                int result = JOptionPane.showConfirmDialog(this, "Do you wish to buy property for " + property.getBuyValue() + " ?", "Buying Property", JOptionPane.YES_NO_OPTION);
+                if (result == JOptionPane.YES_OPTION) {
+                    JOptionPane.showMessageDialog(this, player.getName() +  " now owns " + property.getName());
+                    player.subMoney(property.getBuyValue());
+                    player.addProperty(property);
+                    property.setOwner(player);
+                } else {
+                    JOptionPane.showMessageDialog(this, "You don't wish to buy this property.");
+                }
+            }
+
+        }
+    }
+
+    /**
+     * The events that happen when a player lands on a utility tile, either the option to buy the utility or pay rent
+     * to the utility of the property.
+     * @param utility
+     * @param player
+     */
+    private void onUtility(Utility utility, Player player) {
+        if (utility.isOwned()) {
+            JOptionPane.showMessageDialog(this, "You must pay " + utility.getRentValue() + " to stay here.");
+            player.subMoney(utility.getRentValue());
+        } else {
+            if (utility.getBuyValue() > player.getMoney()) {
+                JOptionPane.showMessageDialog(this, "You don't have enough money to buy this utility.");
+            } else {
+                int result = JOptionPane.showConfirmDialog(this, "Do you wish to buy the utility for " + utility.getBuyValue() + " ?", "Buying Utility", JOptionPane.YES_NO_OPTION);
+                if (result == JOptionPane.YES_OPTION) {
+                    JOptionPane.showMessageDialog(this, player.getName() +  " now owns " + utility.getName());
+                    player.subMoney(utility.getBuyValue());
+                    player.addUtility(utility);
+                    utility.setOwner(player);
+                } else {
+                    JOptionPane.showMessageDialog(this, "You don't wish to buy this property.");
+                }
+            }
+
+        }
+    }
+
+    /**
+     * Sends player to jail and ends their turn.
+     * @param player Player that is going to jail
+     */
+    private void goToJail(Player player) {
+        JOptionPane.showMessageDialog(this, "You were caught breaking the law, go to jail. Do not collect 200$, and your turn ends immediately.");
+        player.setInJail(true);
+        player.moveSpecificPosition(10);
+        paintBoardPanel();
+        endTurn();
     }
 
     /**
@@ -344,7 +382,6 @@ public class GUI extends JFrame {
         southPanel.removeAll();
         eastPanel.removeAll();
         westPanel.removeAll();
-
 
         // North Panel Filler - Needed so that there is always space between grid positions
         for (int i = 0; i < 10; i++) {
@@ -466,11 +503,8 @@ public class GUI extends JFrame {
         JLabel playerMoneyLabel = new JLabel("Player Money: " + playerMoney);
         JLabel playerPositionLabel = new JLabel("Player Position: " + playerPosition);
 
-        List<Property> properties;
-        List<Utility> utilities;
-
-        properties = players[currentPlayer].getProperties();
-        utilities = players[currentPlayer].getUtilities();
+        List<Property> properties = players[currentPlayer].getProperties();
+        List<Utility> utilities = players[currentPlayer].getUtilities();
 
         List<Object> assets = new ArrayList<Object>();
 
@@ -569,6 +603,8 @@ public class GUI extends JFrame {
         actionPanel.add(mortgageButton);
         actionPanel.add(endTurnButton);
 
+        actionPanel.revalidate();
+        actionPanel.repaint();
     }
 
     private void paintJailButtonFrame() {
@@ -582,7 +618,7 @@ public class GUI extends JFrame {
                 if (diceRolled) {
                     JOptionPane.showMessageDialog(boardPanel, "You have already rolled this turn.");
                 } else {
-                    boolean gotOut = rollJailDice();
+                    rollJailDice();
                 }
             }
         });
@@ -608,9 +644,7 @@ public class GUI extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!diceRolled) {
-                    JOptionPane.showMessageDialog(boardPanel, "You must roll the dice before you end the turn.");
-                } else if (players[currentPlayer].getTurnsInJail() == 3) {
+                if (players[currentPlayer].getTurnsInJail() == 3) {
                     JOptionPane.showMessageDialog(boardPanel, "You must pay fine and roll dice before you end the turn, or use other methods if available.");
                 } else {
                     endTurn();
