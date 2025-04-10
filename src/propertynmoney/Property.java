@@ -25,8 +25,9 @@ import java.awt.*;
  * -setOwner: sets the owner to specified player. <p>
  */
 public class Property extends Tile{
-    int buyValue;
-    int rentValue;
+    private int buyValue;
+    private int[] rentValues; // An array with a length of five that holds the rent value of each house value from 0-5
+    private int houseAmount;
     private final PropertyNames name;
     private final Color color;
     private Player owner;
@@ -42,7 +43,8 @@ public class Property extends Tile{
         this.name = name;
         this.color = name.getColor();
         this.owner = null;
-        this.rentValue = 20;
+        this.rentValues = name.getRentValues();
+        this.houseAmount = 0;
     }
 
     /**
@@ -83,10 +85,10 @@ public class Property extends Tile{
      * @return the buy value, rent value, is owned bool, and owner
      */
     public int getBuyValue() {return buyValue;}
-    public void setBuyValue(int value) {buyValue = value;}
 
-    public int getRentValue() {return rentValue;}
-    public void setRentValue(int value) {rentValue = value;}
+    public int getRentValue(int index) {return rentValues[index];}
+
+    public int getHouseAmount() {return houseAmount;}
 
     public boolean isOwned() {return this.owner != null;}
 

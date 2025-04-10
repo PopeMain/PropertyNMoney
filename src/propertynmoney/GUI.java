@@ -39,7 +39,9 @@ public class GUI extends JFrame {
     private final JPanel boardPanel;
     private final JPanel sideBarPanel;
     private final JPanel actionPanel;
-    private final Bank theBank = new Bank();
+    private JList<Object> propertiesList;
+
+
 
     private Player[] players; // Holds the players in the game
     private int currentPlayer; // The index of the current player in the array of players
@@ -162,14 +164,23 @@ public class GUI extends JFrame {
         boolean passedGo = players[currentPlayer].movePosition(1);
 
 
-        diceRolled = true;
-
         if (passedGo) {
             JOptionPane.showMessageDialog(this, "You passed go! Collect $200.");
             players[currentPlayer].addMoney(200);
         }
 
-        // TODO Doubles
+        if (dice1 == dice2) {
+            if (doubleAmount == 3) {
+                JOptionPane.showMessageDialog(this, "Oops! You were caught speeding! You must go to jail.");
+                goToJail(players[currentPlayer]);
+            } else {
+                JOptionPane.showMessageDialog(this, "You rolled doubles! You get to roll again after you land on tile.");
+                doubleAmount++;
+            }
+        } else {
+            diceRolled = true;
+        }
+
         JOptionPane.showMessageDialog(this, "You rolled a " + dice1 + ", and a " + dice2);
         paintBoardPanel();
         paintPlayerSidePanel();
@@ -208,6 +219,8 @@ public class GUI extends JFrame {
         if (players[currentPlayer].isInJail()) {
             players[currentPlayer].setTurnsInJail(players[currentPlayer].getTurnsInJail() + 1);
         }
+
+        doubleAmount = 0; // Reset double amount for next player
 
         boolean nextPlayerFound = false;
         while (!nextPlayerFound) {
@@ -265,9 +278,9 @@ public class GUI extends JFrame {
      */
     private void onProperty(Property property, Player player) {
         if (property.isOwned()) {
-            JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue() + " to " + property.getOwner().toString() + "in order stay here.");
-            player.subMoney(property.getRentValue());
-            property.getOwner().addMoney(property.getRentValue());
+            JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue(property.getHouseAmount()) + " to " + property.getOwner().toString() + "in order stay here.");
+            player.subMoney(property.getRentValue(property.getHouseAmount()));
+            property.getOwner().addMoney(property.getRentValue(property.getHouseAmount()));
         } else {
             if (property.getBuyValue() > player.getMoney()) {
                 JOptionPane.showMessageDialog(this, "You don't have enough money to buy this property.");
@@ -324,6 +337,23 @@ public class GUI extends JFrame {
         player.moveSpecificPosition(10);
         paintBoardPanel();
         endTurn();
+    }
+
+    /**
+     * Check if player meets all requirements to buy a house on the property, then either purchases a house or cancels the
+     * transaction.
+     * @param selectedProperty
+     */
+    private void buyHouse(Property selectedProperty) {
+    }
+
+    /**
+     * Check if player meets all requirements to sell a house on the property, then either sell a house or cancels the
+     * transaction.
+     * @param selectedProperty
+     */
+    private void sellHouse(Property selectedProperty) {
+
     }
 
     /**
@@ -496,6 +526,7 @@ public class GUI extends JFrame {
     private void paintPlayerSidePanel() {
         clearSideBarPanel();
 
+        // Get details about the player to display to user on the side panel
         String playerName = players[currentPlayer].getName();
         int playerMoney = players[currentPlayer].getMoney();
         int playerPosition = players[currentPlayer].getPosition();
@@ -508,14 +539,15 @@ public class GUI extends JFrame {
 
         List<Object> assets = new ArrayList<Object>();
 
-        for (Property property : properties)
-            assets.add(property.getName());
+        for (Property property : properties) {
+            assets.add(property);
+        }
 
         for (Utility utility : utilities)
-            assets.add(utility.getName());
+            assets.add(utility);
 
         // Create the JList of properties
-        JList<Object> propertiesList = new JList<>(assets.toArray());
+        propertiesList = new JList<>(assets.toArray());
 
         propertiesList.setFixedCellWidth(100); // Prevents JList from expanding to take up entire panel on the east side
         // Set a custom cell renderer for the list
@@ -545,6 +577,8 @@ public class GUI extends JFrame {
                 return renderer;
             }
         });
+
+        propertiesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         sideBarPanel.add(playerNameLabel);
         sideBarPanel.add(playerMoneyLabel);
@@ -582,7 +616,7 @@ public class GUI extends JFrame {
             }
         });
 
-        JButton buyHousesButton = new JButton("Buy Houses");
+        JButton buyHousesButton = buyAndSellHouseButton();
         JButton mortgageButton = new JButton("Mortgage");
         JButton endTurnButton = new JButton("End Turn");
         endTurnButton.addActionListener(new ActionListener() {
@@ -637,7 +671,7 @@ public class GUI extends JFrame {
             }
         });
 
-        JButton buyHousesButton = new JButton("Buy Houses");
+        JButton buyHousesButton = buyAndSellHouseButton();
         JButton mortgageButton = new JButton("Mortgage");
         JButton endTurnButton = new JButton("End Turn");
         endTurnButton.addActionListener(new ActionListener() {
@@ -661,6 +695,32 @@ public class GUI extends JFrame {
 
         actionPanel.revalidate();
         actionPanel.repaint();
+    }
+
+    private JButton buyAndSellHouseButton() {
+        JButton button = new JButton("Buy/Sell House");
+        button.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Property propertySelected = (Property) propertiesList.getSelectedValue();
+
+                if (propertySelected == null) {
+                    JOptionPane.showMessageDialog(boardPanel, "You must select a property from the list on the right side of the screen.");
+                } else {
+                    int choice = JOptionPane.showOptionDialog(boardPanel, "Do you wish to buy or sell house on the property " + propertySelected.getName() + "?", "Buying and Selling Houses", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] {"Buy", "Selling", "Cancel"}, propertySelected.getName());
+                    if (choice == 0) {
+                        buyHouse(propertySelected);
+                    } else if (choice == 1) {
+                        sellHouse(propertySelected);
+                    }
+                }
+            }
+
+        });
+
+
+        return button;
     }
 
     /**

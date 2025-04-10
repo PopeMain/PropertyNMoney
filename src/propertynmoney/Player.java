@@ -12,14 +12,14 @@ Notes: This is currently Bullshit Code that can be used to store info specific t
 
 
 public class Player {
-    int money;
-    int position;
-    String name;
-    boolean inJail;
-    int turnsInJail;
-    boolean bankrupt;
-    List<Property> properties;
-    List<Utility> utilities;
+    private int money;
+    private int position;
+    private String name;
+    private boolean inJail;
+    private int turnsInJail;
+    private boolean bankrupt;
+    private final List<Property> properties;
+    private final List<Utility> utilities;
 
     public Player(int money, String name) {
         /*
