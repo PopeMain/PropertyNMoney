@@ -214,6 +214,7 @@ public class GUI extends JFrame {
             players[currentPlayer].movePosition(dice1 + dice2);
             paintBoardPanel();
             paintPlayerSidePanel();
+            paintStandardButtonFrame();
             determineMovementResult();
         }
 
@@ -293,10 +294,17 @@ public class GUI extends JFrame {
      * @param player
      */
     private void onProperty(Property property, Player player) {
+        // Make player pay rent to owner if they land on owned unmortgaged property, else give them the ability to buy property if
         if (property.isOwned()) {
-            JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue(property.getHouseAmount()) + " to " + property.getOwner().toString() + "in order stay here.");
-            player.subMoney(property.getRentValue(property.getHouseAmount()));
-            property.getOwner().addMoney(property.getRentValue(property.getHouseAmount()));
+            // Don't pay rent if property is mortgaged
+            if (property.isMortgaged()) {
+                JOptionPane.showMessageDialog(this, "You landed on an owned property, but it is mortgaged. So you do not have to pay rent");
+            } else {
+                JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue(property.getHouseAmount()) + " to " + property.getOwner().toString() + "in order stay here.");
+                player.subMoney(property.getRentValue(property.getHouseAmount()));
+                property.getOwner().addMoney(property.getRentValue(property.getHouseAmount())); // Pay rent to owner
+            }
+
         } else {
             if (property.getBuyValue() > player.getMoney()) {
                 JOptionPane.showMessageDialog(this, "You don't have enough money to buy this property.");
@@ -417,6 +425,16 @@ public class GUI extends JFrame {
             return;
         }
 
+        // Check if at least one property is mortgaged, if true, prevent house purchase
+        for (Property property: players[currentPlayer].getProperties()) {
+            if (selectedProperty.getColorEnum() == property.getColorEnum()) {
+                if (property.isMortgaged()) {
+                    JOptionPane.showMessageDialog(this, "You cannot buy houses if one or more properties are mortgaged in a color group.");
+                    return;
+                }
+            }
+        }
+
         int highestHouseAmount = 0;
         int lowestHouseAmount = 6;
 
@@ -498,6 +516,63 @@ public class GUI extends JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "You changed your mind on selling a house from this property.");
         }
+    }
+
+    /**
+     *
+     * @param selectedProperty
+     */
+    private void mortgageProperty(Property selectedProperty) {
+        boolean noHouses = true;
+        for (Property property: players[currentPlayer].getProperties()) {
+            if (selectedProperty.getColorEnum() == property.getColorEnum()) {
+                if (property.getHouseAmount() > 0) {
+                    noHouses = false;
+                }
+            }
+        }
+
+        // Prevent player from mortgaging a property if they started to buy houses for that color group
+        if (!noHouses) {
+            JOptionPane.showMessageDialog(this, "All properties of one color must have no houses to be able to mortgage a property of that color.");
+            return;
+        }
+
+        // Confirm player wishes to mortgage property
+        int choice = JOptionPane.showConfirmDialog(this, "Are you sure you wish to mortgage " + selectedProperty.getName() + " to gain " + selectedProperty.getMortgageValue() + "?");
+
+        if (choice == JOptionPane.YES_OPTION) {
+            JOptionPane.showMessageDialog(this, "You mortgaged the property " + selectedProperty.getName() + " to gain " + selectedProperty.getMortgageValue() + ".");
+            players[currentPlayer].addMoney(selectedProperty.getMortgageValue());
+            selectedProperty.setMortgaged(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "You changed your mind to mortgage the property " + selectedProperty.getName() + ".");
+        }
+
+    }
+
+    /**
+     *
+     * @param selectedProperty
+     */
+    private void unmortgageProperty(Property selectedProperty) {
+
+        if (players[currentPlayer].getMoney() < selectedProperty.getMortgageValue() + (selectedProperty .getMortgageValue() * .10)) {
+            JOptionPane.showMessageDialog(this, "You lack the funds to unmortgage the property " + selectedProperty.getName() + ".");
+            return;
+        }
+
+        // Confirm player wishes to mortgage property
+        int choice = JOptionPane.showConfirmDialog(this, "Are you sure you wish to unmortgage " + selectedProperty.getName() + " for " + (selectedProperty.getMortgageValue() + (selectedProperty.getMortgageValue() * .10)) + "?");
+
+        if (choice == JOptionPane.YES_OPTION) {
+            JOptionPane.showMessageDialog(this, "You unmortgaged the property " + selectedProperty.getName() + " for " + (selectedProperty.getMortgageValue() + (selectedProperty.getMortgageValue() * .10)) + ".");
+            players[currentPlayer].subMoney((int) (selectedProperty.getMortgageValue() + (selectedProperty.getMortgageValue() * .10)));
+            selectedProperty.setMortgaged(false);
+        } else {
+            JOptionPane.showMessageDialog(this, "You changed your mind to unmortgage the property " + selectedProperty.getName() + ".");
+        }
+
     }
 
     /**
@@ -761,7 +836,7 @@ public class GUI extends JFrame {
         });
 
         JButton buyHousesButton = buyAndSellHouseButton();
-        JButton mortgageButton = new JButton("Mortgage");
+        JButton mortgageButton = mortgagePropertyButton();
         JButton endTurnButton = new JButton("End Turn");
         endTurnButton.addActionListener(new ActionListener() {
 
@@ -816,7 +891,7 @@ public class GUI extends JFrame {
         });
 
         JButton buyHousesButton = buyAndSellHouseButton();
-        JButton mortgageButton = new JButton("Mortgage");
+        JButton mortgageButton = mortgagePropertyButton();
         JButton endTurnButton = new JButton("End Turn");
         endTurnButton.addActionListener(new ActionListener() {
 
@@ -841,6 +916,10 @@ public class GUI extends JFrame {
         actionPanel.repaint();
     }
 
+    /**
+     *
+     * @return
+     */
     private JButton buyAndSellHouseButton() {
         JButton button = new JButton("Buy/Sell House");
         button.addActionListener(new ActionListener() {
@@ -866,6 +945,43 @@ public class GUI extends JFrame {
 
 
         return button;
+    }
+
+    /**
+     *
+     * @return
+     */
+    private JButton mortgagePropertyButton() {
+        JButton mortgageButton = new JButton("Mortgage Property");
+        mortgageButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Property propertySelected = (Property) propertiesList.getSelectedValue();
+
+                if (propertySelected == null) {
+                    JOptionPane.showMessageDialog(boardPanel, "You must select a property from the list on the right side of the screen.");
+                } else {
+                    if (propertySelected.isMortgaged()) {
+                        JOptionPane.showConfirmDialog(boardPanel, propertySelected.getName() + "is mortgaged. Do you wish to unmortgage the property for " + (propertySelected.getMortgageValue() + (propertySelected.getMortgageValue() * .10)) + " to regain rent collection?");
+                        unmortgageProperty(propertySelected);
+                    } else {
+                        JOptionPane.showConfirmDialog(boardPanel, propertySelected.getName() + "is unmortgaged. Do you wish to mortgage the property to gain " + propertySelected.getMortgageValue() + " at the cost for losing rent collection?");
+                        mortgageProperty(propertySelected);
+                    }
+                    paintPlayerSidePanel();
+                }
+            }
+        });
+        /*
+        Player selects property then clicks button
+        Checks if any property of the same color has houses
+        if not allow player to mortgage property for half of buy value
+        mark property as mortgaged
+        do same thing backwards, but make player pay 10% interest to buy back
+         */
+
+        return mortgageButton;
     }
 
     /**
