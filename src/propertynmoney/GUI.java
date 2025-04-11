@@ -4,9 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Constructs, displays GUI, and manages the game. The GUI is separated into three parts, boardPanel, sideBarPanel, and
@@ -63,8 +62,9 @@ public class GUI extends JFrame {
 
     private final Random diceRand; // Random number generation for dice rolls
 
-    private final int IMAGEWIDTH;
+    private final int IMAGE_WIDTH;
 
+    private Map<PropertyColors, Integer> houseAmounts = new HashMap<PropertyColors, Integer>();
 
     /**
      *
@@ -87,7 +87,16 @@ public class GUI extends JFrame {
         currentPlayer = 0;
         amountOfPlayers = 2;
 
-        IMAGEWIDTH = gameBoard.getIconWidth(); // Width same as
+        houseAmounts.put(PropertyColors.BROWN, 2);
+        houseAmounts.put(PropertyColors.CYAN, 3);
+        houseAmounts.put(PropertyColors.MAGENTA, 3);
+        houseAmounts.put(PropertyColors.ORANGE, 3);
+        houseAmounts.put(PropertyColors.RED, 3);
+        houseAmounts.put(PropertyColors.YELLOW, 3);
+        houseAmounts.put(PropertyColors.GREEN, 3);
+        houseAmounts.put(PropertyColors.BLUE, 2);
+
+        IMAGE_WIDTH = gameBoard.getIconWidth(); // Width same as
 
         // Construct player holders
         northPanel = new JPanel();
@@ -345,6 +354,63 @@ public class GUI extends JFrame {
      * @param selectedProperty
      */
     private void buyHouse(Property selectedProperty) {
+        if (selectedProperty.getHouseAmount() == 5) {
+            JOptionPane.showMessageDialog(this, "You cannot buy more than 5 houses.");
+            return;
+        }
+
+        int propertyAmount = 0;
+
+        // Check to see if player has all properties of one color
+        for (Property property: players[currentPlayer].getProperties()) {
+            if (selectedProperty.getColorEnum() == property.getColorEnum()) {
+                propertyAmount++;
+            }
+        }
+
+        // Display and exit if player does not own all properties
+        if (propertyAmount < houseAmounts.get(selectedProperty.getColorEnum())) {
+            JOptionPane.showMessageDialog(this, "You don't own all the properties of this color.");
+            return;
+        }
+
+        int highestHouseAmount = 0;
+        int lowestHouseAmount = 6;
+
+        // Check to see if player has properties that have equal house amounts
+        for (Property property: players[currentPlayer].getProperties()) {
+            if (selectedProperty.getColorEnum() == property.getColorEnum()) {
+                if (property.getHouseAmount() > highestHouseAmount) {
+                    highestHouseAmount = property.getHouseAmount();
+                } else if (property.getHouseAmount() < lowestHouseAmount) {
+                    lowestHouseAmount = property.getHouseAmount();
+                }
+            }
+        }
+
+        if (selectedProperty.getHouseAmount() == highestHouseAmount && lowestHouseAmount < highestHouseAmount) {
+            JOptionPane.showMessageDialog(this, "You need to develop the properties of one color at the same rate. " +
+                    "EX: If one property has two houses and the other has one house, the property with one house must have two houses before the " +
+                    "two house property can have three houses.");
+            return;
+        }
+
+        // Check to see if player has enough money to buy house
+        if (players[currentPlayer].getMoney() < selectedProperty.getHouseCost()) {
+            JOptionPane.showMessageDialog(this, "You don't have enough money to buy this property.");
+            return;
+        }
+
+        // Finally, confirm player wants to buy a house on property
+        int choice = JOptionPane.showConfirmDialog(this, "Are you sure you want to buy a house, on " + selectedProperty.getName() + " for " + selectedProperty.getHouseCost() + "?");
+
+        if (choice == JOptionPane.YES_OPTION) {
+            JOptionPane.showMessageDialog(this, "You bought a house on this property named " + selectedProperty.getName() + " for " + selectedProperty.getHouseCost() + ".");
+            selectedProperty.incrementHouseAmount();
+            players[currentPlayer].subMoney(selectedProperty.getHouseCost());
+        } else {
+            JOptionPane.showMessageDialog(this, "You changed your mind on buying a house on this property.");
+        }
     }
 
     /**
@@ -353,7 +419,42 @@ public class GUI extends JFrame {
      * @param selectedProperty
      */
     private void sellHouse(Property selectedProperty) {
+        if (selectedProperty.getHouseAmount() == 0) {
+            JOptionPane.showMessageDialog(this, "There are no houses to sell.");
+            return;
+        }
 
+        int highestHouseAmount = 0;
+        int lowestHouseAmount = 6;
+
+        // Check to see if player has properties that have equal house amounts
+        for (Property property: players[currentPlayer].getProperties()) {
+            if (selectedProperty.getColorEnum() == property.getColorEnum()) {
+                if (property.getHouseAmount() > highestHouseAmount) {
+                    highestHouseAmount = property.getHouseAmount();
+                } else if (property.getHouseAmount() < lowestHouseAmount) {
+                    lowestHouseAmount = property.getHouseAmount();
+                }
+            }
+        }
+
+        if (selectedProperty.getHouseAmount() == lowestHouseAmount && lowestHouseAmount < highestHouseAmount) {
+            JOptionPane.showMessageDialog(this, "You need to bring down the properties of one color at the same rate. " +
+                    "EX: If one property has three houses and the other has two house, the property with three house must have two houses before the " +
+                    "two house property can have one houses.");
+            return;
+        }
+
+        // Finally, confirm player wants to buy a house on property
+        int choice = JOptionPane.showConfirmDialog(this, "Are you sure you want to sell a house, from " + selectedProperty.getName() + " for " + selectedProperty.getHouseCost() / 2 + "?");
+
+        if (choice == JOptionPane.YES_OPTION) {
+            JOptionPane.showMessageDialog(this, "You sold a house on this property named " + selectedProperty.getName() + " for " + selectedProperty.getHouseCost() / 2 + ".");
+            selectedProperty.decrementHouseAmount();
+            players[currentPlayer].addMoney(selectedProperty.getHouseCost() / 2);
+        } else {
+            JOptionPane.showMessageDialog(this, "You changed your mind on selling a house from this property.");
+        }
     }
 
     /**
@@ -420,9 +521,9 @@ public class GUI extends JFrame {
 
             //Set spacing between grid spaces
             if (i == 0) {
-                northPanelConstraints.insets = new Insets(0, (int) (IMAGEWIDTH * (0.153) + 80), 0,  0); // 0.153
+                northPanelConstraints.insets = new Insets(0, (int) (IMAGE_WIDTH * (0.153) + 80), 0,  0); // 0.153
             } else {
-                northPanelConstraints.insets = new Insets(0, (int) (IMAGEWIDTH * (0.08 / 2)), 0, (int) (IMAGEWIDTH * (0.08 / 2))); // 0.0918
+                northPanelConstraints.insets = new Insets(0, (int) (IMAGE_WIDTH * (0.08 / 2)), 0, (int) (IMAGE_WIDTH * (0.08 / 2))); // 0.0918
             }
 
             northPanel.add(Box.createHorizontalBox(), northPanelConstraints); // Empty space
@@ -435,11 +536,11 @@ public class GUI extends JFrame {
 
             //
             if (i == 0) {
-                southPanelConstraints.insets = new Insets(0, 0, 0,  (int) (IMAGEWIDTH * (0.153) + 125)); // 0.153
+                southPanelConstraints.insets = new Insets(0, 0, 0,  (int) (IMAGE_WIDTH * (0.153) + 125)); // 0.153
             } else if (i == 9) {
                 southPanelConstraints.insets = new Insets(0, 0, 0, 0); // 0.0918
             } else {
-                southPanelConstraints.insets = new Insets(0, (int) (IMAGEWIDTH * (0.06 / 2)), 0, (int) (IMAGEWIDTH * (0.06 / 2))); // 0.0918
+                southPanelConstraints.insets = new Insets(0, (int) (IMAGE_WIDTH * (0.06 / 2)), 0, (int) (IMAGE_WIDTH * (0.06 / 2))); // 0.0918
             }
 
             southPanel.add(Box.createHorizontalBox(), southPanelConstraints); // Empty space
@@ -451,9 +552,9 @@ public class GUI extends JFrame {
             westPanelConstraints.gridy = i;
 
             if (i == 9) {
-                westPanelConstraints.insets = new Insets(0, 0, (int) (IMAGEWIDTH * (0.153)) + 40,  0); // 0.153
+                westPanelConstraints.insets = new Insets(0, 0, (int) (IMAGE_WIDTH * (0.153)) + 40,  0); // 0.153
             } else {
-                westPanelConstraints.insets = new Insets((int) (IMAGEWIDTH * (0.08 / 2)), 0, (int) (IMAGEWIDTH * (0.08 / 2)), 0); // 0.0918
+                westPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.08 / 2)), 0, (int) (IMAGE_WIDTH * (0.08 / 2)), 0); // 0.0918
             }
 
             eastPanel.add(Box.createHorizontalGlue(), westPanelConstraints);
@@ -466,9 +567,9 @@ public class GUI extends JFrame {
             eastPanelConstraints.gridy = i;
 
             if (i == 0) {
-                eastPanelConstraints.insets = new Insets((int) (IMAGEWIDTH * (0.153) + 40), 0, 0,  0); // 0.153
+                eastPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.153) + 40), 0, 0,  0); // 0.153
             } else {
-                eastPanelConstraints.insets = new Insets((int) (IMAGEWIDTH * (0.08 / 2)), 0, (int) (IMAGEWIDTH * (0.08 / 2)), 0); // 0.0918
+                eastPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.08 / 2)), 0, (int) (IMAGE_WIDTH * (0.08 / 2)), 0); // 0.0918
             }
 
             eastPanel.add(Box.createHorizontalGlue(), eastPanelConstraints);
@@ -708,12 +809,13 @@ public class GUI extends JFrame {
                 if (propertySelected == null) {
                     JOptionPane.showMessageDialog(boardPanel, "You must select a property from the list on the right side of the screen.");
                 } else {
-                    int choice = JOptionPane.showOptionDialog(boardPanel, "Do you wish to buy or sell house on the property " + propertySelected.getName() + "?", "Buying and Selling Houses", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] {"Buy", "Selling", "Cancel"}, propertySelected.getName());
+                    int choice = JOptionPane.showOptionDialog(boardPanel, propertySelected.getName() + " has " + propertySelected.getHouseAmount() + " houses. Do you wish to buy or sell house on the property ?", "Buying and Selling Houses", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] {"Buy", "Selling", "Cancel"}, propertySelected.getName());
                     if (choice == 0) {
                         buyHouse(propertySelected);
                     } else if (choice == 1) {
                         sellHouse(propertySelected);
                     }
+                    paintPlayerSidePanel();
                 }
             }
 

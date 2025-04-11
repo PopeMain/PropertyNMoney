@@ -28,6 +28,8 @@ public class Property extends Tile{
     private int buyValue;
     private int[] rentValues; // An array with a length of five that holds the rent value of each house value from 0-5
     private int houseAmount;
+    private int housePrice;
+    private int mortgageAmount;
     private final PropertyNames name;
     private final Color color;
     private Player owner;
@@ -45,6 +47,8 @@ public class Property extends Tile{
         this.owner = null;
         this.rentValues = name.getRentValues();
         this.houseAmount = 0;
+        this.housePrice = name.getHousePrice();
+        this.mortgageAmount = name.getMortgageValue();
     }
 
     /**
@@ -89,6 +93,10 @@ public class Property extends Tile{
     public int getRentValue(int index) {return rentValues[index];}
 
     public int getHouseAmount() {return houseAmount;}
+    public void incrementHouseAmount() {houseAmount++;}
+    public void decrementHouseAmount() {houseAmount--;}
+
+    public int getHouseCost() {return housePrice;}
 
     public boolean isOwned() {return this.owner != null;}
 
