@@ -13,6 +13,7 @@ public class CommunityTile extends Tile{
         cards[0] = new SubMoneyCard("Pay Doctor fees of $50.", 50);
         cards[1] = new GiveMoneyCard("Receive $100 in dividends from the bank.", 50);
         cards[2] = new GiveMoneyCard("Receive $100 in dividends from the bank.", 50);
+        cards[3] = new GiveMoneyCard("Receive $100 in dividends from the bank.", 50);
         cards[4] = new SubMoneyCard("Pay Doctor fees of $50.", 50);
         cards[5] = new GiveMoneyCard("Receive $50.", 50);
         cards[6] = new GiveMoneyCard("Receive $50.", 50);
