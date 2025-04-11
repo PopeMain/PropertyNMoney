@@ -30,6 +30,7 @@ public class Property extends Tile{
     private int houseAmount;
     private int housePrice;
     private int mortgageAmount;
+    private boolean mortgaged;
     private final PropertyNames name;
     private final Color color;
     private Player owner;
@@ -49,6 +50,7 @@ public class Property extends Tile{
         this.houseAmount = 0;
         this.housePrice = name.getHousePrice();
         this.mortgageAmount = name.getMortgageValue();
+        this.mortgaged = false;
     }
 
     /**
@@ -102,6 +104,11 @@ public class Property extends Tile{
 
     public Player getOwner() {return owner;}
     public void setOwner(Player owner) {this.owner = owner;}
+
+    public boolean isMortgaged() {return mortgaged;}
+    public void setMortgaged(boolean mortgaged) {this.mortgaged = mortgaged;}
+
+    public int getMortgageValue() {return mortgageAmount;}
 
 
 }
