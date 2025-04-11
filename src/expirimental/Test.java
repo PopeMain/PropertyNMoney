@@ -16,6 +16,7 @@ public class Test extends JFrame{
         PropertyTile parkPlaceTile = new PropertyTile(PropertyNames.PARK_PL);
         PropertyTile balticAveTile = new PropertyTile(PropertyNames.BALTIC_AVE);
         PropertyTile atlanticAveTile = new PropertyTile(PropertyNames.ATLANTIC_AVE);
+        UtilityTile railroad = new UtilityTile("South RAILROAD", "src/MIcons.png", 7);
 
         // Simulate Player 1 buying Mediterranean Ave
         playerGUI.addProperty(1, PropertyNames.MEDITERRANEAN_AVE);
@@ -25,6 +26,7 @@ public class Test extends JFrame{
         mediterraneanAveTile.addPlayer(playerGUI.getPlayerPanel(1).getPlayerIconL(), 0);
         mediterraneanAveTile.addPlayer(playerGUI.getPlayerPanel(2).getPlayerIconL(), 1);
         mediterraneanAveTile.addPlayer(playerGUI.getPlayerPanel(4).getPlayerIconL(), 3);
+        atlanticAveTile.addPlayer(playerGUI.getPlayerPanel(3).getPlayerIconL(), 2);
 
         // Simulate Player 1 buying Park Place
         playerGUI.addProperty(2, PropertyNames.PARK_PL);
@@ -42,6 +44,7 @@ public class Test extends JFrame{
         boardPanel.add(parkPlaceTile);
         boardPanel.add(balticAveTile);
         boardPanel.add(atlanticAveTile);
+        boardPanel.add(railroad);
 
         // Add the panels to the JFrame
         add(playerGUI, BorderLayout.CENTER); // Player details on the left

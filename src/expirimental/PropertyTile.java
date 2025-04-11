@@ -26,6 +26,7 @@ public class PropertyTile extends TileAbstract {
         top.setLayout(new BorderLayout());
         //build spot for owner Icon
         ownerIconL = new JLabel("", SwingConstants.CENTER);
+        ownerIconL.setIcon(new ColorIcon(propertyColor, 50));
         ownerIconL.setPreferredSize(new Dimension(50, 50)); // Size for the owner icon
         ownerIconL.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
@@ -33,6 +34,7 @@ public class PropertyTile extends TileAbstract {
         //build spot for houses
         housePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
         housePanel.setOpaque(false);
+        housePanel.add(new JLabel(new ColorIcon(propertyColor, 30)));
         updateHousePanel();
 
         //build spot to show the property Name

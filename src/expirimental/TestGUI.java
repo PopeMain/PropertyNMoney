@@ -99,7 +99,7 @@ public class TestGUI extends JFrame {
 
         c.gridx = 5;
         c.gridy = 10;
-        southTrain = new UtilityTile("South Train", extractSprite(MIicons, 7));
+        southTrain = new UtilityTile("South Train", MIicons, 7);
         add(southTrain, c);
 
         c.gridx = 4;
@@ -134,7 +134,7 @@ public class TestGUI extends JFrame {
 
         c.gridx = 0;
         c.gridy = 8;
-        electricUtility = new UtilityTile("Electric Utility", extractSprite(MIicons, 4));
+        electricUtility = new UtilityTile("Electric Utility", MIicons, 4);
         add(electricUtility, c);
 
         c.gridx = 0;
@@ -149,7 +149,7 @@ public class TestGUI extends JFrame {
 
         c.gridx = 0;
         c.gridy = 5;
-        westTrain = new UtilityTile("West Train", extractSprite(MIicons, 7));
+        westTrain = new UtilityTile("West Train", MIicons, 7);
         add(westTrain, c);
 
         c.gridx = 0;
@@ -199,7 +199,7 @@ public class TestGUI extends JFrame {
 
         c.gridx = 5;
         c.gridy = 10;
-        northTrain = new UtilityTile("North Train", extractSprite(MIicons, 7));
+        northTrain = new UtilityTile("North Train", MIicons, 7);
         add(northTrain, c);
 
         c.gridx = 6;
@@ -214,7 +214,7 @@ public class TestGUI extends JFrame {
 
         c.gridx = 8;
         c.gridy = 10;
-        waterUtility = new UtilityTile("Water Utility", extractSprite(MIicons, 1));
+        waterUtility = new UtilityTile("Water Utility", MIicons, 1);
         add(waterUtility, c);
 
         c.gridx = 9;
@@ -249,7 +249,7 @@ public class TestGUI extends JFrame {
 
         c.gridx = 10;
         c.gridy = 5;
-        eastTrain = new UtilityTile("East Train", extractSprite(MIicons, 7));
+        eastTrain = new UtilityTile("East Train", MIicons, 7);
         add(eastTrain, c);
 
         c.gridx = 10;

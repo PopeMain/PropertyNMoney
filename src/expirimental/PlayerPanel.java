@@ -7,7 +7,21 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-
+/**
+ * @author Frank Pope
+ * <p>
+ * PlayerPanel is a class for saving player information in a visual system to aid in game play.
+ * The player's name, money and chosen icon will appear in the top part of their panel. Then in a
+ * JList below that the purchased and earned properties will be rendered with an appropriate icon or color
+ * </p>
+ * Methods:<p>
+ *     -updateMoney: takes the new balance of the player and changes the display for the new value <p>
+ *     -addProperty: adds purchased properties to the list of owned properties for the player <p>
+ *     -removeProperty: removes a specified property from the list of owned properties <p>
+ *     -getPlayerIconL: get's the IconImage from the PlayerIconL a JLabel short for PlayerIconLabel <p>
+ *     -addUtility: add's the utilities to the list of owned properties.<p>
+ *     -extractSprite: takes the spritesheet and the index and returns a single image for a player Icon <p>
+ */
 public class PlayerPanel extends JPanel {
     private JLabel playerNameL;
     private JLabel playerMoneyL;
@@ -15,34 +29,50 @@ public class PlayerPanel extends JPanel {
     private DefaultListModel<PropertyNames> propertyModel;
     private JList<PropertyNames> propertyList;
 
+    /**
+     * get's the important stuff for the playerPanel, then builds the Graphical interface.
+     * @param playerName submitted name for the player of this panel
+     * @param startingMoney the inital amount of money players will start with
+     * @param iconIndex the indexed location for the picture the player wants as their icon from a spritesheet
+     * @param spriteSheetPath A string that points to the file location for the sprite sheet
+     * @param utilityIcon The special rendering options for owned properties.
+     */
     public PlayerPanel(String playerName, int startingMoney, int iconIndex, String spriteSheetPath, Icon utilityIcon) {
         setLayout(new BorderLayout(10, 10)); // Layout with gaps
         setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Optional border for separation
 
+        JPanel playerInfoP = new JPanel();
+        playerInfoP.setLayout(new BorderLayout());
+        playerInfoP.setBorder(BorderFactory.createEmptyBorder(10,25,10,25));
         // Player Name at the top
         playerNameL = new JLabel(playerName, SwingConstants.CENTER);
-        playerNameL.setFont(new Font("SansSerif", Font.BOLD, 16));
-        add(playerNameL, BorderLayout.NORTH);
+        playerNameL.setFont(new Font("SansSerif", Font.BOLD, 10));
+        playerNameL.setHorizontalAlignment(SwingConstants.CENTER);
+        playerInfoP.add(playerNameL, BorderLayout.NORTH);
 
         // Center panel for money and icon
-        JPanel centerPanel = new JPanel(new GridLayout(2, 1));
         playerMoneyL = new JLabel("Money: $" + startingMoney, SwingConstants.CENTER);
-        playerMoneyL.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        centerPanel.add(playerMoneyL);
+        playerMoneyL.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        playerMoneyL.setHorizontalAlignment(SwingConstants.CENTER);
+        playerInfoP.add(playerMoneyL,BorderLayout.CENTER);
+
 
         // Player icon from the sprite sheet
         playerIconL = new JLabel("", SwingConstants.CENTER);
         playerIconL.setIcon(extractSprite(spriteSheetPath, iconIndex));
-        centerPanel.add(playerIconL);
+        playerIconL.setHorizontalAlignment(SwingConstants.CENTER);
+        playerInfoP.add(playerIconL, BorderLayout.SOUTH);
 
-        add(centerPanel, BorderLayout.CENTER);
+        // Add playerInfoPanel to the top of the main panel
+        add(playerInfoP, BorderLayout.NORTH);
+
 
         // Property list at the bottom
         propertyModel = new DefaultListModel<>();
         propertyList = new JList<>(propertyModel); // Property list uses the DefaultListModel
         propertyList.setCellRenderer(new PropertyListRenderer(utilityIcon)); // Set custom renderer
         JScrollPane propertyScrollPane = new JScrollPane(propertyList);
-        add(propertyScrollPane, BorderLayout.SOUTH);
+        add(propertyScrollPane, BorderLayout.CENTER);
     }
 
     /**
@@ -70,16 +100,20 @@ public class PlayerPanel extends JPanel {
         return playerIconL.getIcon();
     }
 
+    public void addUtility(String name, Icon utilityIcon) {
+        propertyList.setCellRenderer(new PropertyListRenderer(utilityIcon));
+    }
+
     /**
      * Extract a specific icon from the sprite sheet.
      *
      * @param spriteSheetPath Path to the sprite sheet image.
-     * @param iconIndex       The index of the icon (row-wise, 0-8).
-     * @return An ImageIcon containing the extracted icon.
+     * @param iconIndex       The index of the icon left to right top to bottom
+     * @return An ImageIcon containing the chosen ImageIcon.
      */
     private ImageIcon extractSprite(String spriteSheetPath, int iconIndex) {
-        final int SPRITE_WIDTH = 300; // Each sprite's width (900px / 3 sprites per row)
-        final int SPRITE_HEIGHT = 237; // Each sprite's height (711px / 3 sprites per column)
+        final int SPRITE_WIDTH = 300; // Each sprite's width (900px / 3 sprites per row) = 300px
+        final int SPRITE_HEIGHT = 237; // Each sprite's height (711px / 3 sprites per column) = 237px
         final int SPRITES_PER_ROW = 3; // Number of sprites in each row
 
         try {
@@ -90,7 +124,7 @@ public class PlayerPanel extends JPanel {
             int row = iconIndex / SPRITES_PER_ROW;
             int col = iconIndex % SPRITES_PER_ROW;
 
-            // Extract the specific sprite
+            // get the specific sprite
             BufferedImage sprite = spriteSheet.getSubimage(
                     col * SPRITE_WIDTH,
                     row * SPRITE_HEIGHT,

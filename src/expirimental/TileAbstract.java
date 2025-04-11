@@ -12,6 +12,7 @@ abstract class TileAbstract extends JPanel {
     protected JPanel bottomPanel;
     private JPanel playerBox;
     private Icon[] players;
+    public final Color bgColor = new Color(100, 255, 255);
 
     public TileAbstract() {
     }
@@ -23,7 +24,7 @@ abstract class TileAbstract extends JPanel {
     public JPanel createBottom() {
         playerBox = new JPanel(new GridLayout(2,2));
         playerBox.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        playerBox.setBackground(new Color(100, 255, 255));
+        playerBox.setBackground(bgColor);
 
         //placeholders for player icons
         for (int i = 0; i < 4; i++) {
@@ -42,7 +43,10 @@ abstract class TileAbstract extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
 
         //Initialize Player Array
-        players = new ImageIcon[4];
+        players = new Icon[4];
+        for (int i = 0; i < 4; i++) {
+            players[i] = new ColorIcon(bgColor, 50);
+        }
 
         //Initialize panels
         topPanel = createTop();
@@ -81,13 +85,13 @@ abstract class TileAbstract extends JPanel {
     }
 
     public void removePlayer(int index){
-        players[index] = null;
+        players[index] = new ColorIcon(bgColor, 50);
         updatePlayerIcons();
     }
 
     public ImageIcon extractSprite(String spriteSheetPath, int iconIndex) {
-        final int SPRITE_WIDTH = 25; // Each sprite's width (160px / 4 sprites per row)
-        final int SPRITE_HEIGHT = 25; // Each sprite's height (120px / 3 sprites per column)
+        final int SPRITE_WIDTH = 25; // Each sprite's width (900px / 3 sprites per row)
+        final int SPRITE_HEIGHT = 25; // Each sprite's height (711px / 3 sprites per column)
         final int SPRITES_PER_ROW = 1; // Number of sprites in each row
 
         try {
@@ -107,7 +111,7 @@ abstract class TileAbstract extends JPanel {
             );
 
             // Scale the sprite to a smaller size for display
-            Image scaledSprite = sprite.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+            Image scaledSprite = sprite.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
             return new ImageIcon(scaledSprite);
 
         } catch (IOException e) {
