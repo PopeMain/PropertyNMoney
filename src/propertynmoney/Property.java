@@ -73,7 +73,7 @@ public class Property extends Tile{
      * getColor takes the color value from the name.getColor() set at the time of construction
      * @return Java.awt.Color value for the property
      */
-    public java.awt.Color getColor() {
+    public Color getColor() {
         return color;
     }
 

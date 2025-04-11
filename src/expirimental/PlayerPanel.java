@@ -14,13 +14,6 @@ import java.io.IOException;
  * The player's name, money and chosen icon will appear in the top part of their panel. Then in a
  * JList below that the purchased and earned properties will be rendered with an appropriate icon or color
  * </p>
- * Methods:<p>
- *     -updateMoney: takes the new balance of the player and changes the display for the new value <p>
- *     -addProperty: adds purchased properties to the list of owned properties for the player <p>
- *     -removeProperty: removes a specified property from the list of owned properties <p>
- *     -getPlayerIconL: get's the IconImage from the PlayerIconL a JLabel short for PlayerIconLabel <p>
- *     -addUtility: add's the utilities to the list of owned properties.<p>
- *     -extractSprite: takes the spritesheet and the index and returns a single image for a player Icon <p>
  */
 public class PlayerPanel extends JPanel {
     private JLabel playerNameL;
@@ -30,6 +23,7 @@ public class PlayerPanel extends JPanel {
     private JList<PropertyNames> propertyList;
 
     /**
+     * TODO MAKE MORE TECHNICAL
      * get's the important stuff for the playerPanel, then builds the Graphical interface.
      * @param playerName submitted name for the player of this panel
      * @param startingMoney the inital amount of money players will start with
@@ -137,6 +131,7 @@ public class PlayerPanel extends JPanel {
             return new ImageIcon(scaledSprite);
 
         } catch (IOException e) {
+            //TODO MAKE THIS MORE SPECIFIC
             e.printStackTrace();
             return null; // Return null if the sprite cannot be extracted
         }

@@ -4,11 +4,13 @@ import propertynmoney.Property;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-/**
- * @author Frank Pope
- *
- * Notes: This is currently Bullshit Code that can be used to store info specific to each player.
+/*
+Auth: Frank Pope
+GroupID: The Capitalists
+Notes: This is currently Bullshit Code that can be used to store info specific to each player.
  */
+
+
 public class Player {
     private int money;
     private int position;
