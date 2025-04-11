@@ -39,7 +39,10 @@ public class Player {
     public String getName() {return name;}
 
     public void addMoney(int money) {this.money += money;}
-    public void subMoney(int money) {this.money -= money;}
+    public boolean subMoney(int money) {
+        this.money -= money;
+        return this.money < 0;
+    }
 
     public int getPosition() {return position;}
     public boolean movePosition(int rollValue){

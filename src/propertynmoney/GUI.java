@@ -32,15 +32,11 @@ import java.util.List;
  * give the player $200.
  * @author Nevin Fullerton and Frank Pope
  */
-
 public class GUI extends JFrame {
-
     private final JPanel boardPanel;
     private final JPanel sideBarPanel;
     private final JPanel actionPanel;
     private JList<Object> propertiesList;
-
-
 
     private Player[] players; // Holds the players in the game
     private int currentPlayer; // The index of the current player in the array of players
@@ -61,10 +57,8 @@ public class GUI extends JFrame {
     private JPanel westPanelHolder;
 
     private final Random diceRand; // Random number generation for dice rolls
-
     private final int IMAGE_WIDTH;
-
-    private Map<PropertyColors, Integer> houseAmounts = new HashMap<PropertyColors, Integer>();
+    private final Map<PropertyColors, Integer> houseAmounts = new HashMap<PropertyColors, Integer>();
 
     /**
      *
@@ -170,7 +164,7 @@ public class GUI extends JFrame {
 
 //        boolean passedGo = players[currentPlayer].movePosition(dice1 + dice2);
 
-        boolean passedGo = players[currentPlayer].movePosition(1);
+        boolean passedGo = players[currentPlayer].movePosition(1); // TODO Testing code, remove when done
 
 
         if (passedGo) {
@@ -273,7 +267,7 @@ public class GUI extends JFrame {
             TaxTile tax = (TaxTile) tile;
             JOptionPane.showMessageDialog(this, "You must pay a tax of " + tax.getTaxAmount() + ".");
             player.subMoney(tax.getTaxAmount());
-        }else if (tile.getTileType() == TileTypes.CHANCE) {
+        } else if (tile.getTileType() == TileTypes.CHANCE) {
             ChanceTile chance = (ChanceTile) tile;
             onChance(chance, player);
         } else if (tile.getTileType() == TileTypes.COMMUNITYCHEST) {
@@ -290,8 +284,8 @@ public class GUI extends JFrame {
     /**
      * The events that happen when the player lands on a property tile, either the option to buy the property or paying rent to the
      * owner.
-     * @param property
-     * @param player
+     * @param property The property tile the player landed on
+     * @param player The player that landed on the tile
      */
     private void onProperty(Property property, Player player) {
         // Make player pay rent to owner if they land on owned unmortgaged property, else give them the ability to buy property if
@@ -301,7 +295,10 @@ public class GUI extends JFrame {
                 JOptionPane.showMessageDialog(this, "You landed on an owned property, but it is mortgaged. So you do not have to pay rent");
             } else {
                 JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue(property.getHouseAmount()) + " to " + property.getOwner().toString() + "in order stay here.");
-                player.subMoney(property.getRentValue(property.getHouseAmount()));
+                boolean bankrupt = player.subMoney(property.getRentValue(property.getHouseAmount()));
+                if (bankrupt) {
+                    bankruptcy();
+                }
                 property.getOwner().addMoney(property.getRentValue(property.getHouseAmount())); // Pay rent to owner
             }
 
@@ -319,20 +316,23 @@ public class GUI extends JFrame {
                     JOptionPane.showMessageDialog(this, "You don't wish to buy this property.");
                 }
             }
-
         }
     }
 
     /**
      * The events that happen when a player lands on a utility tile, either the option to buy the utility or pay rent
      * to the utility of the property.
-     * @param utility
-     * @param player
+     * @param utility The utility tile the player landed on
+     * @param player Player that landed on the tile
      */
     private void onUtility(Utility utility, Player player) {
         if (utility.isOwned()) {
             JOptionPane.showMessageDialog(this, "You must pay " + utility.getRentValue() + " to stay here.");
-            player.subMoney(utility.getRentValue());
+            boolean bankrupt = player.subMoney(utility.getRentValue());
+            if (bankrupt) {
+                bankruptcy();
+            }
+            utility.getOwner().addMoney(utility.getRentValue());
         } else {
             if (utility.getBuyValue() > player.getMoney()) {
                 JOptionPane.showMessageDialog(this, "You don't have enough money to buy this utility.");
@@ -353,8 +353,8 @@ public class GUI extends JFrame {
 
     /**
      *
-     * @param chance
-     * @param player
+     * @param chance The chance tile the player landed on
+     * @param player Player that landed on the tile
      */
     private void onChance(ChanceTile chance, Player player) {
         int playerLastPosition = player.getPosition(); // Used to determine if player was moved by card
@@ -477,7 +477,7 @@ public class GUI extends JFrame {
     /**
      * Check if player meets all requirements to sell a house on the property, then either sell a house or cancels the
      * transaction.
-     * @param selectedProperty
+     * @param selectedProperty property players wishes to sell property on
      */
     private void sellHouse(Property selectedProperty) {
         if (selectedProperty.getHouseAmount() == 0) {
@@ -520,7 +520,7 @@ public class GUI extends JFrame {
 
     /**
      *
-     * @param selectedProperty
+     * @param selectedProperty property player wishes to mortgage
      */
     private void mortgageProperty(Property selectedProperty) {
         boolean noHouses = true;
@@ -553,7 +553,7 @@ public class GUI extends JFrame {
 
     /**
      *
-     * @param selectedProperty
+     * @param selectedProperty property players wishes to unmortgage
      */
     private void unmortgageProperty(Property selectedProperty) {
 
@@ -623,8 +623,13 @@ public class GUI extends JFrame {
         tiles[39] = new Property(PropertyNames.BOARDWALK);
     }
 
-    private void bankRuptcy() {
-
+    /**
+     * Set up the bankruptcy button frame so as to
+     */
+    private void bankruptcy() {
+        JOptionPane.showMessageDialog(this, "Bankruptcy! If you have any houses to sell or properties" +
+                "to mortgage, do so to get balance above 0. Else you will go bankrupt and leave the game!");
+        paintBankruptcyButtonFrame();
     }
 
     /**
@@ -706,7 +711,7 @@ public class GUI extends JFrame {
         gbc.insets = new Insets(0, 0, 0, 0);
 
         for (Player player : players) {
-            if (player == null) break; // TODO Make this take account of player out
+            if (player == null || player.isBankrupt()) break; // Don't draw players who are bankrupt or don't exist
             JLabel playerLabel = new JLabel(player.getName());
             playerLabel.setPreferredSize(new Dimension(80, 20));
 
@@ -814,18 +819,85 @@ public class GUI extends JFrame {
     }
 
     /**
-     * @author Nevin Fullerton
+     * Remove all components in sidebar panel to draw new components on sidebar panel
      */
     private void clearSideBarPanel() {
         sideBarPanel.removeAll();
     }
 
     /**
-     * @author Nevin Fullerton
+     * Displays the actions that the player is able to do in a normal turn
      */
     private void paintStandardButtonFrame() {
         clearActionPanel();
 
+        // Create buttons the player is able to do on a normal turn
+        JButton rollDiceButton = rollDiceButton();
+        JButton buyHousesButton = buyAndSellHouseButton();
+        JButton mortgageButton = mortgagePropertyButton();
+        JButton endTurnButton = endTurnButton();
+
+        // Add buttons to JPanel
+        actionPanel.add(rollDiceButton);
+        actionPanel.add(buyHousesButton);
+        actionPanel.add(mortgageButton);
+        actionPanel.add(endTurnButton);
+
+        // Repaint screen
+        actionPanel.revalidate();
+        actionPanel.repaint();
+    }
+
+    /**
+     * Displays the actions that the player is able to do while they are in jail
+     */
+    private void paintJailButtonFrame() {
+        clearActionPanel();
+
+        // Create buttons that show the actions the player can do while in jail
+        JButton rollDiceButton = rollDiceJailButton();
+        JButton payFineButton = payFineButton();
+        JButton buyHousesButton = buyAndSellHouseButton();
+        JButton mortgageButton = mortgagePropertyButton();
+        JButton endTurnButton = endTurnJailButton();
+
+        // Add buttons to JPanel
+        actionPanel.add(rollDiceButton);
+        actionPanel.add(payFineButton);
+        actionPanel.add(buyHousesButton);
+        actionPanel.add(mortgageButton);
+        actionPanel.add(endTurnButton);
+
+        // Repaint screen
+        actionPanel.revalidate();
+        actionPanel.repaint();
+    }
+
+    /**
+     * Creates the buttons that the player is able to do to avoid bankruptcy and remain in the game, or declare bankruptcy
+     * and leave the game
+     */
+    private void paintBankruptcyButtonFrame() {
+        clearActionPanel();
+
+        JButton sellHousesButton = buyAndSellHouseButton(); // TOOD make sepearte button for just selling
+        JButton mortgageButton = mortgagePropertyButton();
+        JButton payDebtsButton = new JButton("Pay Debts"); // TODO if balance above 0, go back into game
+        JButton declareBankruptcy = new JButton("Declare Bankruptcy"); // TODO leave game
+
+        actionPanel.add(sellHousesButton);
+        actionPanel.add(mortgageButton);
+        actionPanel.add(payDebtsButton);
+        actionPanel.add(declareBankruptcy);
+
+        actionPanel.add(declareBankruptcy);
+    }
+
+    /**
+     * Creates the button that allows player to roll dice to move on the game board
+     * @return JButton that allows player to roll dice to move on the game board
+     */
+    private JButton rollDiceButton() {
         JButton rollDiceButton = new JButton("Roll Dice");
         rollDiceButton.addActionListener(new ActionListener() {
 
@@ -839,40 +911,16 @@ public class GUI extends JFrame {
             }
         });
 
-        JButton buyHousesButton = buyAndSellHouseButton();
-        JButton mortgageButton = mortgagePropertyButton();
-        JButton endTurnButton = new JButton("End Turn");
-        endTurnButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!diceRolled) {
-                    JOptionPane.showMessageDialog(boardPanel, "You must roll the dice before you end the turn.");
-                } else {
-                    endTurn();
-                }
-            }
-
-        });
-
-        actionPanel.add(rollDiceButton);
-        actionPanel.add(buyHousesButton);
-        actionPanel.add(mortgageButton);
-        actionPanel.add(endTurnButton);
-
-        actionPanel.revalidate();
-        actionPanel.repaint();
+        return rollDiceButton;
     }
 
     /**
-     * Displays the button the player is able to press if they are in jail
+     * Creates the button that allows the player to roll dice to attempt to leave jail early
+     * @return JButton that allows player to roll dice to attempt to leave jail early
      */
-    private void paintJailButtonFrame() {
-        clearActionPanel();
-
-        JButton rollDiceButton = new JButton("Roll Doubles to get out");
+    private JButton rollDiceJailButton() {
+        JButton rollDiceButton = new JButton("Roll Dice");
         rollDiceButton.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (diceRolled) {
@@ -882,7 +930,15 @@ public class GUI extends JFrame {
                 }
             }
         });
+        
+        return rollDiceButton;
+    }
 
+    /**
+     * Creates a button that allow the player to pay a fine to leave jail and roll dice afterward
+     * @return JButton that allows player to pay a find to leave jail
+     */
+    private JButton payFineButton() {
         JButton payFineButton = new JButton("Pay Fine and roll dice");
         payFineButton.addActionListener(new ActionListener() {
             @Override
@@ -896,36 +952,12 @@ public class GUI extends JFrame {
                 paintStandardButtonFrame();
             }
         });
-
-        JButton buyHousesButton = buyAndSellHouseButton();
-        JButton mortgageButton = mortgagePropertyButton();
-        JButton endTurnButton = new JButton("End Turn");
-        endTurnButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (players[currentPlayer].getTurnsInJail() == 3) {
-                    JOptionPane.showMessageDialog(boardPanel, "You must pay fine and roll dice before you end the turn, or use other methods if available.");
-                } else {
-                    endTurn();
-                }
-            }
-
-        });
-
-        actionPanel.add(rollDiceButton);
-        actionPanel.add(payFineButton);
-        actionPanel.add(buyHousesButton);
-        actionPanel.add(mortgageButton);
-        actionPanel.add(endTurnButton);
-
-        actionPanel.revalidate();
-        actionPanel.repaint();
+        return payFineButton;
     }
 
     /**
-     *
-     * @return
+     * Creates a button that allows the player to buy and sell houses
+     * @return A button that allows the player to buy and sell houses
      */
     private JButton buyAndSellHouseButton() {
         JButton button = new JButton("Buy/Sell House");
@@ -950,13 +982,12 @@ public class GUI extends JFrame {
 
         });
 
-
         return button;
     }
 
     /**
-     *
-     * @return
+     * Creates the button that allows the player to mortgage property they own
+     * @return JButton that allows player to mortgage properties
      */
     private JButton mortgagePropertyButton() {
         JButton mortgageButton = new JButton("Mortgage Property");
@@ -980,19 +1011,55 @@ public class GUI extends JFrame {
                 }
             }
         });
-        /*
-        Player selects property then clicks button
-        Checks if any property of the same color has houses
-        if not allow player to mortgage property for half of buy value
-        mark property as mortgaged
-        do same thing backwards, but make player pay 10% interest to buy back
-         */
-
         return mortgageButton;
     }
 
     /**
-     * @author Nevin Fullerton
+     * Creates the end turn button that is shown in normal circumstances
+     * @return A JButton that ends the player's turn
+     */
+    private JButton endTurnButton() {
+        JButton endTurnButton = new JButton("End Turn");
+        endTurnButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Player must roll dice before ending turn
+                if (!diceRolled) {
+                    JOptionPane.showMessageDialog(boardPanel, "You must roll the dice before you end the turn.");
+                } else {
+                    endTurn();
+                }
+            }
+        });
+
+        return endTurnButton;
+    }
+
+    /**
+     * Creates the end turn button that shows if the player is in jail
+     * @return A JButton that ends the player's turn while in jail
+     */
+    private JButton endTurnJailButton() {
+        JButton endTurnButton = new JButton("End Turn");
+        endTurnButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Player can only remain in jail for 3 turns, after that they must pay $50 dollar fine and leave
+                if (players[currentPlayer].getTurnsInJail() == 3) {
+                    JOptionPane.showMessageDialog(boardPanel, "You must pay fine and roll dice before you end the turn, or use other methods if available.");
+                } else {
+                    endTurn();
+                }
+            }
+        });
+
+        return endTurnButton;
+    }
+
+    /**
+     * Clears action panel so that new buttons can be drawn there
      */
     private void clearActionPanel() {
         actionPanel.removeAll();
