@@ -272,11 +272,18 @@ public class GUI extends JFrame {
             TaxTile tax = (TaxTile) tile;
             JOptionPane.showMessageDialog(this, "You must pay a tax of " + tax.getTaxAmount() + ".");
             player.subMoney(tax.getTaxAmount());
+        }else if (tile.getTileType() == TileTypes.CHANCE) {
+            ChanceTile chance = (ChanceTile) tile;
+            onChance(chance, player);
+        } else if (tile.getTileType() == TileTypes.COMMUNITYCHEST) {
+            CommunityTile community = (CommunityTile) tile;
+            onCommunityChest(community, player);
         } else if (tile.getTileType() == TileTypes.GOTOJAIL) {
             goToJail(player);
         }
 
         paintPlayerSidePanel();
+        paintBoardPanel();
     }
 
     /**
@@ -333,6 +340,42 @@ public class GUI extends JFrame {
                 }
             }
 
+        }
+    }
+
+    /**
+     *
+     * @param chance
+     * @param player
+     */
+    private void onChance(ChanceTile chance, Player player) {
+        int playerLastPosition = player.getPosition(); // Used to determine if player was moved by card
+
+        Card chanceCard = chance.drawCard();
+        JOptionPane.showMessageDialog(this, chanceCard.getCardText());
+        chanceCard.playerEffect(player);
+
+        // If player is moved by the card, determine movement result again as if they rolled dice
+        if (player.getPosition() != playerLastPosition) {
+            determineMovementResult();
+        }
+    }
+
+    /**
+     *
+     * @param community
+     * @param player
+     */
+    private void onCommunityChest(CommunityTile community, Player player) {
+        int playerLastPosition = player.getPosition(); // Used to determine if player was moved by card
+
+        Card communityCard = community.drawCard();
+        JOptionPane.showMessageDialog(this, communityCard.getCardText());
+        communityCard.playerEffect(player);
+
+        // If player is moved by the card, determine movement result again as if they rolled dice
+        if (player.getPosition() != playerLastPosition) {
+            determineMovementResult();
         }
     }
 
@@ -465,12 +508,12 @@ public class GUI extends JFrame {
         tiles = new Tile[40];
         tiles[0] = new Tile(TileTypes.PARKING);
         tiles[1] = new Property(PropertyNames.MEDITERRANEAN_AVE);
-        tiles[2] = new Tile(TileTypes.COMMUNITYCHEST); // Placeholder
+        tiles[2] = new CommunityTile();
         tiles[3] = new Property(PropertyNames.BALTIC_AVE);
         tiles[4] = new TaxTile(200);
         tiles[5] = new Utility(200, "RailRoad 1");
         tiles[6] = new Property(PropertyNames.ORIENTAL_AVE);
-        tiles[7] = new Tile(TileTypes.CHANCE); // Placeholder
+        tiles[7] = new ChanceTile();
         tiles[8] = new Property(PropertyNames.VERMONT_AVE);
         tiles[9] = new Property(PropertyNames.CONNECTICUT_AVE);
         tiles[10] = new Tile(TileTypes.PARKING);
@@ -480,12 +523,12 @@ public class GUI extends JFrame {
         tiles[14] = new Property(PropertyNames.VIRGINIA_AVE);
         tiles[15] = new Utility(200, "Railroad 2");
         tiles[16] = new Property(PropertyNames.ST_JAMES_PL);
-        tiles[17] = new Tile(TileTypes.COMMUNITYCHEST); // Placeholder
+        tiles[17] = new CommunityTile();
         tiles[18] = new Property(PropertyNames.TENNESSEE_AVE);
         tiles[19] = new Property(PropertyNames.NEW_YORK_AVE);
         tiles[20] = new Tile(TileTypes.PARKING);
         tiles[21] = new Property(PropertyNames.KENTUCKY_AVE);
-        tiles[22] = new Tile(TileTypes.CHANCE); // Placeholder
+        tiles[22] = new ChanceTile();
         tiles[23] = new Property(PropertyNames.INDIANA_AVE);
         tiles[24] = new Property(PropertyNames.ILLINOIS_AVE);
         tiles[25] = new Utility(200, "Railroad 3");
@@ -496,10 +539,10 @@ public class GUI extends JFrame {
         tiles[30] = new Tile(TileTypes.GOTOJAIL);
         tiles[31] = new Property(PropertyNames.PACIFIC_AVE);
         tiles[32] = new Property(PropertyNames.NORTH_CAROLINA_AVE);
-        tiles[33] = new Tile(TileTypes.COMMUNITYCHEST); // Placeholder
+        tiles[33] = new CommunityTile();
         tiles[34] = new Property(PropertyNames.PENNSYLVANIA_AVE);
         tiles[35] = new Utility(200, "Railroad 4");
-        tiles[36] = new Tile(TileTypes.CHANCE); // Placeholder
+        tiles[36] = new ChanceTile();
         tiles[37] = new Property(PropertyNames.PARK_PL);
         tiles[38] = new TaxTile(100);
         tiles[39] = new Property(PropertyNames.BOARDWALK);
