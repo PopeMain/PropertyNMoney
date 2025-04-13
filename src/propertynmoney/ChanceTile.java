@@ -2,14 +2,23 @@ package propertynmoney;
 
 import java.util.Random;
 
+/**
+ * Chance tile pulls a card from the chance card deck and applies the effect onto the player. Chance deck includes more
+ * movement cards than the community chest.
+ * @author Nevin
+ */
 public class ChanceTile extends Tile{
 
-    private final Card[] cards;
-    private final Random cardRand = new Random();
+    private final Card[] cards; // Deck cards
+    private final Random cardRand = new Random(); // Used to pick random card
 
+    /**
+     * Sets up card deck for the chance tile
+     */
     ChanceTile() {
         super(TileTypes.CHANCE);
         cards = new Card[16];
+        // Set up cards in the deck
         cards[0] = new MovementCard("Advance to Go!", 0);
         cards[1] = new MovementCard("Advance to Illinois Ave.!", 24);
         cards[2] = new MovementCard("Advance to Illinois Ave.!", 24);
