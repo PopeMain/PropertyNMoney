@@ -8,47 +8,27 @@ import java.util.*;
 import java.util.List;
 
 /**
- * Constructs, displays GUI, and manages the game. The GUI is separated into three parts, boardPanel, sideBarPanel, and
- * actionPanel. Board Panel displays the game board and the locations of all players still in the game, sideBarPanel
- * displays the current player's name, money amount, and a list of owned properties, actionPanel displays buttons of that
- * the current player is able to do. Any information that needs to be displayed to the player are displayed using
- * JOptionPanes. At the start of the game, a box will appear which will ask the user or users how many players are in
- * the game, then it will ask how many players are computer controlled, then the program will ask the name of each player
- * one by one. Finally, the program will start up the game, giving each player $1500 and starting their position at the
- * start. Starting with the first player, the player will have multiple buttons on the bottom to click on, rolling dice
- * which will roll dice and move the current player by the sum of the dice, buy houses which will allow the player to buy
- * houses on a property where they own all properties of one color by selecting the property in the side panel and clicking
- * the button, the mortgage button allows the current player to select any property they own and get half of its value
- * in to cash with the cost of having the property unable to collect rent until the mortgage is paid back, and the end
- * turn button allows the player to end their turn after they have rolled the dice and allows the program to change the
- * next player to the next player. Upon rolling dice, the program will move the player by the sum of the dice and will
- * take the players position and check which tile they landed on in the tiles array. If property, the program will check
- * if the property is owned, if false allow the user to purchase the property for the value of the house, if user purchases
- * give the player the property and subtract the money from their account, else if the property is owned, the player must
- * pay rent to the owner. If the player lands on a tax tile, they must pay the value of the tax. If the tile is a utility,
- * the process is the same as property. If the player lands on a chance or community chest tile, pull a random card and
- * put the effect on the player or players, which can include giving money, paying money, moving player, going to jail.
- * If the player lands on the go-to jail tile, the player is put into jail. If the player lands or passes the GO tile,
- * give the player $200.
+ * Constructs and displays GUI, and manages the game by moving players, handling button inputs, taking and giving money
+ * determining bankruptcy, setting up game, determining victor, ending gaming, and restaring game.
  * @author Nevin Fullerton and Frank Pope
  */
 public class GUI extends JFrame {
-    private final JPanel boardPanel;
-    private final JPanel sideBarPanel;
-    private final JPanel actionPanel;
-    private JList<Object> propertiesList;
+    private final JPanel boardPanel; // Holds game board and shows player locations on board
+    private final JPanel sideBarPanel; // Shows player information and allows user to select their properties
+    private final JPanel actionPanel; // Shows the actions the player is able to take depending on the state they are in
+    private JList<Object> propertiesList; // Shows the current player's properties, allowing them to buy/sell houses and mortgage them
 
     private Player[] players; // Holds the players in the game
     private int currentPlayer; // The index of the current player in the array of players
-    private int amountOfPlayers; // Amount of players - 1
+    private int amountOfPlayers; // Amount of players - 1, used to know where end of players array is
     private boolean diceRolled; // If dice have been rolled this turn
-    private int doubleAmount; // Used to detect if player is speeding
+    private int doubleAmount; // Used to detect if player is speeding to send them to jail
 
     private Tile[] tiles; // When the player moves, the position will be used as an index to determine what should happen to player
 
     // Panels that hold the icons of each player, to show their location on the board
     private JPanel northPanel;
-    private JPanel northPanelHolder;
+    private JPanel northPanelHolder; // Holders used to alter position of normal panels
     private JPanel southPanel;
     private JPanel southPanelHolder;
     private JPanel eastPanel;
@@ -57,11 +37,11 @@ public class GUI extends JFrame {
     private JPanel westPanelHolder;
 
     private final Random diceRand; // Random number generation for dice rolls
-    private final int IMAGE_WIDTH;
-    private final Map<PropertyColors, Integer> houseAmounts = new HashMap<PropertyColors, Integer>();
+    private final int IMAGE_WIDTH; // Used to paint player names to align them with the tiles on the game board
+    private final Map<PropertyColors, Integer> houseAmounts = new HashMap<PropertyColors, Integer>(); // Used to see if player owns all properties of one color for buying and selling houses
 
     /**
-     *
+     * Constructor that sets up the GUI and sets up important game variables like amount of players, player names, positions
      */
     GUI() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -78,9 +58,11 @@ public class GUI extends JFrame {
         players[2] = new Player(1500, "Nathan");
         players[0].moveSpecificPosition(29);
 
+        // TODO set up game method
         currentPlayer = 0;
         amountOfPlayers = 2;
 
+        // The amount of houses per property color, to know if player owns all properties of one color for buying and selling houses
         houseAmounts.put(PropertyColors.BROWN, 2);
         houseAmounts.put(PropertyColors.CYAN, 3);
         houseAmounts.put(PropertyColors.MAGENTA, 3);
@@ -90,9 +72,9 @@ public class GUI extends JFrame {
         houseAmounts.put(PropertyColors.GREEN, 3);
         houseAmounts.put(PropertyColors.BLUE, 2);
 
-        IMAGE_WIDTH = gameBoard.getIconWidth(); // Width same as
+        IMAGE_WIDTH = gameBoard.getIconWidth(); // Width of game board, used to align player names to tiles on board
 
-        // Construct player holders
+        // Construct player holders, to ensure player names are aligned with board
         northPanel = new JPanel();
         northPanel.setLayout(new GridBagLayout());
         northPanelHolder = new JPanel();
@@ -125,11 +107,13 @@ public class GUI extends JFrame {
         boardLabel.setVisible(true);
         boardPanel.add(boardLabel, BorderLayout.CENTER);
 
+        // Position panels where player names are drawn to be aligned with board
         boardPanel.add(northPanelHolder, BorderLayout.NORTH);
         boardPanel.add(southPanelHolder, BorderLayout.SOUTH);
         boardPanel.add(eastPanelHolder, BorderLayout.EAST);
         boardPanel.add(westPanelHolder, BorderLayout.WEST);
 
+        // Set up tiles so the game knows what to do when player moves onto a tile
         setUpTiles();
         paintBoardPanel();
 
@@ -159,19 +143,26 @@ public class GUI extends JFrame {
      * but if they roll three doubles in a row, they go to jail for speeding.
      */
     private void rollDice() {
+        // Roll the two dice
         int dice1 = diceRand.nextInt(1,6);
         int dice2 = diceRand.nextInt(1,6);
 
+        // Move player and check if they passed go
 //        boolean passedGo = players[currentPlayer].movePosition(dice1 + dice2);
 
         boolean passedGo = players[currentPlayer].movePosition(1); // TODO Testing code, remove when done
 
+        // Show player what dice they rolled
+        JOptionPane.showMessageDialog(this, "You rolled a " + dice1 + ", and a " + dice2);
 
+        // Give player $200  if they pass go
         if (passedGo) {
             JOptionPane.showMessageDialog(this, "You passed go! Collect $200.");
             players[currentPlayer].addMoney(200);
         }
 
+        // Allow player to roll again if they roll doubles (both dice have same value), or put them in jail
+        // if they roll three doubles in a row
         if (dice1 == dice2) {
             if (doubleAmount == 3) {
                 JOptionPane.showMessageDialog(this, "Oops! You were caught speeding! You must go to jail.");
@@ -181,10 +172,9 @@ public class GUI extends JFrame {
                 doubleAmount++;
             }
         } else {
-            diceRolled = true;
+            diceRolled = true; // Prevent player from rolling in the same turn
         }
 
-        JOptionPane.showMessageDialog(this, "You rolled a " + dice1 + ", and a " + dice2);
         paintBoardPanel();
         paintPlayerSidePanel();
         determineMovementResult();
@@ -196,13 +186,14 @@ public class GUI extends JFrame {
      * player remains in jail.
      */
     private void rollJailDice() {
-        Random diceRand = new Random();
+        // Roll two dice
         int dice1 = diceRand.nextInt(1,6);
         int dice2 = diceRand.nextInt(1,6);
-        diceRolled = true;
+        diceRolled = true; // Prevent player from rolling again in same turn
 
         JOptionPane.showMessageDialog(this, "You rolled a " + dice1 + ", and a " + dice2);
 
+        // Check if two dice share the same value, if true get player out of jail and move them by dice amount
         if (dice1 == dice2) {
             JOptionPane.showMessageDialog(this, "You rolled a double! You get out of jail and move by " + (dice1 + dice2));
             players[currentPlayer].movePosition(dice1 + dice2);
@@ -220,32 +211,37 @@ public class GUI extends JFrame {
      * and position.
      */
     private void endTurn() {
+        // Increase player in jail turn amount to prevent player from being in jail forever
         if (players[currentPlayer].isInJail()) {
             players[currentPlayer].setTurnsInJail(players[currentPlayer].getTurnsInJail() + 1);
         }
 
         doubleAmount = 0; // Reset double amount for next player
 
+        // Find next eligible player by linearly searching through players array
         boolean nextPlayerFound = false;
         while (!nextPlayerFound) {
+            // Go to array start if reached end of array
             if (currentPlayer == amountOfPlayers) {
                 currentPlayer = 0;
             } else {
                 currentPlayer++;
             }
 
+            // Ensure player is not bankrupt before going assigning nextPlayerFound
             if (!players[currentPlayer].isBankrupt()) {
                 nextPlayerFound = true;
             }
         }
 
+        // Paint button frame depending on which state they are in
         if (players[currentPlayer].isInJail()) {
             paintJailButtonFrame();
         } else {
             paintStandardButtonFrame();
         }
 
-        diceRolled = false;
+        diceRolled = false; // Reset diceRolled to allow the next player to roll
         paintPlayerSidePanel();
     }
 
@@ -254,9 +250,10 @@ public class GUI extends JFrame {
      * if property or utility either allow player to buy or make them pay rent to owner, if chance card
      */
     private void determineMovementResult() {
-        Player player = players[currentPlayer];
-        Tile tile = tiles[player.getPosition()];
+        Player player = players[currentPlayer]; // Current player that just moved
+        Tile tile = tiles[player.getPosition()]; // Tile the player just landed on
 
+        // Find type of tile player landed on, covert tile to respective child class, and run method related to that tile type
         if (tile.getTileType() == TileTypes.PROPERTY) {
             Property property = (Property) tile;
             onProperty(property, player);
@@ -266,7 +263,7 @@ public class GUI extends JFrame {
         } else if (tile.getTileType() == TileTypes.TAX) {
             TaxTile tax = (TaxTile) tile;
             JOptionPane.showMessageDialog(this, "You must pay a tax of " + tax.getTaxAmount() + ".");
-            player.subMoney(tax.getTaxAmount());
+            player.subMoney(tax.getTaxAmount()); // TODO Bankruptcy
         } else if (tile.getTileType() == TileTypes.CHANCE) {
             ChanceTile chance = (ChanceTile) tile;
             onChance(chance, player);
@@ -288,14 +285,15 @@ public class GUI extends JFrame {
      * @param player The player that landed on the tile
      */
     private void onProperty(Property property, Player player) {
-        // Make player pay rent to owner if they land on owned unmortgaged property, else give them the ability to buy property if
+        // Make player pay rent to owner if they land on owned unmortgaged property
         if (property.isOwned()) {
             // Don't pay rent if property is mortgaged
             if (property.isMortgaged()) {
                 JOptionPane.showMessageDialog(this, "You landed on an owned property, but it is mortgaged. So you do not have to pay rent");
             } else {
                 JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue(property.getHouseAmount()) + " to " + property.getOwner().toString() + "in order stay here.");
-                boolean bankrupt = player.subMoney(property.getRentValue(property.getHouseAmount()));
+                boolean bankrupt = player.subMoney(property.getRentValue(property.getHouseAmount())); // TODO bankruptcy
+                // Take money from player and check if they are bankrupt
                 if (bankrupt) {
                     bankruptcy();
                 }
@@ -303,11 +301,13 @@ public class GUI extends JFrame {
             }
 
         } else {
+            // Allow player to buy property if they have sufficient funds
             if (property.getBuyValue() > player.getMoney()) {
                 JOptionPane.showMessageDialog(this, "You don't have enough money to buy this property.");
             } else {
                 int result = JOptionPane.showConfirmDialog(this, "Do you wish to buy property for " + property.getBuyValue() + " ?", "Buying Property", JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
+                    // Give player property and take money from player if they buy property
                     JOptionPane.showMessageDialog(this, player.getName() +  " now owns " + property.getName());
                     player.subMoney(property.getBuyValue());
                     player.addProperty(property);
@@ -326,17 +326,26 @@ public class GUI extends JFrame {
      * @param player Player that landed on the tile
      */
     private void onUtility(Utility utility, Player player) {
+        // Make player pay rent to owner if they land on owned unmortgaged utility
         if (utility.isOwned()) {
-            JOptionPane.showMessageDialog(this, "You must pay " + utility.getRentValue() + " to stay here.");
-            boolean bankrupt = player.subMoney(utility.getRentValue());
-            if (bankrupt) {
-                bankruptcy();
+            // Don't pay rent if utility is mortgaged
+            if (utility.isMortgaged()) {
+                JOptionPane.showMessageDialog(this, "You landed on an owned utility, but it is mortgaged. So you do not have to pay rent");
+            } else {
+                JOptionPane.showMessageDialog(this, "You must pay " + utility.getRentValue() + " to stay here.");
+                boolean bankrupt = player.subMoney(utility.getRentValue());
+                // Take money from player and check if they are bankrupt
+                if (bankrupt) {
+                    bankruptcy();
+                }
+                utility.getOwner().addMoney(utility.getRentValue()); // Give money to owner
             }
-            utility.getOwner().addMoney(utility.getRentValue());
         } else {
+            // Allow player to buy utility if eligible
             if (utility.getBuyValue() > player.getMoney()) {
                 JOptionPane.showMessageDialog(this, "You don't have enough money to buy this utility.");
             } else {
+                // Give player utility and take money from player if they buy property
                 int result = JOptionPane.showConfirmDialog(this, "Do you wish to buy the utility for " + utility.getBuyValue() + " ?", "Buying Utility", JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
                     JOptionPane.showMessageDialog(this, player.getName() +  " now owns " + utility.getName());
@@ -347,12 +356,12 @@ public class GUI extends JFrame {
                     JOptionPane.showMessageDialog(this, "You don't wish to buy this property.");
                 }
             }
-
         }
     }
 
     /**
-     *
+     * The events that happen when a player lands on a chance tile, draws a card from the chance card deck and applies
+     * effect onto the player
      * @param chance The chance tile the player landed on
      * @param player Player that landed on the tile
      */
@@ -370,9 +379,10 @@ public class GUI extends JFrame {
     }
 
     /**
-     *
-     * @param community
-     * @param player
+     * The events that happen when a player lands on a community tile, draws a card from the community chest card deck and
+     * applies effect onto the player
+     * @param community The community tile the player landed on
+     * @param player Player that landed on the tile
      */
     private void onCommunityChest(CommunityTile community, Player player) {
         int playerLastPosition = player.getPosition(); // Used to determine if player was moved by card
@@ -402,9 +412,10 @@ public class GUI extends JFrame {
     /**
      * Check if player meets all requirements to buy a house on the property, then either purchases a house or cancels the
      * transaction.
-     * @param selectedProperty
+     * @param selectedProperty Property the player wishes to buy houses on
      */
     private void buyHouse(Property selectedProperty) {
+        // Prevent more than 5 houses on one property
         if (selectedProperty.getHouseAmount() == 5) {
             JOptionPane.showMessageDialog(this, "You cannot buy more than 5 houses.");
             return;
@@ -419,7 +430,7 @@ public class GUI extends JFrame {
             }
         }
 
-        // Display and exit if player does not own all properties
+        // Display and exit if player does not own all properties of one color
         if (propertyAmount < houseAmounts.get(selectedProperty.getColorEnum())) {
             JOptionPane.showMessageDialog(this, "You don't own all the properties of this color.");
             return;
@@ -435,6 +446,7 @@ public class GUI extends JFrame {
             }
         }
 
+        // These two variables are to make sure player builds up properties at the same rate, rather than focus one
         int highestHouseAmount = 0;
         int lowestHouseAmount = 6;
 
@@ -449,6 +461,8 @@ public class GUI extends JFrame {
             }
         }
 
+        // If player upgrades property with most houses, but there are still properties in the color group that are not
+        // that level, prevent upgrade
         if (selectedProperty.getHouseAmount() == highestHouseAmount && lowestHouseAmount < highestHouseAmount) {
             JOptionPane.showMessageDialog(this, "You need to develop the properties of one color at the same rate. " +
                     "EX: If one property has two houses and the other has one house, the property with one house must have two houses before the " +
@@ -466,6 +480,7 @@ public class GUI extends JFrame {
         int choice = JOptionPane.showConfirmDialog(this, "Are you sure you want to buy a house, on " + selectedProperty.getName() + " for " + selectedProperty.getHouseCost() + "?");
 
         if (choice == JOptionPane.YES_OPTION) {
+            // Put one house on property and subtract money from player
             JOptionPane.showMessageDialog(this, "You bought a house on this property named " + selectedProperty.getName() + " for " + selectedProperty.getHouseCost() + ".");
             selectedProperty.incrementHouseAmount();
             players[currentPlayer].subMoney(selectedProperty.getHouseCost());
@@ -480,11 +495,14 @@ public class GUI extends JFrame {
      * @param selectedProperty property players wishes to sell property on
      */
     private void sellHouse(Property selectedProperty) {
+        // Prevent player from selling houses that don't exist
         if (selectedProperty.getHouseAmount() == 0) {
             JOptionPane.showMessageDialog(this, "There are no houses to sell.");
             return;
         }
 
+        // These two variables are to make sure player deconstructs properties at the same rate, rather than sell all
+        // houses on one property but leave others with a high amount of houses
         int highestHouseAmount = 0;
         int lowestHouseAmount = 6;
 
@@ -499,6 +517,7 @@ public class GUI extends JFrame {
             }
         }
 
+        // Prevent player from deconstructing property further if other properties have more houses than it
         if (selectedProperty.getHouseAmount() == lowestHouseAmount && lowestHouseAmount < highestHouseAmount) {
             JOptionPane.showMessageDialog(this, "You need to bring down the properties of one color at the same rate. " +
                     "EX: If one property has three houses and the other has two house, the property with three house must have two houses before the " +
@@ -506,10 +525,11 @@ public class GUI extends JFrame {
             return;
         }
 
-        // Finally, confirm player wants to buy a house on property
+        // Finally, confirm player wants to sell a house on the property
         int choice = JOptionPane.showConfirmDialog(this, "Are you sure you want to sell a house, from " + selectedProperty.getName() + " for " + selectedProperty.getHouseCost() / 2 + "?");
 
         if (choice == JOptionPane.YES_OPTION) {
+            // Get rid of house and give player half of the houses cost
             JOptionPane.showMessageDialog(this, "You sold a house on this property named " + selectedProperty.getName() + " for " + selectedProperty.getHouseCost() / 2 + ".");
             selectedProperty.decrementHouseAmount();
             players[currentPlayer].addMoney(selectedProperty.getHouseCost() / 2);
@@ -519,10 +539,12 @@ public class GUI extends JFrame {
     }
 
     /**
-     *
+     * Allows player to mortgage a property to get mortgage value of the property in cash, with the downside
+     * being rent can no longer be collected from players landing on that property
      * @param selectedProperty property player wishes to mortgage
      */
     private void mortgageProperty(Property selectedProperty) {
+        // Make sure there are no houses in the color group the property belongs to
         boolean noHouses = true;
         for (Property property: players[currentPlayer].getProperties()) {
             if (selectedProperty.getColorEnum() == property.getColorEnum()) {
@@ -542,6 +564,7 @@ public class GUI extends JFrame {
         int choice = JOptionPane.showConfirmDialog(this, "Are you sure you wish to mortgage " + selectedProperty.getName() + " to gain " + selectedProperty.getMortgageValue() + "?");
 
         if (choice == JOptionPane.YES_OPTION) {
+            // Give player mortgage value of the house, and prevent rent from being collected on the property
             JOptionPane.showMessageDialog(this, "You mortgaged the property " + selectedProperty.getName() + " to gain " + selectedProperty.getMortgageValue() + ".");
             players[currentPlayer].addMoney(selectedProperty.getMortgageValue());
             selectedProperty.setMortgaged(true);
@@ -552,20 +575,23 @@ public class GUI extends JFrame {
     }
 
     /**
-     *
+     * Allows player to unmortgage a property to start collecting rent again, at the cost of the mortgage value plus
+     * %10 interest the player has to pay
      * @param selectedProperty property players wishes to unmortgage
      */
     private void unmortgageProperty(Property selectedProperty) {
 
+        // Ensure player has enough funds to unmortgage property
         if (players[currentPlayer].getMoney() < selectedProperty.getMortgageValue() + (selectedProperty .getMortgageValue() * .10)) {
             JOptionPane.showMessageDialog(this, "You lack the funds to unmortgage the property " + selectedProperty.getName() + ".");
             return;
         }
 
-        // Confirm player wishes to mortgage property
+        // Confirm player wishes to unmortgage property
         int choice = JOptionPane.showConfirmDialog(this, "Are you sure you wish to unmortgage " + selectedProperty.getName() + " for " + (selectedProperty.getMortgageValue() + (selectedProperty.getMortgageValue() * .10)) + "?");
 
         if (choice == JOptionPane.YES_OPTION) {
+            // Mortgagee property and subtract cash from player
             JOptionPane.showMessageDialog(this, "You unmortgaged the property " + selectedProperty.getName() + " for " + (selectedProperty.getMortgageValue() + (selectedProperty.getMortgageValue() * .10)) + ".");
             players[currentPlayer].subMoney((int) (selectedProperty.getMortgageValue() + (selectedProperty.getMortgageValue() * .10)));
             selectedProperty.setMortgaged(false);
@@ -577,18 +603,17 @@ public class GUI extends JFrame {
 
     /**
      * Sets up the tile array manually so that when the player moves, the game can figure out actions to do afterward.
-     * Includes the information of each property, value, name, color,
      */
     private void setUpTiles() {
         tiles = new Tile[40];
-        tiles[0] = new Tile(TileTypes.PARKING);
-        tiles[1] = new Property(PropertyNames.MEDITERRANEAN_AVE);
-        tiles[2] = new CommunityTile();
+        tiles[0] = new Tile(TileTypes.PARKING); // Parking means nothing happens if the player lands on the tile
+        tiles[1] = new Property(PropertyNames.MEDITERRANEAN_AVE); // Property tile, Property.name holds property info
+        tiles[2] = new CommunityTile(); // Draw from community chest deck
         tiles[3] = new Property(PropertyNames.BALTIC_AVE);
-        tiles[4] = new TaxTile(200);
+        tiles[4] = new TaxTile(200); // Pay tax
         tiles[5] = new Utility(200, "RailRoad 1");
         tiles[6] = new Property(PropertyNames.ORIENTAL_AVE);
-        tiles[7] = new ChanceTile();
+        tiles[7] = new ChanceTile(); // Draw from chance decl
         tiles[8] = new Property(PropertyNames.VERMONT_AVE);
         tiles[9] = new Property(PropertyNames.CONNECTICUT_AVE);
         tiles[10] = new Tile(TileTypes.PARKING);
@@ -611,7 +636,7 @@ public class GUI extends JFrame {
         tiles[27] = new Property(PropertyNames.VENTNOR_AVE);
         tiles[28] = new Utility(150, "Water Works");
         tiles[29] = new Property(PropertyNames.MARVIN_GAR);
-        tiles[30] = new Tile(TileTypes.GOTOJAIL);
+        tiles[30] = new Tile(TileTypes.GOTOJAIL); // Send player to jail
         tiles[31] = new Property(PropertyNames.PACIFIC_AVE);
         tiles[32] = new Property(PropertyNames.NORTH_CAROLINA_AVE);
         tiles[33] = new CommunityTile();
@@ -624,7 +649,7 @@ public class GUI extends JFrame {
     }
 
     /**
-     * Set up the bankruptcy button frame so as to
+     * Set up the bankruptcy button frame to allow player to get out of bankruptcy
      */
     private void bankruptcy() {
         JOptionPane.showMessageDialog(this, "Bankruptcy! If you have any houses to sell or properties" +
@@ -636,6 +661,7 @@ public class GUI extends JFrame {
      * Paints the board Panel and updates the positions of players on the board when they move.
      */
     private void paintBoardPanel() {
+        // Clear panels
         northPanel.removeAll();
         southPanel.removeAll();
         eastPanel.removeAll();
@@ -661,7 +687,7 @@ public class GUI extends JFrame {
             GridBagConstraints southPanelConstraints = new GridBagConstraints();
             southPanelConstraints.gridx = i;
 
-            //
+            // Set spacing between grid spaces
             if (i == 0) {
                 southPanelConstraints.insets = new Insets(0, 0, 0,  (int) (IMAGE_WIDTH * (0.153) + 125)); // 0.153
             } else if (i == 9) {
@@ -678,14 +704,15 @@ public class GUI extends JFrame {
             GridBagConstraints westPanelConstraints = new GridBagConstraints();
             westPanelConstraints.gridy = i;
 
+            // Set spacing between grid spaces
             if (i == 9) {
                 westPanelConstraints.insets = new Insets(0, 0, (int) (IMAGE_WIDTH * (0.153)) + 40,  0); // 0.153
             } else {
                 westPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.08 / 2)), 0, (int) (IMAGE_WIDTH * (0.08 / 2)), 0); // 0.0918
             }
 
-            eastPanel.add(Box.createHorizontalGlue(), westPanelConstraints);
-            westPanel.add(Box.createHorizontalGlue(), westPanelConstraints);
+            eastPanel.add(Box.createHorizontalGlue(), westPanelConstraints); // TODO fix this
+            westPanel.add(Box.createHorizontalGlue(), westPanelConstraints); // Empty space
         }
 
         // East Panel Filler
@@ -693,23 +720,25 @@ public class GUI extends JFrame {
             GridBagConstraints eastPanelConstraints = new GridBagConstraints();
             eastPanelConstraints.gridy = i;
 
+            // Set spacing between grid spaces
             if (i == 0) {
                 eastPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.153) + 40), 0, 0,  0); // 0.153
             } else {
                 eastPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.08 / 2)), 0, (int) (IMAGE_WIDTH * (0.08 / 2)), 0); // 0.0918
             }
 
-            eastPanel.add(Box.createHorizontalGlue(), eastPanelConstraints);
+            eastPanel.add(Box.createHorizontalGlue(), eastPanelConstraints); // Empty space
         }
 
         GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.gridy = 11;
         gbc.gridx = 0;
-        gbc.insets = new Insets(0, 80, 0, 0); // Forces left side to always be 80 width
+        gbc.insets = new Insets(0, 80, 0, 0); // Forces left side to always be 80 width to keep sizes consistent
         westPanel.add(Box.createHorizontalGlue(), gbc);
         gbc.insets = new Insets(0, 0, 0, 0);
 
+        // Draw all player names in game
         for (Player player : players) {
             if (player == null || player.isBankrupt()) break; // Don't draw players who are bankrupt or don't exist
             JLabel playerLabel = new JLabel(player.getName());
@@ -749,7 +778,7 @@ public class GUI extends JFrame {
 
     /**
      * Paints the player side panel on the right side of the screen, which includes the current player's name, money
-     * position, and a list of
+     * position, and a list of the properties they own
      */
     private void paintPlayerSidePanel() {
         clearSideBarPanel();
@@ -762,6 +791,7 @@ public class GUI extends JFrame {
         JLabel playerMoneyLabel = new JLabel("Player Money: " + playerMoney);
         JLabel playerPositionLabel = new JLabel("Player Position: " + playerPosition);
 
+        // Get properties and utilities and put them into one list to display them all
         List<Property> properties = players[currentPlayer].getProperties();
         List<Utility> utilities = players[currentPlayer].getUtilities();
 
@@ -903,6 +933,7 @@ public class GUI extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Roll dice if player has not already rolled dice this turn
                 if (diceRolled) {
                     JOptionPane.showMessageDialog(boardPanel, "You have already rolled this turn.");
                 } else {
@@ -923,6 +954,7 @@ public class GUI extends JFrame {
         rollDiceButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Roll dice if player has not rolled dice this turn
                 if (diceRolled) {
                     JOptionPane.showMessageDialog(boardPanel, "You have already rolled this turn.");
                 } else {
@@ -943,6 +975,7 @@ public class GUI extends JFrame {
         payFineButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Player pays fine and gets out of jail, and then moves
                 JOptionPane.showMessageDialog(boardPanel, "You paid a fine of $50 to get out.");
                 players[currentPlayer].setInJail(false);
                 players[currentPlayer].setTurnsInJail(0);
@@ -967,9 +1000,11 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 Property propertySelected = (Property) propertiesList.getSelectedValue();
 
+                // Check if player selected a property from the list
                 if (propertySelected == null) {
                     JOptionPane.showMessageDialog(boardPanel, "You must select a property from the list on the right side of the screen.");
                 } else {
+                    // Ask if player is buying or selling houses on property
                     int choice = JOptionPane.showOptionDialog(boardPanel, propertySelected.getName() + " has " + propertySelected.getHouseAmount() + " houses. Do you wish to buy or sell house on the property ?", "Buying and Selling Houses", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] {"Buy", "Selling", "Cancel"}, propertySelected.getName());
                     if (choice == 0) {
                         buyHouse(propertySelected);
@@ -979,9 +1014,7 @@ public class GUI extends JFrame {
                     paintPlayerSidePanel();
                 }
             }
-
         });
-
         return button;
     }
 
@@ -997,9 +1030,11 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 Property propertySelected = (Property) propertiesList.getSelectedValue();
 
+                // Check if player selected a property from list
                 if (propertySelected == null) {
                     JOptionPane.showMessageDialog(boardPanel, "You must select a property from the list on the right side of the screen.");
                 } else {
+                    // Check if property is mortgaged or not, and ask if they wish to change it
                     if (propertySelected.isMortgaged()) {
                         JOptionPane.showConfirmDialog(boardPanel, propertySelected.getName() + "is mortgaged. Do you wish to unmortgage the property for " + (propertySelected.getMortgageValue() + (propertySelected.getMortgageValue() * .10)) + " to regain rent collection?");
                         unmortgageProperty(propertySelected);
@@ -1065,6 +1100,10 @@ public class GUI extends JFrame {
         actionPanel.removeAll();
     }
 
+    /**
+     * Entry point for program
+     * @param args None
+     */
     public static void main(String[] args) {
         new GUI();
     }
