@@ -2,11 +2,17 @@ package propertynmoney;
 
 import java.util.Random;
 
+/**
+ *
+ */
 public class CommunityTile extends Tile{
 
-    Card[] cards;
+    private final Card[] cards;
     private final Random cardRand = new Random();
 
+    /**
+     *
+     */
     CommunityTile() {
         super(TileTypes.COMMUNITYCHEST);
         cards = new Card[16];
