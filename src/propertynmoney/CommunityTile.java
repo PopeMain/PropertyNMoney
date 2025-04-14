@@ -9,8 +9,8 @@ import java.util.Random;
  */
 public class CommunityTile extends Tile{
 
-    private final Card[] cards;
-    private final Random cardRand = new Random();
+    private final Card[] cards; // Card in deck that will be pull from
+    private final Random cardRand = new Random(); // Used to determine which card will be pulled
 
     /**
      * Sets up card deck for community chest deck
