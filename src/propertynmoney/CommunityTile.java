@@ -2,14 +2,23 @@ package propertynmoney;
 
 import java.util.Random;
 
+/**
+ * Community tile pulls a card from the community chest card deck and applies the effect onto the player. Community deck
+ * includes more money giving and taking  cards than the chance deck.
+ * @author Nevin
+ */
 public class CommunityTile extends Tile{
 
-    Card[] cards;
-    private final Random cardRand = new Random();
+    private final Card[] cards; // Card in deck that will be pull from
+    private final Random cardRand = new Random(); // Used to determine which card will be pulled
 
+    /**
+     * Sets up card deck for community chest deck
+     */
     CommunityTile() {
         super(TileTypes.COMMUNITYCHEST);
         cards = new Card[16];
+        // Sets up card deck
         cards[0] = new SubMoneyCard("Pay Doctor fees of $50.", 50);
         cards[1] = new GiveMoneyCard("Receive $100 in dividends from the bank.", 50);
         cards[2] = new GiveMoneyCard("Receive $100 in dividends from the bank.", 50);
