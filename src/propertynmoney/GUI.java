@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.util.*;
 import java.util.List;
 
@@ -56,7 +57,6 @@ public class GUI extends JFrame {
         players[0] = new Player(1500, "Nevin"); // Testing ** Remove when done
         players[1] = new Player(1500, "Frank");
         players[2] = new Player(1500, "Nathan");
-        players[0].moveSpecificPosition(29);
 
         // TODO set up game method
         currentPlayer = 0;
@@ -148,18 +148,14 @@ public class GUI extends JFrame {
         int dice2 = diceRand.nextInt(1,6);
 
         // Move player and check if they passed go
-//        boolean passedGo = players[currentPlayer].movePosition(dice1 + dice2);
-
-        boolean passedGo = players[currentPlayer].movePosition(1); // TODO Testing code, remove when done
+        boolean passedGo = players[currentPlayer].movePosition(dice1 + dice2);
 
         // Show player what dice they rolled
         JOptionPane.showMessageDialog(this, "You rolled a " + dice1 + ", and a " + dice2);
 
         // Give player $200  if they pass go
-        if (passedGo) {
-            JOptionPane.showMessageDialog(this, "You passed go! Collect $200.");
-            players[currentPlayer].addMoney(200);
-        }
+        if (passedGo)
+            passedGo();
 
         // Allow player to roll again if they roll doubles (both dice have same value), or put them in jail
         // if they roll three doubles in a row
@@ -203,6 +199,14 @@ public class GUI extends JFrame {
             determineMovementResult();
         }
 
+    }
+
+    /**
+     * Give player $200 and inform player that they have passed go
+     */
+    private void passedGo() {
+        JOptionPane.showMessageDialog(this, "You passed go! Collect $200.");
+        players[currentPlayer].addMoney(200);
     }
 
     /**
@@ -370,7 +374,15 @@ public class GUI extends JFrame {
 
         Card chanceCard = chance.drawCard();
         JOptionPane.showMessageDialog(this, chanceCard.getCardText());
-        chanceCard.playerEffect(player);
+        boolean checkPlayer = chanceCard.playerEffect(player); // Used to check certain variables after player has been affected
+
+        if (chanceCard instanceof MovementCard && checkPlayer) {
+            // Player has passed go, give them money
+            passedGo();
+        } else if (chanceCard instanceof SubMoneyCard && checkPlayer) {
+            // Player's balance is below 0, declare bankruptcy
+            bankruptcy();
+        }
 
         // If player is moved by the card, determine movement result again as if they rolled dice
         if (player.getPosition() != playerLastPosition) {
@@ -389,7 +401,16 @@ public class GUI extends JFrame {
 
         Card communityCard = community.drawCard();
         JOptionPane.showMessageDialog(this, communityCard.getCardText());
-        communityCard.playerEffect(player);
+        boolean checkPlayer = communityCard.playerEffect(player); // Used to check certain variables after player has been affected
+
+
+        if (communityCard instanceof MovementCard && checkPlayer) {
+            // Player has passed go, give them money
+            passedGo();
+        } else if (communityCard instanceof SubMoneyCard && checkPlayer) {
+            // Player's balance is below 0, declare bankruptcy
+            bankruptcy();
+        }
 
         // If player is moved by the card, determine movement result again as if they rolled dice
         if (player.getPosition() != playerLastPosition) {
@@ -613,7 +634,7 @@ public class GUI extends JFrame {
         tiles[4] = new TaxTile(200); // Pay tax
         tiles[5] = new Utility(200, "RailRoad 1");
         tiles[6] = new Property(PropertyNames.ORIENTAL_AVE);
-        tiles[7] = new ChanceTile(); // Draw from chance decl
+        tiles[7] = new ChanceTile(); // Draw from chance deck
         tiles[8] = new Property(PropertyNames.VERMONT_AVE);
         tiles[9] = new Property(PropertyNames.CONNECTICUT_AVE);
         tiles[10] = new Tile(TileTypes.PARKING);
@@ -652,8 +673,9 @@ public class GUI extends JFrame {
      * Set up the bankruptcy button frame to allow player to get out of bankruptcy
      */
     private void bankruptcy() {
-        JOptionPane.showMessageDialog(this, "Bankruptcy! If you have any houses to sell or properties" +
-                "to mortgage, do so to get balance above 0. Else you will go bankrupt and leave the game!");
+        JOptionPane.showMessageDialog(this, "Bankruptcy! If you have any houses to sell or properties " +
+                "to mortgage, do so to get balance above 0. Else you will go bankrupt and leave the game! When balance is above 0" +
+                " , press the paid debts button to get back into the game.");
         paintBankruptcyButtonFrame();
     }
 
@@ -740,7 +762,7 @@ public class GUI extends JFrame {
 
         // Draw all player names in game
         for (Player player : players) {
-            if (player == null || player.isBankrupt()) break; // Don't draw players who are bankrupt or don't exist
+            if (player == null || player.isBankrupt()) continue; // Don't draw players who are bankrupt or don't exist
             JLabel playerLabel = new JLabel(player.getName());
             playerLabel.setPreferredSize(new Dimension(80, 20));
 
@@ -910,11 +932,13 @@ public class GUI extends JFrame {
     private void paintBankruptcyButtonFrame() {
         clearActionPanel();
 
-        JButton sellHousesButton = buyAndSellHouseButton(); // TOOD make sepearte button for just selling
-        JButton mortgageButton = mortgagePropertyButton();
-        JButton payDebtsButton = new JButton("Pay Debts"); // TODO if balance above 0, go back into game
-        JButton declareBankruptcy = new JButton("Declare Bankruptcy"); // TODO leave game
+        // Set up buttons
+        JButton sellHousesButton = bankruptcySellHouseButton();
+        JButton mortgageButton = bankruptcyMortgagePropertyButton();
+        JButton payDebtsButton = debtsPaidButton();
+        JButton declareBankruptcy = declareBankruptcyButton();
 
+        // Add buttons to panel
         actionPanel.add(sellHousesButton);
         actionPanel.add(mortgageButton);
         actionPanel.add(payDebtsButton);
@@ -1019,6 +1043,36 @@ public class GUI extends JFrame {
     }
 
     /**
+     * Creates a button that allows the player to sell houses to pay off debts to avoid bankruptcy
+     * @return A button that allow the player to sell houses during bankruptcy
+     */
+    private JButton bankruptcySellHouseButton() {
+        JButton button = new JButton("Sell House");
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Property propertySelected = (Property) propertiesList.getSelectedValue();
+
+                // Check if player selected a property from the list
+                if (propertySelected == null) {
+                    JOptionPane.showMessageDialog(boardPanel, "You must select a property from the list on the right side of the screen.");
+                } else {
+                    // Ask if player is buying or selling houses on property
+                    int choice = JOptionPane.showOptionDialog(boardPanel, propertySelected.getName() + " has " + propertySelected.getHouseAmount() + " houses. Do you wish to buy or sell house on the property ?", "Buying and Selling Houses", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] {"Buy", "Selling", "Cancel"}, propertySelected.getName());
+                    if (choice == 0) {
+                        buyHouse(propertySelected);
+                    } else if (choice == 1) {
+                        sellHouse(propertySelected);
+                    }
+                    paintPlayerSidePanel();
+                }
+            }
+        });
+
+        return button;
+    }
+
+    /**
      * Creates the button that allows the player to mortgage property they own
      * @return JButton that allows player to mortgage properties
      */
@@ -1047,6 +1101,36 @@ public class GUI extends JFrame {
             }
         });
         return mortgageButton;
+    }
+
+    /**
+     * Creates a button that allows player to mortgage properties to avoid bankruptcy
+     * @return JButton that allows player to mortgage properties while bankrupt
+     */
+    private JButton bankruptcyMortgagePropertyButton() {
+        JButton button = new JButton("Mortgage Property");
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Property propertySelected = (Property) propertiesList.getSelectedValue();
+
+                // Check if player selected a property from list
+                if (propertySelected == null) {
+                    JOptionPane.showMessageDialog(boardPanel, "You must select a property from the list on the right side of the screen.");
+                } else {
+                    // Check if property is mortgaged or not, only allow player to mortgage properties to pay debt
+                    if (propertySelected.isMortgaged()) {
+                        JOptionPane.showConfirmDialog(boardPanel, propertySelected.getName() + "is mortgaged. You can't unmortgage property until debts have been paid off.");
+                    } else {
+                        JOptionPane.showConfirmDialog(boardPanel, propertySelected.getName() + "is unmortgaged. Do you wish to mortgage the property to gain " + propertySelected.getMortgageValue() + " to pay your debts?");
+                        mortgageProperty(propertySelected);
+                    }
+                    paintPlayerSidePanel();
+                }
+            }
+        });
+
+        return button;
     }
 
     /**
@@ -1091,6 +1175,112 @@ public class GUI extends JFrame {
         });
 
         return endTurnButton;
+    }
+
+    /**
+     * Creates the debts paid button that allows the player back into the game if they have paid off their debts, avoiding
+     * bankruptcy.
+     * @return Button that allows player to get back into the game
+     */
+    private JButton debtsPaidButton() {
+        JButton debtsPaidButton = new JButton("Debts Paid");
+        debtsPaidButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Check if player has paid off debts, if true allow them to play again
+                if (players[currentPlayer].getMoney() >= 0) {
+                    JOptionPane.showMessageDialog(boardPanel, "Debts have been paid off. " + players[currentPlayer].getName() + " is back in the game!");
+                    paintStandardButtonFrame();
+                } else {
+                    JOptionPane.showMessageDialog(boardPanel, "Debts still have not been paid off! Keeping selling houses or mortgaging properties to avoid bankrupcty.");
+                }
+            }
+        });
+
+        return debtsPaidButton;
+    }
+
+    /**
+     * Creates a button that allows player to declare bankrupt they are unable to pay off their debts, it takes the player
+     * out of the game and makes all properties unowned and without houses
+     * @return Button that allows player to declare bankruptcy
+     */
+    private JButton declareBankruptcyButton() {
+        JButton button = new JButton("Declare Bankruptcy");
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int result = JOptionPane.showConfirmDialog(boardPanel, "Are you sure you want to declare bankruptcy?", "Declaring Bankruptcy", JOptionPane.YES_NO_OPTION);
+
+                // Ensure player really wants to declare bankruptcy
+                if (result == JOptionPane.YES_OPTION) {
+                    JOptionPane.showMessageDialog(boardPanel, players[currentPlayer] + " has declared bankruptcy. All their properties will be made unowned and undeveloped." +
+                            " They will no longer be able to play the game.");
+
+                    players[currentPlayer].setBankrupt(true);
+
+                    // Reset every property player owned back to default state
+                    for (Property property : players[currentPlayer].getProperties()) {
+                        property.setOwner(null);
+                        property.setMortgaged(false);
+
+                        while (property.getHouseAmount() > 0) {
+                            property.decrementHouseAmount();
+                        }
+                    }
+
+                    // Reset every utility player owned back to default state
+                    for (Utility utility : players[currentPlayer].getUtilities()) {
+                        utility.setOwner(null);
+                        utility.setMortgaged(false);
+                    }
+
+                    boolean winnerFound = checkForWinner();
+
+                    // End game if only one player remains, else continue onto next player
+                    if (winnerFound) {
+                        endGame();
+                    } else {
+                        endTurn();
+                        paintBoardPanel();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(boardPanel, "You have changed your mind about declaring bankruptcy.");
+                }
+            }
+        });
+
+        return button;
+    }
+
+    /**
+     * Checks to see if there is only one player still remaining in game, if true, then declare them the winner
+     * @return If only one player is still in game
+     */
+    private boolean checkForWinner() {
+        int amountOfPlayersIn = 0;
+        for (int i = 0; i <= amountOfPlayers; i++) { // See if only one player is bankrupt
+            if (!players[i].isBankrupt())
+                amountOfPlayersIn++;
+        }
+
+        return amountOfPlayersIn == 1;
+    }
+
+    /**
+     * Announces the winner and allows the players to rest or exit the game
+     */
+    private void endGame() {
+        // Find winner
+        Player winner = null;
+        // See if only one player is bankrupt, should be first player found since this is called after check for winner
+        for (int i = 0; i < amountOfPlayers; i++)
+            if (!players[i].isBankrupt())
+                winner = players[i];
+
+        assert winner != null; // Winner should not be null, if it is then something is wrong
+        JOptionPane.showMessageDialog(boardPanel, winner.getName() + " has won the game!");
+        this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)); // Quit program
     }
 
     /**

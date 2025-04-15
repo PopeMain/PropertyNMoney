@@ -22,10 +22,11 @@ public class SubMoneyCard implements Card {
     /**
      * Takes money from player
      * @param player Player that will be effected
+     * @return Whether the player has a balance below 0
      */
     @Override
-    public void playerEffect(Player player) {
-        player.subMoney(moneyToRemove);
+    public boolean playerEffect(Player player) {
+        return player.subMoney(moneyToRemove);
     }
 
     /**

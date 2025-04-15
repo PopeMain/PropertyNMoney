@@ -22,10 +22,12 @@ public class GiveMoneyCard implements Card {
     /**
      * Give player money
      * @param player Player that will be effected
+     * @return Always returns false, nothing needs to be checked afterwards
      */
     @Override
-    public void playerEffect(Player player) {
+    public boolean playerEffect(Player player) {
         player.addMoney(moneyToGive);
+        return false;
     }
 
     /**

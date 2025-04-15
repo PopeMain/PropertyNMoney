@@ -20,21 +20,21 @@ public class ChanceTile extends Tile{
         cards = new Card[16];
         // Set up cards in the deck
         cards[0] = new MovementCard("Advance to Go!", 0);
-        cards[1] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[2] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[3] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[4] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[5] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[6] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[7] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[8] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[9] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[10] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[11] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[12] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[13] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[14] = new MovementCard("Advance to Illinois Ave.!", 24);
-        cards[15] = new MovementCard("Advance to Illinois Ave.!", 24);
+        cards[1] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[2] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[3] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[4] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[5] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[6] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[7] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[8] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[9] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[10] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[11] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[12] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[13] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[14] = new MovementCard("Advance to Illinois Ave.!", 1);
+        cards[15] = new MovementCard("Advance to Illinois Ave.!", 1);
     }
 
     /**

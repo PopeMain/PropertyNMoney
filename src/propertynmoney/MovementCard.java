@@ -22,10 +22,11 @@ public class MovementCard implements Card{
     /**
      * Moves player to a specific location on the board
      * @param player Player that will be effected
+     * @return Whether the player passed go
      */
     @Override
-    public void playerEffect(Player player) {
-        player.moveSpecificPosition(locationIndex);
+    public boolean playerEffect(Player player) {
+        return player.moveSpecificPosition(locationIndex);
     }
 
     /**
