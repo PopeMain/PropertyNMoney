@@ -11,6 +11,8 @@ public class PlayerSetupPanel extends JPanel {
     private final int PLAYER_COUNT = 4; // Number of players
     private final int DEFAULT_STARTING_MONEY = 1500; // Default starting money
     private final ImageIcon[] icons; // Array of icons for the selector
+    private Player[] players;
+    private JPanel[] playerPanels;
 
     public PlayerSetupPanel( CardLayout cardLayout, JPanel mainPanelContainer) {
         // Load the sprite sheet and create an array of icons (Example Array)
@@ -20,12 +22,15 @@ public class PlayerSetupPanel extends JPanel {
         setLayout(new GridLayout(1, PLAYER_COUNT + 1, 10, 10)); // Row per player, spacing=10px
 
         // Create a column for each player
+        playerPanels = new JPanel[4];
         for (int i = 1; i <= PLAYER_COUNT; i++) {
-            add(createPlayerSetupColumn(i));
+            playerPanels[i] = createPlayerSetupColumn(i);
+            add(playerPanels[i]);
         }
         JButton startButton = new JButton("Start");
         startButton.addActionListener(e -> {
             // Switch to setup Panel
+            createPlayers();
             cardLayout.show(mainPanelContainer, "GamePanel");
         });
 
@@ -47,7 +52,7 @@ public class PlayerSetupPanel extends JPanel {
         // Row 2: Starting Money Input
         JPanel moneyPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel moneyLabel = new JLabel("Starting Money:");
-        JSpinner moneySpinner = new JSpinner(new SpinnerNumberModel(DEFAULT_STARTING_MONEY, 0, 1000000, 100));
+        JSpinner moneySpinner = new JSpinner(new SpinnerNumberModel(DEFAULT_STARTING_MONEY, 100, 1000000, 100));
         moneyPanel.add(moneyLabel);
         moneyPanel.add(moneySpinner);
 
@@ -80,6 +85,19 @@ public class PlayerSetupPanel extends JPanel {
         playerPanel.add(iconPanel);
 
         return playerPanel;
+    }
+
+    private void createPlayers() {
+        players = new Player[PLAYER_COUNT];
+        for(int i = 0; i < PLAYER_COUNT; i++) {
+            JPanel temp = playerPanels[i];
+            JPanel moneyPanel = (JPanel) temp.getComponent(1);
+            JPanel namePanel = (JPanel) temp.getComponent(0);
+            JPanel iconPanel = (JPanel) temp.getComponent(2);
+//            players[i] = new Player(moneyPanel.getComponent(1));
+            System.out.println(moneyPanel.getComponent(1).get);
+
+        }
     }
 
     private ImageIcon[] loadPlayerIcons() {
