@@ -14,6 +14,11 @@ public class PlayerSetupPanel extends JPanel {
     private Player[] players;
     private JPanel[] playerPanels;
 
+    // UI components for each player
+    private JTextField[] nameFields;
+    private JSpinner[] moneySpinners;
+    private int[] iconIndices;
+
     public PlayerSetupPanel( CardLayout cardLayout, JPanel mainPanelContainer) {
         // Load the sprite sheet and create an array of icons (Example Array)
         icons = loadPlayerIcons();
@@ -21,15 +26,20 @@ public class PlayerSetupPanel extends JPanel {
         // Set the layout with 4 columns
         setLayout(new GridLayout(1, PLAYER_COUNT + 1, 10, 10)); // Row per player, spacing=10px
 
+        // Initialize arrays for UI components
+        nameFields = new JTextField[PLAYER_COUNT + 1];
+        moneySpinners = new JSpinner[PLAYER_COUNT + 1];
+        iconIndices = new int[PLAYER_COUNT + 1];
+
         // Create a column for each player
-        playerPanels = new JPanel[4];
+        playerPanels = new JPanel[PLAYER_COUNT + 1];
         for (int i = 1; i <= PLAYER_COUNT; i++) {
             playerPanels[i] = createPlayerSetupColumn(i);
             add(playerPanels[i]);
         }
         JButton startButton = new JButton("Start");
         startButton.addActionListener(e -> {
-            // Switch to setup Panel
+            // Switch to Game Panel
             createPlayers();
             cardLayout.show(mainPanelContainer, "GamePanel");
         });
@@ -46,6 +56,8 @@ public class PlayerSetupPanel extends JPanel {
         JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel nameLabel = new JLabel("Name:");
         JTextField nameField = new JTextField(10);
+        // Store reference to the name field
+        nameFields[playerNumber] = nameField;
         namePanel.add(nameLabel);
         namePanel.add(nameField);
 
@@ -53,6 +65,8 @@ public class PlayerSetupPanel extends JPanel {
         JPanel moneyPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel moneyLabel = new JLabel("Starting Money:");
         JSpinner moneySpinner = new JSpinner(new SpinnerNumberModel(DEFAULT_STARTING_MONEY, 100, 1000000, 100));
+        // Store reference to the money spinner
+        moneySpinners[playerNumber] = moneySpinner;
         moneyPanel.add(moneyLabel);
         moneyPanel.add(moneySpinner);
 
@@ -63,15 +77,17 @@ public class PlayerSetupPanel extends JPanel {
         JButton previousButton = new JButton("Previous");
         JButton nextButton = new JButton("Next");
 
+        // Initialize the icon index for this player
+        iconIndices[playerNumber] = 0;
+
         // Add functionality to the selector buttons
-        final int[] iconIndex = {0}; // Track the currently selected icon index
         previousButton.addActionListener(e -> {
-            iconIndex[0] = (iconIndex[0] - 1 + icons.length) % icons.length; // Decrement, wrap around
-            iconDisplay.setIcon(icons[iconIndex[0]]);
+            iconIndices[playerNumber] = (iconIndices[playerNumber] - 1 + icons.length) % icons.length; // Decrement, wrap around
+            iconDisplay.setIcon(icons[iconIndices[playerNumber]]);
         });
         nextButton.addActionListener(e -> {
-            iconIndex[0] = (iconIndex[0] + 1) % icons.length; // Increment, wrap around
-            iconDisplay.setIcon(icons[iconIndex[0]]);
+            iconIndices[playerNumber] = (iconIndices[playerNumber] + 1) % icons.length; // Increment, wrap around
+            iconDisplay.setIcon(icons[iconIndices[playerNumber]]);
         });
 
         iconPanel.add(iconLabel);
@@ -88,16 +104,7 @@ public class PlayerSetupPanel extends JPanel {
     }
 
     private void createPlayers() {
-        players = new Player[PLAYER_COUNT];
-        for(int i = 0; i < PLAYER_COUNT; i++) {
-            JPanel temp = playerPanels[i];
-            JPanel moneyPanel = (JPanel) temp.getComponent(1);
-            JPanel namePanel = (JPanel) temp.getComponent(0);
-            JPanel iconPanel = (JPanel) temp.getComponent(2);
-//            players[i] = new Player(moneyPanel.getComponent(1));
-            System.out.println(moneyPanel.getComponent(1).get);
 
-        }
     }
 
     private ImageIcon[] loadPlayerIcons() {
@@ -140,4 +147,3 @@ public class PlayerSetupPanel extends JPanel {
         }
     }
 }
-
