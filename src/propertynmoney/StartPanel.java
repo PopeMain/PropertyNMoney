@@ -19,7 +19,7 @@ public class StartPanel extends JPanel {
 
         // Add action to the Start button to switch panels
         startButton.addActionListener(e -> {
-            // Switch to MainPanel
+            // Switch to setup Panel
             cardLayout.show(mainPanelContainer, "PlayerSetupPanel");
         });
 

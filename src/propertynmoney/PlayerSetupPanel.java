@@ -12,17 +12,24 @@ public class PlayerSetupPanel extends JPanel {
     private final int DEFAULT_STARTING_MONEY = 1500; // Default starting money
     private final ImageIcon[] icons; // Array of icons for the selector
 
-    public PlayerSetupPanel() {
+    public PlayerSetupPanel( CardLayout cardLayout, JPanel mainPanelContainer) {
         // Load the sprite sheet and create an array of icons (Example Array)
         icons = loadPlayerIcons();
 
         // Set the layout with 4 columns
-        setLayout(new GridLayout(PLAYER_COUNT, 1, 10, 10)); // Row per player, spacing=10px
+        setLayout(new GridLayout(1, PLAYER_COUNT + 1, 10, 10)); // Row per player, spacing=10px
 
         // Create a column for each player
         for (int i = 1; i <= PLAYER_COUNT; i++) {
             add(createPlayerSetupColumn(i));
         }
+        JButton startButton = new JButton("Start");
+        startButton.addActionListener(e -> {
+            // Switch to setup Panel
+            cardLayout.show(mainPanelContainer, "GamePanel");
+        });
+
+        add(startButton);
     }
 
     private JPanel createPlayerSetupColumn(int playerNumber) {

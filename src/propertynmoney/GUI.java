@@ -13,7 +13,7 @@ import java.util.List;
  * determining bankruptcy, setting up game, determining victor, ending gaming, and restaring game.
  * @author Nevin Fullerton and Frank Pope
  */
-public class GUI extends JFrame {
+public class GUI extends JPanel {
     private final JPanel boardPanel; // Holds game board and shows player locations on board
     private final JPanel sideBarPanel; // Shows player information and allows user to select their properties
     private final JPanel actionPanel; // Shows the actions the player is able to take depending on the state they are in
@@ -45,10 +45,7 @@ public class GUI extends JFrame {
      * Constructor that sets up the GUI and sets up important game variables like amount of players, player names, positions
      */
     GUI() {
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setTitle("Property N Money");
         this.setSize(1000, 900);
-        this.setLocationRelativeTo(null);
         this.setLayout(new BorderLayout());
 
         diceRand = new Random();
@@ -134,7 +131,6 @@ public class GUI extends JFrame {
         this.add(actionPanel, BorderLayout.SOUTH);
 
         this.setSize(950, 800);
-        this.setResizable(false);
         this.setVisible(true);
     }
 
@@ -1239,7 +1235,8 @@ public class GUI extends JFrame {
 
                     // End game if only one player remains, else continue onto next player
                     if (winnerFound) {
-                        endGame();
+                        //TODO NEEDS TO BE FIXED AS JPANEL
+//                        endGame();
                     } else {
                         endTurn();
                         paintBoardPanel();
@@ -1280,7 +1277,8 @@ public class GUI extends JFrame {
 
         assert winner != null; // Winner should not be null, if it is then something is wrong
         JOptionPane.showMessageDialog(boardPanel, winner.getName() + " has won the game!");
-        this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)); // Quit program
+        //TODO THIS NEEDSS TO BE FIXED AS JPANEL
+        //this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)); // Quit program
     }
 
     /**
@@ -1290,11 +1288,5 @@ public class GUI extends JFrame {
         actionPanel.removeAll();
     }
 
-    /**
-     * Entry point for program
-     * @param args None
-     */
-    public static void main(String[] args) {
-        new GUI();
-    }
+
 }

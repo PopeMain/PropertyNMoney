@@ -10,7 +10,7 @@ public class TestFrame extends JFrame {
         super("Property and Money");
 
         // Set size of the frame
-        setSize(600, 400);
+        setSize(1000, 900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Center the frame on screen
 
@@ -20,11 +20,13 @@ public class TestFrame extends JFrame {
 
         // Create panels
         StartPanel startPanel = new StartPanel(cardLayout, mainPanelContainer);
-        PlayerSetupPanel playerSetupPanel = new PlayerSetupPanel();
+        PlayerSetupPanel playerSetupPanel = new PlayerSetupPanel(cardLayout, mainPanelContainer);
+        GUI gamePanel = new GUI();
 
         // Add panels to the container with unique keys
         mainPanelContainer.add(startPanel, "StartPanel");
         mainPanelContainer.add(playerSetupPanel, "PlayerSetupPanel");
+        mainPanelContainer.add(gamePanel, "GamePanel");
 
         // Add the container to the frame
         add(mainPanelContainer);
