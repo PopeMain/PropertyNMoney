@@ -3,9 +3,9 @@ package propertynmoney;
 import javax.swing.*;
 import java.awt.*;
 
-public class TestFrame extends JFrame {
+public class StartGame extends JFrame {
 
-    public TestFrame() {
+    public StartGame() {
         // Set the frame title
         super("Property and Money");
 
@@ -37,7 +37,7 @@ public class TestFrame extends JFrame {
 
     public static void main(String[] args) {
         // Create and display the application
-        new TestFrame();
+        new StartGame();
     }
 }
 
