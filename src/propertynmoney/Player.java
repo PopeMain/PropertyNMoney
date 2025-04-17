@@ -38,6 +38,11 @@ public class Player {
         this.iconIndex = iconIndex;
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
     /**
      * Get current balance from player
      * @return Balance of player

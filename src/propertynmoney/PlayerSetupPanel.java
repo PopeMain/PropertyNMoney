@@ -19,7 +19,7 @@ public class PlayerSetupPanel extends JPanel {
     private JSpinner[] moneySpinners;
     private int[] iconIndices;
 
-    public PlayerSetupPanel( CardLayout cardLayout, JPanel mainPanelContainer) {
+    public PlayerSetupPanel(StartGame frame) {
         // Load the sprite sheet and create an array of icons (Example Array)
         icons = loadPlayerIcons();
 
@@ -27,13 +27,13 @@ public class PlayerSetupPanel extends JPanel {
         setLayout(new GridLayout(1, PLAYER_COUNT + 1, 10, 10)); // Row per player, spacing=10px
 
         // Initialize arrays for UI components
-        nameFields = new JTextField[PLAYER_COUNT + 1];
-        moneySpinners = new JSpinner[PLAYER_COUNT + 1];
-        iconIndices = new int[PLAYER_COUNT + 1];
+        nameFields = new JTextField[PLAYER_COUNT];
+        moneySpinners = new JSpinner[PLAYER_COUNT];
+        iconIndices = new int[PLAYER_COUNT];
 
         // Create a column for each player
-        playerPanels = new JPanel[PLAYER_COUNT + 1];
-        for (int i = 1; i <= PLAYER_COUNT; i++) {
+        playerPanels = new JPanel[PLAYER_COUNT];
+        for (int i = 0; i < PLAYER_COUNT; i++) {
             playerPanels[i] = createPlayerSetupColumn(i);
             add(playerPanels[i]);
         }
@@ -41,7 +41,7 @@ public class PlayerSetupPanel extends JPanel {
         startButton.addActionListener(e -> {
             // Switch to Game Panel
             createPlayers();
-            cardLayout.show(mainPanelContainer, "GamePanel");
+            frame.playGame(players);
         });
 
         add(startButton);
@@ -104,7 +104,10 @@ public class PlayerSetupPanel extends JPanel {
     }
 
     private void createPlayers() {
-
+        players = new Player[PLAYER_COUNT];
+        for(int i = 0; i < PLAYER_COUNT; i++) {
+            players[i] = new Player((Integer) moneySpinners[i].getValue(), nameFields[i].getText(), iconIndices[i]);
+        }
     }
 
     private ImageIcon[] loadPlayerIcons() {

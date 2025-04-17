@@ -19,7 +19,7 @@ public class GUI extends JPanel {
     private final JPanel actionPanel; // Shows the actions the player is able to take depending on the state they are in
     private JList<Object> propertiesList; // Shows the current player's properties, allowing them to buy/sell houses and mortgage them
 
-//    private Player[] players; // Holds the players in the game
+    private Player[] players; // Holds the players in the game
     private int currentPlayer; // The index of the current player in the array of players
     private int amountOfPlayers; // Amount of players - 1, used to know where end of players array is
     private boolean diceRolled; // If dice have been rolled this turn
@@ -44,17 +44,15 @@ public class GUI extends JPanel {
     /**
      * Constructor that sets up the GUI and sets up important game variables like amount of players, player names, positions
      */
-    GUI(Player[] players) {
+    GUI(Player[] initialPlayers) {
+        this.players = initialPlayers;
         this.setSize(1000, 900);
         this.setLayout(new BorderLayout());
 
         diceRand = new Random();
         final ImageIcon gameBoard = new ImageIcon("src/GameBoard_Resized.png");
 
-
-        // TODO set up game method
         currentPlayer = 0;
-        amountOfPlayers = 2;
 
         // The amount of houses per property color, to know if player owns all properties of one color for buying and selling houses
         houseAmounts.put(PropertyColors.BROWN, 2);
@@ -130,6 +128,7 @@ public class GUI extends JPanel {
         this.setSize(950, 800);
         this.setVisible(true);
     }
+
 
     /**
      * Rolls two dice and moves the player by the sum of the dice. If the dice have equal value, the player can roll again,
