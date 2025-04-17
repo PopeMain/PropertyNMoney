@@ -17,24 +17,21 @@ public class CommunityTile extends Tile{
      */
     CommunityTile() {
         super(TileTypes.COMMUNITYCHEST);
-        cards = new Card[16];
+        cards = new Card[13];
         // Sets up card deck
         cards[0] = new SubMoneyCard("Pay Doctor fees of $50.", 50);
-        cards[1] = new GiveMoneyCard("Receive $100 in dividends from the bank.", 50);
-        cards[2] = new GiveMoneyCard("Receive $100 in dividends from the bank.", 50);
-        cards[3] = new GiveMoneyCard("Receive $100 in dividends from the bank.", 50);
-        cards[4] = new SubMoneyCard("Pay Doctor fees of $50.", 50);
-        cards[5] = new GiveMoneyCard("Receive $50.", 50);
-        cards[6] = new GiveMoneyCard("Receive $50.", 50);
-        cards[7] = new GiveMoneyCard("Receive $50.", 50);
-        cards[8] = new GiveMoneyCard("Receive $50.", 50);
-        cards[9] = new GiveMoneyCard("Receive $50.", 50);
-        cards[10] = new GiveMoneyCard("Receive $50.", 50);
-        cards[11] = new GiveMoneyCard("Receive $50.", 50);
-        cards[12] = new GiveMoneyCard("Receive $50.", 50);
-        cards[13] = new GiveMoneyCard("Receive $50.", 50);
-        cards[14] = new GiveMoneyCard("Receive $50.", 50);
-        cards[15] = new GiveMoneyCard("Receive $50.", 50);
+        cards[1] = new GiveMoneyCard("Receive $100 in dividends from the bank.", 100);
+        cards[2] = new GiveMoneyCard("Bank Error in your favor. Collect $200", 200);
+        cards[3] = new GiveMoneyCard("From sale of stock, you get $50.", 50);
+        cards[4] = new GiveMoneyCard("Holiday Fund matures. Receive $100.", 100);
+        cards[5] = new GiveMoneyCard("Income tax refund. Collect $20", 20);
+        cards[6] = new GiveMoneyCard("Life insurance matures. Collect $100", 100);
+        cards[7] = new SubMoneyCard("Hospital fees. Pay $50", 50);
+        cards[8] = new SubMoneyCard("School Fees. Pay $50", 50);
+        cards[9] = new GiveMoneyCard("Receive $25 consultancy fee.", 25);
+        cards[10] = new GiveMoneyCard("You have won second prize in a beauty contest. Collect $10", 10);
+        cards[11] = new GiveMoneyCard("You inherit $100.", 100);
+        cards[12] = new JailCard();
     }
 
     /**
