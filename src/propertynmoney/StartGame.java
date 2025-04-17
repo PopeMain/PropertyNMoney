@@ -10,7 +10,7 @@ public class StartGame extends JFrame {
         super("Property and Money");
 
         // Set size of the frame
-        setSize(1000, 900);
+        setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Center the frame on screen
 
