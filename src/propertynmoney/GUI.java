@@ -28,13 +28,15 @@ public class GUI extends JPanel {
     private Tile[] tiles; // When the player moves, the position will be used as an index to determine what should happen to player
 
     // Panels that hold the icons of each player, to show their location on the board
-    private JPanel northPanel;
-    private JPanel southPanel;
-    private JPanel eastPanel;
-    private JPanel westPanel;
+    private final JPanel northPanel;
+    private final JPanel southPanel;
+    private final JPanel eastPanel;
+    private final JPanel westPanel;
 
     private final Random diceRand; // Random number generation for dice rolls
     private final int IMAGE_WIDTH; // Used to paint player names to align them with the tiles on the game board
+    private final int IMAGE_HEIGHT;
+
     private final Map<PropertyColors, Integer> houseAmounts = new HashMap<PropertyColors, Integer>(); // Used to see if player owns all properties of one color for buying and selling houses
 
     /**
@@ -46,13 +48,14 @@ public class GUI extends JPanel {
 
         diceRand = new Random();
         final ImageIcon gameBoard = new ImageIcon("src/GameBoard_Resized.png");
+
         players = new Player[8];
         players[0] = new Player(1500, "Nevin"); // Testing ** Remove when done
         players[1] = new Player(1500, "Frank");
         players[2] = new Player(1500, "Nathan");
-        players[0].moveSpecificPosition(10);
-        players[1].moveSpecificPosition(11);
-        players[2].moveSpecificPosition(12);
+        players[0].moveSpecificPosition(0);
+        players[1].moveSpecificPosition(31);
+        players[2].moveSpecificPosition(32);
 
         // TODO set up game method
         currentPlayer = 0;
@@ -69,7 +72,9 @@ public class GUI extends JPanel {
         houseAmounts.put(PropertyColors.BLUE, 2);
 
         IMAGE_WIDTH = gameBoard.getIconWidth(); // Width of game board, used to align player names to tiles on board
+        IMAGE_HEIGHT = gameBoard.getIconHeight(); // Height of game board, used to align player names to tiles on board
 
+        // Holders used to alter position of normal panels
         JPanel northPanelHolder = new JPanel();
         JPanel southPanelHolder = new JPanel();
         JPanel eastPanelHolder = new JPanel();
@@ -77,24 +82,30 @@ public class GUI extends JPanel {
 
         // Construct player holders, to ensure player names are aligned with board
         northPanel = new JPanel();
-        northPanel.setLayout(new GridBagLayout());
-        // Holders used to alter position of normal panels
+        northPanel.setLayout(null);
+        northPanel.setPreferredSize(new Dimension(IMAGE_WIDTH + 300, 60));
+
         northPanelHolder.setLayout(new BorderLayout());
         northPanelHolder.add(northPanel, BorderLayout.WEST);
+
         southPanel = new JPanel();
-        southPanel.setLayout(null); // TODO Testing
+        southPanel.setLayout(null);
         southPanel.setPreferredSize(new Dimension(IMAGE_WIDTH + 300, 60));
-        southPanelHolder = new JPanel();
+
         southPanelHolder.setLayout(new BorderLayout());
         southPanelHolder.add(southPanel, BorderLayout.EAST);
+
         eastPanel = new JPanel();
-        eastPanel.setLayout(new GridBagLayout());
-        eastPanelHolder = new JPanel();
+        eastPanel.setLayout(null);
+        eastPanel.setPreferredSize(new Dimension(80, IMAGE_HEIGHT - 10));
+
         eastPanelHolder.setLayout(new BorderLayout());
         eastPanelHolder.add(eastPanel, BorderLayout.NORTH);
+
         westPanel = new JPanel();
-        westPanel.setLayout(new GridBagLayout());
-        westPanelHolder = new JPanel();
+        westPanel.setLayout(null);
+        westPanel.setPreferredSize(new Dimension(80, IMAGE_HEIGHT - 10));
+
         westPanelHolder.setLayout(new BorderLayout());
         westPanelHolder.add(westPanel, BorderLayout.SOUTH);
 
@@ -168,15 +179,15 @@ public class GUI extends JPanel {
                 goToJail(players[currentPlayer]);
             } else {
                 JOptionPane.showMessageDialog(this, "You rolled doubles! You get to roll again after you land on tile.");
-                doubleAmount++;
+//                doubleAmount++; TODO
             }
         } else {
-//            diceRolled = true; // Prevent player from rolling in the same turn
+//            diceRolled = true; // Prevent player from rolling in the same turn TODO
         }
 
         paintBoardPanel();
         paintPlayerSidePanel();
-        determineMovementResult();
+//        determineMovementResult(); TODO
 
     }
 
@@ -701,94 +712,35 @@ public class GUI extends JPanel {
         eastPanel.removeAll();
         westPanel.removeAll();
 
-        // North Panel Filler - Needed so that there is always space between grid positions
-        for (int i = 0; i < 10; i++) {
-            GridBagConstraints northPanelConstraints = new GridBagConstraints();
-            northPanelConstraints.gridx = i;
-
-            //Set spacing between grid spaces
-            if (i == 0) {
-                northPanelConstraints.insets = new Insets(0, (int) (IMAGE_WIDTH * (0.153) + 80), 0,  0); // 0.153
-            } else {
-                northPanelConstraints.insets = new Insets(0, (int) (IMAGE_WIDTH * (0.08 / 2)), 0, (int) (IMAGE_WIDTH * (0.08 / 2))); // 0.0918
-            }
-
-            northPanel.add(Box.createHorizontalBox(), northPanelConstraints); // Empty space
-        }
-
-        // West Panel Filler
-        for (int i = 0; i < 10; i++) {
-            GridBagConstraints westPanelConstraints = new GridBagConstraints();
-            westPanelConstraints.gridy = i;
-
-            // Set spacing between grid spaces
-            if (i == 9) {
-                westPanelConstraints.insets = new Insets(0, 0, (int) (IMAGE_WIDTH * (0.153)) + 60,  0); // 0.153
-            } else {
-                westPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.04)), 0, (int) (IMAGE_WIDTH * (0.04)), 0); // 0.0918
-            }
-
-            eastPanel.add(Box.createHorizontalGlue(), westPanelConstraints); // TODO fix this
-            westPanel.add(Box.createHorizontalGlue(), westPanelConstraints); // Empty space
-        }
-
-        // East Panel Filler
-        for (int i = 0; i < 10; i++) {
-            GridBagConstraints eastPanelConstraints = new GridBagConstraints();
-            eastPanelConstraints.gridy = i;
-
-            // Set spacing between grid spaces
-            if (i == 0) {
-                eastPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.153) + 40), 0, 0,  0); // 0.153
-            } else {
-                eastPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.08 / 2)), 0, (int) (IMAGE_WIDTH * (0.08 / 2)), 0); // 0.0918
-            }
-
-            eastPanel.add(Box.createHorizontalGlue(), eastPanelConstraints); // Empty space
-        }
-
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        gbc.gridy = 11;
-        gbc.gridx = 0;
-        gbc.insets = new Insets(0, 80, 0, 0); // Forces left side to always be 80 width to keep sizes consistent
-        westPanel.add(Box.createHorizontalGlue(), gbc);
-        gbc.insets = new Insets(0, 0, 0, 0);
-
-        int[][] southPanelPositions = {{700, 0},{640,0},{585,0},{535,0},{485,0},{430,0},{380,0},{330,0},{280,0},{240,0}};
-        int[][] westPanelPositions = {{700, 0},{640,0},{585,0},{535,0},{485,0},{430,0},{380,0},{330,0},{280,0},{240,0}};
-        int[][] northPanelPositions = {{700, 0},{640,0},{585,0},{535,0},{485,0},{430,0},{380,0},{330,0},{280,0},{240,0}};
-        int[][] eastPanelPositions = {{700, 0},{640,0},{585,0},{535,0},{485,0},{430,0},{380,0},{330,0},{280,0},{240,0}};
-
+        // Positions player icon will be placed next to the tile they occupy
+        int[][] southPanelPositions = {{700, 0},{640,0},{585,0},{535,0},{485,0},{440,0},{390,0},{340,0},{290,0},{245,0}};
+        int[][] westPanelPositions = {{40, 530},{40,465},{40,420},{40, 370},{40, 320},{40, 270},{40,220},{40,170},{40,125},{40,75}};
+        int[][] northPanelPositions = {{100, 0},{160,0},{210,0},{260,0},{310,0},{360,0},{410,0},{460,0},{510,0},{560,0}};
+        int[][] eastPanelPositions = {{0, 30},{0, 100},{0, 150},{0,190},{0,240},{0,290},{0,340},{0,390},{0,440},{0,490}};
 
         // Draw all player names in game
         for (Player player : players) {
             if (player == null || player.isBankrupt()) continue; // Don't draw players who are bankrupt or don't exist
+
             JLabel playerLabel = new JLabel(player.getName());
             playerLabel.setPreferredSize(new Dimension(80, 20));
 
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-
-            System.out.println(southPanel.getWidth());
-            System.out.println(southPanel.getHeight());
             int pos = player.getPosition();
+
             if (pos >= 0 && pos <= 9) { // Bottom (South Panel)
                 playerLabel.setBounds(southPanelPositions[pos][0], southPanelPositions[pos][1], 80, 20);
                 southPanel.add(playerLabel);
             } else if (pos >= 10 && pos <= 19) { // Left (West Panel)
-                gbc.gridy = (19 - pos) % 10;
-                westPanel.add(playerLabel, gbc);
+                playerLabel.setBounds(westPanelPositions[pos % 10][0], westPanelPositions[pos % 10][1], 80, 20);
+                westPanel.add(playerLabel);
             } else if (pos >= 20 && pos <= 29) { // Top (North Panel)
-                gbc.gridx = pos % 10;
-                northPanel.add(playerLabel, gbc);
+                playerLabel.setBounds(northPanelPositions[pos % 10][0], northPanelPositions[pos % 10][1], 80, 20);
+                northPanel.add(playerLabel);
             } else if (pos >= 30 && pos <= 39) { // Right (East Panel)
-                gbc.gridy = pos % 10;
-                eastPanel.add(playerLabel, gbc);
+                playerLabel.setBounds(eastPanelPositions[pos % 10][0], eastPanelPositions[pos % 10][1], 80, 20);
+                eastPanel.add(playerLabel);
             }
         }
-
-
 
         // Refresh panels
         northPanel.revalidate();
