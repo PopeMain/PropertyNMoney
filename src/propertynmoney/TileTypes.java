@@ -11,6 +11,7 @@ public enum TileTypes {
     CHANCE,
     COMMUNITYCHEST,
     TAX,
-    PARKING
+    PARKING,
+    NONE
 
 }

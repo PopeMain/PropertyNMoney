@@ -19,7 +19,7 @@ public class GUI extends JPanel {
     private final JPanel actionPanel; // Shows the actions the player is able to take depending on the state they are in
     private JList<Object> propertiesList; // Shows the current player's properties, allowing them to buy/sell houses and mortgage them
 
-    private Player[] players; // Holds the players in the game
+    private final Player[] players; // Holds the players in the game
     private int currentPlayer; // The index of the current player in the array of players
     private int amountOfPlayers; // Amount of players - 1, used to know where end of players array is
     private boolean diceRolled; // If dice have been rolled this turn
@@ -27,18 +27,18 @@ public class GUI extends JPanel {
 
     private Tile[] tiles; // When the player moves, the position will be used as an index to determine what should happen to player
 
+    private int freeParkingMoney; // Used to store money from player landing on tax tiles, then if a player lands on free parking tile, they get this money
+
     // Panels that hold the icons of each player, to show their location on the board
-    private JPanel northPanel;
-    private JPanel northPanelHolder; // Holders used to alter position of normal panels
-    private JPanel southPanel;
-    private JPanel southPanelHolder;
-    private JPanel eastPanel;
-    private JPanel eastPanelHolder;
-    private JPanel westPanel;
-    private JPanel westPanelHolder;
+    private final JPanel northPanel;
+    private final JPanel southPanel;
+    private final JPanel eastPanel;
+    private final JPanel westPanel;
 
     private final Random diceRand; // Random number generation for dice rolls
     private final int IMAGE_WIDTH; // Used to paint player names to align them with the tiles on the game board
+    private final int IMAGE_HEIGHT;
+
     private final Map<PropertyColors, Integer> houseAmounts = new HashMap<PropertyColors, Integer>(); // Used to see if player owns all properties of one color for buying and selling houses
 
     /**
@@ -53,7 +53,9 @@ public class GUI extends JPanel {
         final ImageIcon gameBoard = new ImageIcon("src/GameBoard_Resized.png");
 
         currentPlayer = 0;
-        amountOfPlayers = this.players.length;
+        amountOfPlayers = this.players.length - 1;
+
+        freeParkingMoney = 0;
 
         // The amount of houses per property color, to know if player owns all properties of one color for buying and selling houses
         houseAmounts.put(PropertyColors.BROWN, 2);
@@ -66,27 +68,40 @@ public class GUI extends JPanel {
         houseAmounts.put(PropertyColors.BLUE, 2);
 
         IMAGE_WIDTH = gameBoard.getIconWidth(); // Width of game board, used to align player names to tiles on board
+        IMAGE_HEIGHT = gameBoard.getIconHeight(); // Height of game board, used to align player names to tiles on board
+
+        // Holders used to alter position of normal panels
+        JPanel northPanelHolder = new JPanel();
+        JPanel southPanelHolder = new JPanel();
+        JPanel eastPanelHolder = new JPanel();
+        JPanel westPanelHolder = new JPanel();
 
         // Construct player holders, to ensure player names are aligned with board
         northPanel = new JPanel();
-        northPanel.setLayout(new GridBagLayout());
-        northPanelHolder = new JPanel();
+        northPanel.setLayout(null);
+        northPanel.setPreferredSize(new Dimension(IMAGE_WIDTH + 300, 60));
+
         northPanelHolder.setLayout(new BorderLayout());
         northPanelHolder.add(northPanel, BorderLayout.WEST);
+
         southPanel = new JPanel();
-        southPanel.setLayout(new GridBagLayout());
-        southPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        southPanelHolder = new JPanel();
+        southPanel.setLayout(null);
+        southPanel.setPreferredSize(new Dimension(IMAGE_WIDTH + 300, 60));
+
         southPanelHolder.setLayout(new BorderLayout());
         southPanelHolder.add(southPanel, BorderLayout.EAST);
+
         eastPanel = new JPanel();
-        eastPanel.setLayout(new GridBagLayout());
-        eastPanelHolder = new JPanel();
+        eastPanel.setLayout(null);
+        eastPanel.setPreferredSize(new Dimension(80, IMAGE_HEIGHT - 10));
+
         eastPanelHolder.setLayout(new BorderLayout());
         eastPanelHolder.add(eastPanel, BorderLayout.NORTH);
+
         westPanel = new JPanel();
-        westPanel.setLayout(new GridBagLayout());
-        westPanelHolder = new JPanel();
+        westPanel.setLayout(null);
+        westPanel.setPreferredSize(new Dimension(80, IMAGE_HEIGHT - 10));
+
         westPanelHolder.setLayout(new BorderLayout());
         westPanelHolder.add(westPanel, BorderLayout.SOUTH);
 
@@ -115,6 +130,7 @@ public class GUI extends JPanel {
         // Construct Side Bar Panel
         sideBarPanel = new JPanel();
         sideBarPanel.setLayout(new BoxLayout(sideBarPanel, BoxLayout.Y_AXIS));
+        sideBarPanel.setPreferredSize(new Dimension(165, 900));
         paintPlayerSidePanel();
 
         this.add(sideBarPanel, BorderLayout.EAST);
@@ -136,14 +152,11 @@ public class GUI extends JPanel {
      */
     private void rollDice() {
         // Roll the two dice
-        int dice1 = diceRand.nextInt(1,6);
-        int dice2 = diceRand.nextInt(1,6);
+        int dice1 = diceRand.nextInt(1,7);
+        int dice2 = diceRand.nextInt(1,7);
 
         // Move player and check if they passed go
-//        boolean passedGo = players[currentPlayer].movePosition(dice1 + dice2);
-
-        boolean passedGo = players[currentPlayer].movePosition(1);
-
+        boolean passedGo = players[currentPlayer].movePosition(dice1 + dice2);
 
         // Show player what dice they rolled
         JOptionPane.showMessageDialog(this, "You rolled a " + dice1 + ", and a " + dice2);
@@ -245,8 +258,7 @@ public class GUI extends JPanel {
     }
 
     /**
-     * Will determine which position the player is on, and will react accordingly to what type of tile the player is on,
-     * if property or utility either allow player to buy or make them pay rent to owner, if chance card
+     * Will determine which position the player is on, and will react accordingly to what type of tile the player is on.
      */
     private void determineMovementResult() {
         Player player = players[currentPlayer]; // Current player that just moved
@@ -261,8 +273,7 @@ public class GUI extends JPanel {
             onUtility(utility, player);
         } else if (tile.getTileType() == TileTypes.TAX) {
             TaxTile tax = (TaxTile) tile;
-            JOptionPane.showMessageDialog(this, "You must pay a tax of " + tax.getTaxAmount() + ".");
-            player.subMoney(tax.getTaxAmount()); // TODO Bankruptcy
+            onTax(tax, player);
         } else if (tile.getTileType() == TileTypes.CHANCE) {
             ChanceTile chance = (ChanceTile) tile;
             onChance(chance, player);
@@ -271,6 +282,8 @@ public class GUI extends JPanel {
             onCommunityChest(community, player);
         } else if (tile.getTileType() == TileTypes.GOTOJAIL) {
             goToJail(player);
+        } else if (tile.getTileType() == TileTypes.PARKING) {
+            onParking(player);
         }
 
         paintPlayerSidePanel();
@@ -290,7 +303,7 @@ public class GUI extends JPanel {
             if (property.isMortgaged()) {
                 JOptionPane.showMessageDialog(this, "You landed on an owned property, but it is mortgaged. So you do not have to pay rent");
             } else {
-                JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue(property.getHouseAmount()) + " to " + property.getOwner().toString() + "in order stay here.");
+                JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue(property.getHouseAmount()) + " to " + property.getOwner().getName() + " in order stay here.");
                 boolean bankrupt = player.subMoney(property.getRentValue(property.getHouseAmount())); // TODO bankruptcy
                 // Take money from player and check if they are bankrupt
                 if (bankrupt) {
@@ -359,12 +372,29 @@ public class GUI extends JPanel {
     }
 
     /**
+     * The events that happen when player lands on tax tile, take tax amount from player's balance and increase free
+     * parking money.
+     * @param tax The tax tile the player landed on
+     * @param player Player that landed on tile
+     */
+    private void onTax(TaxTile tax, Player player) {
+        boolean bankruptcy = player.subMoney(tax.getTaxAmount());
+        freeParkingMoney += tax.getTaxAmount(); // Add money to pool to pay to player who land on free parking
+        JOptionPane.showMessageDialog(this, "You must pay a tax of " + tax.getTaxAmount() + ". The amount of money in the free parking pool is now $" + freeParkingMoney + ".");
+
+        if(bankruptcy)
+            bankruptcy();
+    }
+
+    /**
      * The events that happen when a player lands on a chance tile, draws a card from the chance card deck and applies
      * effect onto the player
      * @param chance The chance tile the player landed on
      * @param player Player that landed on the tile
      */
     private void onChance(ChanceTile chance, Player player) {
+        JOptionPane.showMessageDialog(this, "You landed on a chance tile. Drawing a card now.");
+
         int playerLastPosition = player.getPosition(); // Used to determine if player was moved by card
 
         Card chanceCard = chance.drawCard();
@@ -430,6 +460,16 @@ public class GUI extends JPanel {
         player.moveSpecificPosition(10);
         paintBoardPanel();
         endTurn();
+    }
+
+    /**
+     * Give player free parking money that has been accumulating money from players landing on tax tiles
+     * @param player Player that landed on tile
+     */
+    private void onParking(Player player) {
+        JOptionPane.showMessageDialog(this, "You have landed on free parking. You collect $" + freeParkingMoney + " from the free parking pool.");
+        player.addMoney(freeParkingMoney);
+        freeParkingMoney = 0;
     }
 
     /**
@@ -629,7 +669,7 @@ public class GUI extends JPanel {
      */
     private void setUpTiles() {
         tiles = new Tile[40];
-        tiles[0] = new Tile(TileTypes.PARKING); // Parking means nothing happens if the player lands on the tile
+        tiles[0] = new Tile(TileTypes.NONE); // None means nothing happens if the player lands on the tile
         tiles[1] = new Property(PropertyNames.MEDITERRANEAN_AVE); // Property tile, Property.name holds property info
         tiles[2] = new CommunityTile(); // Draw from community chest deck
         tiles[3] = new Property(PropertyNames.BALTIC_AVE);
@@ -639,7 +679,7 @@ public class GUI extends JPanel {
         tiles[7] = new ChanceTile(); // Draw from chance deck
         tiles[8] = new Property(PropertyNames.VERMONT_AVE);
         tiles[9] = new Property(PropertyNames.CONNECTICUT_AVE);
-        tiles[10] = new Tile(TileTypes.PARKING);
+        tiles[10] = new Tile(TileTypes.NONE);
         tiles[11] = new Property(PropertyNames.ST_CHARLES_PL);
         tiles[12] = new Utility(150, "Electric Company");
         tiles[13] = new Property(PropertyNames.STATES_AVE);
@@ -649,7 +689,7 @@ public class GUI extends JPanel {
         tiles[17] = new CommunityTile();
         tiles[18] = new Property(PropertyNames.TENNESSEE_AVE);
         tiles[19] = new Property(PropertyNames.NEW_YORK_AVE);
-        tiles[20] = new Tile(TileTypes.PARKING);
+        tiles[20] = new Tile(TileTypes.PARKING); // Player collects free parking money when landing on this tile
         tiles[21] = new Property(PropertyNames.KENTUCKY_AVE);
         tiles[22] = new ChanceTile();
         tiles[23] = new Property(PropertyNames.INDIANA_AVE);
@@ -691,99 +731,39 @@ public class GUI extends JPanel {
         eastPanel.removeAll();
         westPanel.removeAll();
 
-        // North Panel Filler - Needed so that there is always space between grid positions
-        for (int i = 0; i < 10; i++) {
-            GridBagConstraints northPanelConstraints = new GridBagConstraints();
-            northPanelConstraints.gridx = i;
+        // Positions player icon will be placed next to the tile they occupy
+        int[][] southPanelPositions = {{700, 0},{640,0},{585,0},{535,0},{485,0},{440,0},{390,0},{340,0},{290,0},{245,0}};
+        int[][] westPanelPositions = {{40, 530},{40,465},{40,420},{40, 370},{40, 320},{40, 270},{40,220},{40,170},{40,125},{40,75}};
+        int[][] northPanelPositions = {{100, 40},{160,40},{210,40},{260,40},{310,40},{360,40},{410,40},{460,40},{510,40},{560,40}};
+        int[][] eastPanelPositions = {{0, 30},{0, 100},{0, 150},{0,190},{0,240},{0,290},{0,340},{0,390},{0,440},{0,490}};
 
-            //Set spacing between grid spaces
-            if (i == 0) {
-                northPanelConstraints.insets = new Insets(0, (int) (IMAGE_WIDTH * (0.153) + 80), 0,  0); // 0.153
-            } else {
-                northPanelConstraints.insets = new Insets(0, (int) (IMAGE_WIDTH * (0.08 / 2)), 0, (int) (IMAGE_WIDTH * (0.08 / 2))); // 0.0918
-            }
-
-            northPanel.add(Box.createHorizontalBox(), northPanelConstraints); // Empty space
-        }
-
-        // South Panel Filler
-        for (int i = 0; i < 10; i++) {
-            GridBagConstraints southPanelConstraints = new GridBagConstraints();
-            southPanelConstraints.gridx = i;
-
-            // Set spacing between grid spaces
-            if (i == 0) {
-                southPanelConstraints.insets = new Insets(0, 0, 0,  (int) (IMAGE_WIDTH * (0.153) + 125)); // 0.153
-            } else if (i == 9) {
-                southPanelConstraints.insets = new Insets(0, 0, 0, 0); // 0.0918
-            } else {
-                southPanelConstraints.insets = new Insets(0, (int) (IMAGE_WIDTH * (0.06 / 2)), 0, (int) (IMAGE_WIDTH * (0.06 / 2))); // 0.0918
-            }
-
-            southPanel.add(Box.createHorizontalBox(), southPanelConstraints); // Empty space
-        }
-
-        // West Panel Filler
-        for (int i = 0; i < 10; i++) {
-            GridBagConstraints westPanelConstraints = new GridBagConstraints();
-            westPanelConstraints.gridy = i;
-
-            // Set spacing between grid spaces
-            if (i == 9) {
-                westPanelConstraints.insets = new Insets(0, 0, (int) (IMAGE_WIDTH * (0.153)) + 60,  0); // 0.153
-            } else {
-                westPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.04)), 0, (int) (IMAGE_WIDTH * (0.04)), 0); // 0.0918
-            }
-
-            eastPanel.add(Box.createHorizontalGlue(), westPanelConstraints); // TODO fix this
-            westPanel.add(Box.createHorizontalGlue(), westPanelConstraints); // Empty space
-        }
-
-        // East Panel Filler
-        for (int i = 0; i < 10; i++) {
-            GridBagConstraints eastPanelConstraints = new GridBagConstraints();
-            eastPanelConstraints.gridy = i;
-
-            // Set spacing between grid spaces
-            if (i == 0) {
-                eastPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.153) + 40), 0, 0,  0); // 0.153
-            } else {
-                eastPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.08 / 2)), 0, (int) (IMAGE_WIDTH * (0.08 / 2)), 0); // 0.0918
-            }
-
-            eastPanel.add(Box.createHorizontalGlue(), eastPanelConstraints); // Empty space
-        }
-
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        gbc.gridy = 11;
-        gbc.gridx = 0;
-        gbc.insets = new Insets(0, 80, 0, 0); // Forces left side to always be 80 width to keep sizes consistent
-        westPanel.add(Box.createHorizontalGlue(), gbc);
-        gbc.insets = new Insets(0, 0, 0, 0);
+        int[] positionOffSets = new int[40]; // Used to offset player icons so they are not overlapping when on same tile
 
         // Draw all player names in game
         for (Player player : players) {
             if (player == null || player.isBankrupt()) continue; // Don't draw players who are bankrupt or don't exist
+
             JLabel playerLabel = new JLabel(player.getName());
             playerLabel.setPreferredSize(new Dimension(80, 20));
 
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-
             int pos = player.getPosition();
+
             if (pos >= 0 && pos <= 9) { // Bottom (South Panel)
-                gbc.gridx = pos;
-                southPanel.add(playerLabel, gbc);
+                playerLabel.setBounds(southPanelPositions[pos][0], southPanelPositions[pos][1] + positionOffSets[pos], 80, 20);
+                positionOffSets[pos] += 10; // Increase position offset at that specific position to prevent player icons from overlapping
+                southPanel.add(playerLabel);
             } else if (pos >= 10 && pos <= 19) { // Left (West Panel)
-                gbc.gridy = (19 - pos) % 10;
-                westPanel.add(playerLabel, gbc);
+                playerLabel.setBounds(westPanelPositions[pos % 10][0], westPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
+                positionOffSets[pos] += 10;
+                westPanel.add(playerLabel);
             } else if (pos >= 20 && pos <= 29) { // Top (North Panel)
-                gbc.gridx = pos % 10;
-                northPanel.add(playerLabel, gbc);
+                playerLabel.setBounds(northPanelPositions[pos % 10][0], northPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
+                positionOffSets[pos] -= 10; // TODO Reverse
+                northPanel.add(playerLabel);
             } else if (pos >= 30 && pos <= 39) { // Right (East Panel)
-                gbc.gridy = pos % 10;
-                eastPanel.add(playerLabel, gbc);
+                playerLabel.setBounds(eastPanelPositions[pos % 10][0], eastPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
+                positionOffSets[pos] += 10;
+                eastPanel.add(playerLabel);
             }
         }
 
