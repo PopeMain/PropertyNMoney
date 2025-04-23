@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * Constructs and displays GUI, and manages the game by moving players, handling button inputs, taking and giving money
- * determining bankruptcy, setting up game, determining victor, ending gaming, and restaring game.
+ * determining bankruptcy, setting up game, determining victor, ending gaming, and restarting game.
  * @author Nevin Fullerton and Frank Pope
  */
 public class GUI extends JPanel {
@@ -130,7 +130,6 @@ public class GUI extends JPanel {
         this.setVisible(true);
     }
 
-
     /**
      * Rolls two dice and moves the player by the sum of the dice. If the dice have equal value, the player can roll again,
      * but if they roll three doubles in a row, they go to jail for speeding.
@@ -141,7 +140,10 @@ public class GUI extends JPanel {
         int dice2 = diceRand.nextInt(1,6);
 
         // Move player and check if they passed go
-        boolean passedGo = players[currentPlayer].movePosition(dice1 + dice2);
+//        boolean passedGo = players[currentPlayer].movePosition(dice1 + dice2);
+
+        boolean passedGo = players[currentPlayer].movePosition(1);
+
 
         // Show player what dice they rolled
         JOptionPane.showMessageDialog(this, "You rolled a " + dice1 + ", and a " + dice2);
@@ -302,7 +304,7 @@ public class GUI extends JPanel {
             if (property.getBuyValue() > player.getMoney()) {
                 JOptionPane.showMessageDialog(this, "You don't have enough money to buy this property.");
             } else {
-                int result = JOptionPane.showConfirmDialog(this, "Do you wish to buy property for " + property.getBuyValue() + " ?", "Buying Property", JOptionPane.YES_NO_OPTION);
+                int result = JOptionPane.showConfirmDialog(this, "Do you wish to buy the property, '" + property.getName() + "', for $" + property.getBuyValue() + " ?", "Buying Property", JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
                     // Give player property and take money from player if they buy property
                     JOptionPane.showMessageDialog(this, player.getName() +  " now owns " + property.getName());
@@ -343,7 +345,7 @@ public class GUI extends JPanel {
                 JOptionPane.showMessageDialog(this, "You don't have enough money to buy this utility.");
             } else {
                 // Give player utility and take money from player if they buy property
-                int result = JOptionPane.showConfirmDialog(this, "Do you wish to buy the utility for " + utility.getBuyValue() + " ?", "Buying Utility", JOptionPane.YES_NO_OPTION);
+                int result = JOptionPane.showConfirmDialog(this, "Do you wish to buy the utility, '" + utility.getName() +  "' for " + utility.getBuyValue() + " ?", "Buying Utility", JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
                     JOptionPane.showMessageDialog(this, player.getName() +  " now owns " + utility.getName());
                     player.subMoney(utility.getBuyValue());
@@ -369,12 +371,15 @@ public class GUI extends JPanel {
         JOptionPane.showMessageDialog(this, chanceCard.getCardText());
         boolean checkPlayer = chanceCard.playerEffect(player); // Used to check certain variables after player has been affected
 
-        if (chanceCard instanceof MovementCard && checkPlayer) {
+        if ((chanceCard instanceof MovementCard || chanceCard instanceof RealtiveMoveCard) && checkPlayer) {
             // Player has passed go, give them money
             passedGo();
         } else if (chanceCard instanceof SubMoneyCard && checkPlayer) {
             // Player's balance is below 0, declare bankruptcy
             bankruptcy();
+        } else if (chanceCard instanceof JailCard && checkPlayer) {
+            // Send player to jail
+            goToJail(player);
         }
 
         // If player is moved by the card, determine movement result again as if they rolled dice
@@ -390,19 +395,23 @@ public class GUI extends JPanel {
      * @param player Player that landed on the tile
      */
     private void onCommunityChest(CommunityTile community, Player player) {
+        JOptionPane.showMessageDialog(this, "You landed on a chest of fortune tile. Drawing a card now.");
+
         int playerLastPosition = player.getPosition(); // Used to determine if player was moved by card
 
         Card communityCard = community.drawCard();
         JOptionPane.showMessageDialog(this, communityCard.getCardText());
         boolean checkPlayer = communityCard.playerEffect(player); // Used to check certain variables after player has been affected
 
-
-        if (communityCard instanceof MovementCard && checkPlayer) {
+        if ((communityCard instanceof MovementCard || communityCard instanceof RealtiveMoveCard) && checkPlayer) {
             // Player has passed go, give them money
             passedGo();
         } else if (communityCard instanceof SubMoneyCard && checkPlayer) {
             // Player's balance is below 0, declare bankruptcy
             bankruptcy();
+        } else if (communityCard instanceof JailCard && checkPlayer) {
+            // Send player to jail
+            goToJail(player);
         }
 
         // If player is moved by the card, determine movement result again as if they rolled dice
@@ -721,9 +730,9 @@ public class GUI extends JPanel {
 
             // Set spacing between grid spaces
             if (i == 9) {
-                westPanelConstraints.insets = new Insets(0, 0, (int) (IMAGE_WIDTH * (0.153)) + 40,  0); // 0.153
+                westPanelConstraints.insets = new Insets(0, 0, (int) (IMAGE_WIDTH * (0.153)) + 60,  0); // 0.153
             } else {
-                westPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.08 / 2)), 0, (int) (IMAGE_WIDTH * (0.08 / 2)), 0); // 0.0918
+                westPanelConstraints.insets = new Insets((int) (IMAGE_WIDTH * (0.04)), 0, (int) (IMAGE_WIDTH * (0.04)), 0); // 0.0918
             }
 
             eastPanel.add(Box.createHorizontalGlue(), westPanelConstraints); // TODO fix this
@@ -804,7 +813,7 @@ public class GUI extends JPanel {
         int playerPosition = players[currentPlayer].getPosition();
         JLabel playerNameLabel = new JLabel("Player Name: " + playerName);
         JLabel playerMoneyLabel = new JLabel("Player Money: " + playerMoney);
-        JLabel playerPositionLabel = new JLabel("Player Position: " + playerPosition);
+        JLabel playerPositionLabel = new JLabel("Player Position: " + (playerPosition + 1));
 
         // Get properties and utilities and put them into one list to display them all
         List<Property> properties = players[currentPlayer].getProperties();

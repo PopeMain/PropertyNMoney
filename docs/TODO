@@ -17,14 +17,10 @@ Icons can't be shared
 Help Menu
 Validation of player startup information.
 
-Position's shouldn't be an array index.
 Change rendering position for each player spot.
 Change JOptionpane title from Message to Chance and Chest o Fortune.
-validate forced movement location indexes.
 Screen size and location validation.
-Property Buy message should include property Name
 Movement bug.
-Rent payment bug.
 Free parking should have tax money
 
 Add an end game button to finish early, should show a score for winners.
