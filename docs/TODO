@@ -9,18 +9,19 @@ Game start and setup pages --- Frank
 Utility Rendering icons --- Frank
 
 NATE--
-Start screen needs to be smaller.
-Cancel should be Exit
+Start screen could be prettier
 
 Four players may be too many, Change player count or add CPU
 Icons can't be shared
 Help Menu
 Validation of player startup information.
+Start Button very big
 
-Change rendering position for each player spot.
-Change JOptionpane title from Message to Chance and Chest o Fortune.
-Screen size and location validation.
-Movement bug.
-Free parking should have tax money
-
+RailRoad names instead of railroad number
+position should be a tile name not index number
+Change JOptionpane title from Message to Chance and Chest of Fortune.
+Don't abbreviate names
+Free parking should have tax money visual
+paying Rent to::Player Name for landing on:: Property Name
+Change "You" to::Player Name
 Add an end game button to finish early, should show a score for winners.
