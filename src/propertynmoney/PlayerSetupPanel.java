@@ -13,30 +13,39 @@ public class PlayerSetupPanel extends JPanel {
     private final ImageIcon[] icons; // Array of icons for the selector
     private Player[] players;
     private JPanel[] playerPanels;
+    private JPanel setupPanel;
 
     // UI components for each player
     private JTextField[] nameFields;
     private JSpinner[] moneySpinners;
     private int[] iconIndices;
+    private JRadioButton[] radioButtons;
 
     public PlayerSetupPanel(StartGame frame) {
         // Load the sprite sheet and create an array of icons (Example Array)
         icons = loadPlayerIcons();
 
+
+        // Set the main Layout
+        setLayout(new GridLayout(2, 1, 10, 10));
+
         // Set the layout with 4 columns
-        setLayout(new GridLayout(1, PLAYER_COUNT + 1, 10, 10)); // Row per player, spacing=10px
+        setupPanel = new JPanel();
+        setupPanel.setLayout(new GridLayout(1, PLAYER_COUNT, 10, 10)); // Row per player, spacing=10px
 
         // Initialize arrays for UI components
         nameFields = new JTextField[PLAYER_COUNT];
         moneySpinners = new JSpinner[PLAYER_COUNT];
         iconIndices = new int[PLAYER_COUNT];
+        radioButtons = new JRadioButton[PLAYER_COUNT];
 
         // Create a column for each player
         playerPanels = new JPanel[PLAYER_COUNT];
         for (int i = 0; i < PLAYER_COUNT; i++) {
             playerPanels[i] = createPlayerSetupColumn(i);
-            add(playerPanels[i]);
+            setupPanel.add(playerPanels[i]);
         }
+        add(setupPanel);
         JButton startButton = new JButton("Start");
         startButton.addActionListener(e -> {
             // Switch to Game Panel
@@ -44,13 +53,13 @@ public class PlayerSetupPanel extends JPanel {
             frame.playGame(players);
         });
 
-        add(startButton);
+        add(startButton,4);
     }
 
     private JPanel createPlayerSetupColumn(int playerNumber) {
         JPanel playerPanel = new JPanel();
         playerPanel.setLayout(new GridLayout(3, 1, 5, 5)); // 3 Rows for Name, Money, Icon Selector
-        playerPanel.setBorder(BorderFactory.createTitledBorder("Player " + playerNumber + 1)); // Panel title for clarity
+        playerPanel.setBorder(BorderFactory.createTitledBorder("Player " + (playerNumber + 1))); // Panel title for clarity
 
         // Row 1: Player Name Input
         JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -70,7 +79,9 @@ public class PlayerSetupPanel extends JPanel {
         moneyPanel.add(moneyLabel);
         moneyPanel.add(moneySpinner);
 
-        // Row 3: Icon Selector
+        // Row 3: Player On switch
+
+        // Row 4: Icon Selector
         JPanel iconPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel iconLabel = new JLabel("Icon:");
         JLabel iconDisplay = new JLabel(icons[0]); // Display the first icon by default
