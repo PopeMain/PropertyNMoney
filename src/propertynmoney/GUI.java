@@ -19,7 +19,7 @@ public class GUI extends JPanel {
     private final JPanel actionPanel; // Shows the actions the player is able to take depending on the state they are in
     private JList<Object> propertiesList; // Shows the current player's properties, allowing them to buy/sell houses and mortgage them
 
-    private Player[] players; // Holds the players in the game
+    private final Player[] players; // Holds the players in the game
     private int currentPlayer; // The index of the current player in the array of players
     private int amountOfPlayers; // Amount of players - 1, used to know where end of players array is
     private boolean diceRolled; // If dice have been rolled this turn
@@ -50,14 +50,13 @@ public class GUI extends JPanel {
         final ImageIcon gameBoard = new ImageIcon("src/GameBoard_Resized.png");
 
         players = new Player[8];
-        players[0] = new Player(1500, "Nevin"); // Testing ** Remove when done
+        players[0] = new Player(1500, "Nevin"); // TODO Testing ** Remove when done
         players[1] = new Player(1500, "Frank");
         players[2] = new Player(1500, "Nathan");
-        players[0].moveSpecificPosition(0);
+        players[0].moveSpecificPosition(31);
         players[1].moveSpecificPosition(31);
-        players[2].moveSpecificPosition(32);
+        players[2].moveSpecificPosition(31);
 
-        // TODO set up game method
         currentPlayer = 0;
         amountOfPlayers = 2;
 
@@ -718,6 +717,8 @@ public class GUI extends JPanel {
         int[][] northPanelPositions = {{100, 0},{160,0},{210,0},{260,0},{310,0},{360,0},{410,0},{460,0},{510,0},{560,0}};
         int[][] eastPanelPositions = {{0, 30},{0, 100},{0, 150},{0,190},{0,240},{0,290},{0,340},{0,390},{0,440},{0,490}};
 
+        int[] positionOffSets = new int[40]; // Used to offset player icons so they are not overlapping when on same tile
+
         // Draw all player names in game
         for (Player player : players) {
             if (player == null || player.isBankrupt()) continue; // Don't draw players who are bankrupt or don't exist
@@ -728,16 +729,20 @@ public class GUI extends JPanel {
             int pos = player.getPosition();
 
             if (pos >= 0 && pos <= 9) { // Bottom (South Panel)
-                playerLabel.setBounds(southPanelPositions[pos][0], southPanelPositions[pos][1], 80, 20);
+                playerLabel.setBounds(southPanelPositions[pos][0], southPanelPositions[pos][1] + positionOffSets[pos], 80, 20);
+                positionOffSets[pos] += 10; // Increase position offset at that specific position to prevent player icons from overlapping
                 southPanel.add(playerLabel);
             } else if (pos >= 10 && pos <= 19) { // Left (West Panel)
-                playerLabel.setBounds(westPanelPositions[pos % 10][0], westPanelPositions[pos % 10][1], 80, 20);
+                playerLabel.setBounds(westPanelPositions[pos % 10][0], westPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
+                positionOffSets[pos] += 10;
                 westPanel.add(playerLabel);
             } else if (pos >= 20 && pos <= 29) { // Top (North Panel)
-                playerLabel.setBounds(northPanelPositions[pos % 10][0], northPanelPositions[pos % 10][1], 80, 20);
+                playerLabel.setBounds(northPanelPositions[pos % 10][0], northPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
+                positionOffSets[pos] += 10; // TODO Reverse
                 northPanel.add(playerLabel);
             } else if (pos >= 30 && pos <= 39) { // Right (East Panel)
-                playerLabel.setBounds(eastPanelPositions[pos % 10][0], eastPanelPositions[pos % 10][1], 80, 20);
+                playerLabel.setBounds(eastPanelPositions[pos % 10][0], eastPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
+                positionOffSets[pos] += 10;
                 eastPanel.add(playerLabel);
             }
         }
