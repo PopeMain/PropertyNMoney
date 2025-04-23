@@ -5,9 +5,10 @@ import java.awt.*;
 
 public class StartPanel extends JPanel {
 
-    public StartPanel(CardLayout cardLayout, JPanel mainPanelContainer) {
+    public StartPanel(StartGame frame) {
         // Set layout for this panel
         setLayout(new BorderLayout());
+        setSize(200, 200);
 
         // Create the title label
         JLabel titleLabel = new JLabel("Property and Money", JLabel.CENTER);
@@ -15,12 +16,12 @@ public class StartPanel extends JPanel {
 
         // Create Start and Cancel buttons
         JButton startButton = new JButton("Start");
-        JButton cancelButton = new JButton("Cancel");
+        JButton cancelButton = new JButton("EXIT");
 
         // Add action to the Start button to switch panels
         startButton.addActionListener(e -> {
             // Switch to setup Panel
-            cardLayout.show(mainPanelContainer, "PlayerSetupPanel");
+            frame.setupPanel();
         });
 
         // Add action to the Cancel button

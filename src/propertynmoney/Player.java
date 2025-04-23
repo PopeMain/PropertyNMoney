@@ -17,6 +17,7 @@ public class Player {
     private boolean bankrupt; // Out of game
     private final List<Property> properties; // Properties which player can upgrade and collect rent from
     private final List<Utility> utilities; // Utilities which player can collect rent from
+    private final int iconIndex;
 
     /**
      * Constructor of the Player class, initializes variables to default state, with name and money being variable to each
@@ -24,7 +25,7 @@ public class Player {
      * @param money Starting money of player
      * @param name Name of player
      */
-    public Player(int money, String name) {
+    public Player(int money, String name, int iconIndex) {
         // Initializes variables to default state
         this.money = money;
         this.name = name;
@@ -34,6 +35,12 @@ public class Player {
         this.bankrupt = false;
         this.properties = new ArrayList<Property>();
         this.utilities =  new ArrayList<Utility>();
+        this.iconIndex = iconIndex;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 
     /**
@@ -156,4 +163,9 @@ public class Player {
      */
     public void setTurnsInJail(int turns) {this.turnsInJail = turns;}
 
+    /**
+     * Get's the index value for the player's choosen Icon image.
+     * @return iconIndex an integer for the location of the icon for player.
+     */
+    public int getIconIndex() {return iconIndex;}
 }

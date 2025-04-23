@@ -11,22 +11,37 @@ public class PlayerSetupPanel extends JPanel {
     private final int PLAYER_COUNT = 4; // Number of players
     private final int DEFAULT_STARTING_MONEY = 1500; // Default starting money
     private final ImageIcon[] icons; // Array of icons for the selector
+    private Player[] players;
+    private JPanel[] playerPanels;
 
-    public PlayerSetupPanel( CardLayout cardLayout, JPanel mainPanelContainer) {
+    // UI components for each player
+    private JTextField[] nameFields;
+    private JSpinner[] moneySpinners;
+    private int[] iconIndices;
+
+    public PlayerSetupPanel(StartGame frame) {
         // Load the sprite sheet and create an array of icons (Example Array)
         icons = loadPlayerIcons();
 
         // Set the layout with 4 columns
         setLayout(new GridLayout(1, PLAYER_COUNT + 1, 10, 10)); // Row per player, spacing=10px
 
+        // Initialize arrays for UI components
+        nameFields = new JTextField[PLAYER_COUNT];
+        moneySpinners = new JSpinner[PLAYER_COUNT];
+        iconIndices = new int[PLAYER_COUNT];
+
         // Create a column for each player
-        for (int i = 1; i <= PLAYER_COUNT; i++) {
-            add(createPlayerSetupColumn(i));
+        playerPanels = new JPanel[PLAYER_COUNT];
+        for (int i = 0; i < PLAYER_COUNT; i++) {
+            playerPanels[i] = createPlayerSetupColumn(i);
+            add(playerPanels[i]);
         }
         JButton startButton = new JButton("Start");
         startButton.addActionListener(e -> {
-            // Switch to setup Panel
-            cardLayout.show(mainPanelContainer, "GamePanel");
+            // Switch to Game Panel
+            createPlayers();
+            frame.playGame(players);
         });
 
         add(startButton);
@@ -35,19 +50,23 @@ public class PlayerSetupPanel extends JPanel {
     private JPanel createPlayerSetupColumn(int playerNumber) {
         JPanel playerPanel = new JPanel();
         playerPanel.setLayout(new GridLayout(3, 1, 5, 5)); // 3 Rows for Name, Money, Icon Selector
-        playerPanel.setBorder(BorderFactory.createTitledBorder("Player " + playerNumber)); // Panel title for clarity
+        playerPanel.setBorder(BorderFactory.createTitledBorder("Player " + playerNumber + 1)); // Panel title for clarity
 
         // Row 1: Player Name Input
         JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel nameLabel = new JLabel("Name:");
         JTextField nameField = new JTextField(10);
+        // Store reference to the name field
+        nameFields[playerNumber] = nameField;
         namePanel.add(nameLabel);
         namePanel.add(nameField);
 
         // Row 2: Starting Money Input
         JPanel moneyPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel moneyLabel = new JLabel("Starting Money:");
-        JSpinner moneySpinner = new JSpinner(new SpinnerNumberModel(DEFAULT_STARTING_MONEY, 0, 1000000, 100));
+        JSpinner moneySpinner = new JSpinner(new SpinnerNumberModel(DEFAULT_STARTING_MONEY, 100, 1000000, 100));
+        // Store reference to the money spinner
+        moneySpinners[playerNumber] = moneySpinner;
         moneyPanel.add(moneyLabel);
         moneyPanel.add(moneySpinner);
 
@@ -58,15 +77,17 @@ public class PlayerSetupPanel extends JPanel {
         JButton previousButton = new JButton("Previous");
         JButton nextButton = new JButton("Next");
 
+        // Initialize the icon index for this player
+        iconIndices[playerNumber] = 0;
+
         // Add functionality to the selector buttons
-        final int[] iconIndex = {0}; // Track the currently selected icon index
         previousButton.addActionListener(e -> {
-            iconIndex[0] = (iconIndex[0] - 1 + icons.length) % icons.length; // Decrement, wrap around
-            iconDisplay.setIcon(icons[iconIndex[0]]);
+            iconIndices[playerNumber] = (iconIndices[playerNumber] - 1 + icons.length) % icons.length; // Decrement, wrap around
+            iconDisplay.setIcon(icons[iconIndices[playerNumber]]);
         });
         nextButton.addActionListener(e -> {
-            iconIndex[0] = (iconIndex[0] + 1) % icons.length; // Increment, wrap around
-            iconDisplay.setIcon(icons[iconIndex[0]]);
+            iconIndices[playerNumber] = (iconIndices[playerNumber] + 1) % icons.length; // Increment, wrap around
+            iconDisplay.setIcon(icons[iconIndices[playerNumber]]);
         });
 
         iconPanel.add(iconLabel);
@@ -80,6 +101,13 @@ public class PlayerSetupPanel extends JPanel {
         playerPanel.add(iconPanel);
 
         return playerPanel;
+    }
+
+    private void createPlayers() {
+        players = new Player[PLAYER_COUNT];
+        for(int i = 0; i < PLAYER_COUNT; i++) {
+            players[i] = new Player((Integer) moneySpinners[i].getValue(), nameFields[i].getText(), iconIndices[i]);
+        }
     }
 
     private ImageIcon[] loadPlayerIcons() {
@@ -122,4 +150,3 @@ public class PlayerSetupPanel extends JPanel {
         }
     }
 }
-
