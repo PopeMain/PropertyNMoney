@@ -758,7 +758,7 @@ public class GUI extends JPanel {
                 westPanel.add(playerLabel);
             } else if (pos >= 20 && pos <= 29) { // Top (North Panel)
                 playerLabel.setBounds(northPanelPositions[pos % 10][0], northPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
-                positionOffSets[pos] -= 10; // TODO Reverse
+                positionOffSets[pos] -= 10;
                 northPanel.add(playerLabel);
             } else if (pos >= 30 && pos <= 39) { // Right (East Panel)
                 playerLabel.setBounds(eastPanelPositions[pos % 10][0], eastPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
@@ -766,8 +766,6 @@ public class GUI extends JPanel {
                 eastPanel.add(playerLabel);
             }
         }
-
-
 
         // Refresh panels
         northPanel.revalidate();
@@ -924,8 +922,6 @@ public class GUI extends JPanel {
         actionPanel.add(sellHousesButton);
         actionPanel.add(mortgageButton);
         actionPanel.add(payDebtsButton);
-        actionPanel.add(declareBankruptcy);
-
         actionPanel.add(declareBankruptcy);
     }
 
@@ -1221,8 +1217,7 @@ public class GUI extends JPanel {
 
                     // End game if only one player remains, else continue onto next player
                     if (winnerFound) {
-                        //TODO NEEDS TO BE FIXED AS JPANEL
-//                        endGame();
+                        endGame();
                     } else {
                         endTurn();
                         paintBoardPanel();
@@ -1251,7 +1246,7 @@ public class GUI extends JPanel {
     }
 
     /**
-     * Announces the winner and allows the players to rest or exit the game
+     * Announces the winner and allows the player to exit the game
      */
     private void endGame() {
         // Find winner
@@ -1263,8 +1258,7 @@ public class GUI extends JPanel {
 
         assert winner != null; // Winner should not be null, if it is then something is wrong
         JOptionPane.showMessageDialog(boardPanel, winner.getName() + " has won the game!");
-        //TODO THIS NEEDSS TO BE FIXED AS JPANEL
-        //this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)); // Quit program
+        System.exit(0);
     }
 
     /**
