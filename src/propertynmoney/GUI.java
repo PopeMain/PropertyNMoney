@@ -138,7 +138,7 @@ public class GUI extends JPanel {
         // Construct Action Panel
         actionPanel = new JPanel();
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
-        paintStandardButtonFrame();
+        paintStandardButtonFrame(frame);
 
         this.add(actionPanel, BorderLayout.SOUTH);
 
@@ -203,7 +203,7 @@ public class GUI extends JPanel {
             players[currentPlayer].movePosition(dice1 + dice2);
             paintBoardPanel();
             paintPlayerSidePanel();
-            paintStandardButtonFrame();
+            paintStandardButtonFrame(frame);
             determineMovementResult();
         }
 
@@ -250,7 +250,7 @@ public class GUI extends JPanel {
         if (players[currentPlayer].isInJail()) {
             paintJailButtonFrame();
         } else {
-            paintStandardButtonFrame();
+            paintStandardButtonFrame(frame);
         }
 
         diceRolled = false; // Reset diceRolled to allow the next player to roll
@@ -862,7 +862,7 @@ public class GUI extends JPanel {
     /**
      * Displays the actions that the player is able to do in a normal turn
      */
-    private void paintStandardButtonFrame() {
+    private void paintStandardButtonFrame(JFrame frame) {
         clearActionPanel();
 
         // Create buttons the player is able to do on a normal turn
@@ -870,7 +870,7 @@ public class GUI extends JPanel {
         JButton buyHousesButton = buyAndSellHouseButton();
         JButton mortgageButton = mortgagePropertyButton();
         JButton endTurnButton = endTurnButton();
-        JButton endGAMEButton = endGAMEButton();
+        JButton endGAMEButton = endGAMEButton(frame);
 
         // Add buttons to JPanel
         actionPanel.add(rollDiceButton);
@@ -932,11 +932,11 @@ public class GUI extends JPanel {
         actionPanel.add(declareBankruptcy);
     }
 
-    private JButton endGAMEButton() {
+    private JButton endGAMEButton(JFrame frame) {
         JButton rollDiceButton = new JButton("END GAME");
         rollDiceButton.addActionListener(e -> {
             if (currentPlayer == amountOfPlayers){
-                frame.
+                frame.endGame(players);
             } else {
                 JOptionPane.showMessageDialog(boardPanel, "Please Let everyone complete their last Turn before Ending the Game." +
                         "Current Player is " + currentPlayer + ". Last Player is " + amountOfPlayers);
