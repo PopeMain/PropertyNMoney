@@ -53,6 +53,7 @@ public class GUI extends JPanel {
         final ImageIcon gameBoard = new ImageIcon("src/GameBoard_Resized.png");
 
         currentPlayer = 0;
+        amountOfPlayers = this.players.length;
 
         // The amount of houses per property color, to know if player owns all properties of one color for buying and selling houses
         houseAmounts.put(PropertyColors.BROWN, 2);
