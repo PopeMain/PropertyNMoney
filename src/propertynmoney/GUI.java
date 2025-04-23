@@ -44,7 +44,7 @@ public class GUI extends JPanel {
     /**
      * Constructor that sets up the GUI and sets up important game variables like amount of players, player names, positions
      */
-    GUI(Player[] initialPlayers) {
+    GUI(JFrame frame, Player[] initialPlayers) {
         this.players = initialPlayers;
         this.setSize(1000, 900);
         this.setLayout(new BorderLayout());
@@ -870,12 +870,15 @@ public class GUI extends JPanel {
         JButton buyHousesButton = buyAndSellHouseButton();
         JButton mortgageButton = mortgagePropertyButton();
         JButton endTurnButton = endTurnButton();
+        JButton endGAMEButton = endGAMEButton();
 
         // Add buttons to JPanel
         actionPanel.add(rollDiceButton);
         actionPanel.add(buyHousesButton);
         actionPanel.add(mortgageButton);
         actionPanel.add(endTurnButton);
+        actionPanel.add(new JPanel());
+        actionPanel.add(endGAMEButton);
 
         // Repaint screen
         actionPanel.revalidate();
@@ -927,6 +930,20 @@ public class GUI extends JPanel {
         actionPanel.add(declareBankruptcy);
 
         actionPanel.add(declareBankruptcy);
+    }
+
+    private JButton endGAMEButton() {
+        JButton rollDiceButton = new JButton("END GAME");
+        rollDiceButton.addActionListener(e -> {
+            if (currentPlayer == amountOfPlayers){
+                frame.
+            } else {
+                JOptionPane.showMessageDialog(boardPanel, "Please Let everyone complete their last Turn before Ending the Game." +
+                        "Current Player is " + currentPlayer + ". Last Player is " + amountOfPlayers);
+            }
+        });
+
+        return rollDiceButton;
     }
 
     /**

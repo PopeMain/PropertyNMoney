@@ -31,7 +31,14 @@ public class StartGame extends JFrame {
     }
 
     public void playGame(Player[] players) {
-        setContentPane(new GUI(players));
+        setContentPane(new GUI(this, players));
+        revalidate();
+        repaint();
+        pack();
+    }
+
+    public void endGame(Player[] players) {
+        setContentPane(new EndGame(players));
         revalidate();
         repaint();
         pack();
