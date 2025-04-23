@@ -46,7 +46,7 @@ public class GUI extends JPanel {
      */
     GUI(Player[] initialPlayers) {
         this.players = initialPlayers;
-        this.setSize(1000, 900);
+        this.setSize(1000, 800);
         this.setLayout(new BorderLayout());
 
         diceRand = new Random();
