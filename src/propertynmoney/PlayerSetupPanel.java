@@ -50,7 +50,7 @@ public class PlayerSetupPanel extends JPanel {
     private JPanel createPlayerSetupColumn(int playerNumber) {
         JPanel playerPanel = new JPanel();
         playerPanel.setLayout(new GridLayout(3, 1, 5, 5)); // 3 Rows for Name, Money, Icon Selector
-        playerPanel.setBorder(BorderFactory.createTitledBorder("Player " + playerNumber)); // Panel title for clarity
+        playerPanel.setBorder(BorderFactory.createTitledBorder("Player " + playerNumber + 1)); // Panel title for clarity
 
         // Row 1: Player Name Input
         JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
