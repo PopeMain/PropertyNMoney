@@ -53,7 +53,7 @@ public class PlayerSetupPanel extends JPanel {
             frame.playGame(players);
         });
 
-        add(startButton,4);
+        add(startButton);
     }
 
     private JPanel createPlayerSetupColumn(int playerNumber) {
