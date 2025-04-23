@@ -201,6 +201,7 @@ public class GUI extends JPanel {
         if (dice1 == dice2) {
             JOptionPane.showMessageDialog(this, "You rolled a double! You get out of jail and move by " + (dice1 + dice2));
             players[currentPlayer].movePosition(dice1 + dice2);
+            players[currentPlayer].setInJail(false);
             paintBoardPanel();
             paintPlayerSidePanel();
             paintStandardButtonFrame();
