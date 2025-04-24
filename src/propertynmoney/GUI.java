@@ -17,7 +17,9 @@ public class GUI extends JPanel {
     private final JPanel boardPanel; // Holds game board and shows player locations on board
     private final JPanel sideBarPanel; // Shows player information and allows user to select their properties
     private final JPanel actionPanel; // Shows the actions the player is able to take depending on the state they are in
-    private JList<Object> propertiesList; // Shows the current player's properties, allowing them to buy/sell houses and mortgage them
+    private JList<Object> propertiesList;// Shows the current player's properties, allowing them to buy/sell houses and mortgage them
+
+    private final StartGame frame;
 
     private final Player[] players; // Holds the players in the game
     private int currentPlayer; // The index of the current player in the array of players
@@ -44,7 +46,8 @@ public class GUI extends JPanel {
     /**
      * Constructor that sets up the GUI and sets up important game variables like amount of players, player names, positions
      */
-    GUI(JFrame frame, Player[] initialPlayers) {
+    GUI(StartGame frame, Player[] initialPlayers) {
+        this.frame = frame;
         this.players = initialPlayers;
         this.setSize(1000, 900);
         this.setLayout(new BorderLayout());
@@ -138,7 +141,7 @@ public class GUI extends JPanel {
         // Construct Action Panel
         actionPanel = new JPanel();
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
-        paintStandardButtonFrame(frame);
+        paintStandardButtonFrame();
 
         this.add(actionPanel, BorderLayout.SOUTH);
 
@@ -203,7 +206,7 @@ public class GUI extends JPanel {
             players[currentPlayer].movePosition(dice1 + dice2);
             paintBoardPanel();
             paintPlayerSidePanel();
-            paintStandardButtonFrame(frame);
+            paintStandardButtonFrame();
             determineMovementResult();
         }
 
@@ -250,7 +253,7 @@ public class GUI extends JPanel {
         if (players[currentPlayer].isInJail()) {
             paintJailButtonFrame();
         } else {
-            paintStandardButtonFrame(frame);
+            paintStandardButtonFrame();
         }
 
         diceRolled = false; // Reset diceRolled to allow the next player to roll
@@ -862,7 +865,7 @@ public class GUI extends JPanel {
     /**
      * Displays the actions that the player is able to do in a normal turn
      */
-    private void paintStandardButtonFrame(JFrame frame) {
+    private void paintStandardButtonFrame() {
         clearActionPanel();
 
         // Create buttons the player is able to do on a normal turn
@@ -870,7 +873,7 @@ public class GUI extends JPanel {
         JButton buyHousesButton = buyAndSellHouseButton();
         JButton mortgageButton = mortgagePropertyButton();
         JButton endTurnButton = endTurnButton();
-        JButton endGAMEButton = endGAMEButton(frame);
+        JButton endGAMEButton = endGAMEButton();
 
         // Add buttons to JPanel
         actionPanel.add(rollDiceButton);
@@ -932,7 +935,7 @@ public class GUI extends JPanel {
         actionPanel.add(declareBankruptcy);
     }
 
-    private JButton endGAMEButton(JFrame frame) {
+    private JButton endGAMEButton() {
         JButton rollDiceButton = new JButton("END GAME");
         rollDiceButton.addActionListener(e -> {
             if (currentPlayer == amountOfPlayers){
