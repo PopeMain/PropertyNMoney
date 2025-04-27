@@ -1061,7 +1061,7 @@ public class GUI extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                Property propertySelected = (Property) propertiesList.getSelectedValue();
+                Property propertySelected = (Property) propertiesList.getSelectedValue(); // TODO add utility
 
                 // Check if player selected a property from list
                 if (propertySelected == null) {

@@ -11,7 +11,7 @@ import java.util.List;
 public class Player {
     private int money; // Balance of player, used to buy properties, if hits 0, delcared bankruptcy
     private int position; // Position on game board from 0-39
-    private String name; // Name of player
+    private final String name; // Name of player
     private boolean inJail; // Used to determine which button frame to paint when it's their turn
     private int turnsInJail; // Prevents player from staying in jail for too long
     private boolean bankrupt; // Out of game
@@ -75,7 +75,7 @@ public class Player {
      * Get position of player on game board
      * @return Position of player
      */
-    public int getPosition() {return position;}
+    public int getPosition() {return position ;}
 
     /**
      * Move player by taking the roll value and adding it to current position, if player passes go, return true
