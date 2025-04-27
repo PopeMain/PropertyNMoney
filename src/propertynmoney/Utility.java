@@ -11,6 +11,7 @@ public class Utility extends Tile {
     private final int rentValue; // Amount of money player has to pay in rent
     private final String name; // Name of utility
     private boolean mortgaged; // If utility is mortgaged
+    private final int mortgageValue;
     private Player owner; // Owner of property, who to pay rent to
 
 
@@ -22,6 +23,7 @@ public class Utility extends Tile {
     public Utility(int value, String name) {
         super(TileTypes.UTILITY);
         this.buyValue = value;
+        this.mortgageValue = value / 2;
         this.name = name;
         this.owner = null;
         this.rentValue = 20;
@@ -55,6 +57,12 @@ public class Utility extends Tile {
      * @return Rent value of utility
      */
     public int getRentValue() {return rentValue;}
+
+    /**
+     * Get mortgage value of utility
+     * @return Mortgage value of utility
+     */
+    public int getMortgageValue() {return mortgageValue;}
 
     /**
      * Checks if utility is mortgaged by owner, for checking if player has to pay rent of not

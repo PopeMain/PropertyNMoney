@@ -21,9 +21,13 @@ public class RealtiveMoveCard implements Card{
         boolean result = false; // If player passed go or not
         // Move player forward or backwards depending on direction
         if (direction) {
-            result = player.moveSpecificPosition(player.getPosition() + movementAmount);
+            result = player.movePosition(movementAmount);
         } else {
-            result = player.moveSpecificPosition(player.getPosition() - movementAmount);
+            if (player.getPosition() - movementAmount < 0) {
+                result = player.moveSpecificPosition(40 + (player.getPosition() - movementAmount)); // Make sure position is not negative
+            } else {
+                result = player.moveSpecificPosition(player.getPosition() - movementAmount);
+            }
         }
 
         return result; // If player passed go or not

@@ -49,7 +49,7 @@ public class GUI extends JPanel {
     GUI(StartGame frame, Player[] initialPlayers) {
         this.frame = frame;
         this.players = initialPlayers;
-        this.setSize(1000, 900);
+        this.setSize(1000, 800);
         this.setLayout(new BorderLayout());
 
         diceRand = new Random();
@@ -203,6 +203,7 @@ public class GUI extends JPanel {
         if (dice1 == dice2) {
             JOptionPane.showMessageDialog(this, "You rolled a double! You get out of jail and move by " + (dice1 + dice2));
             players[currentPlayer].movePosition(dice1 + dice2);
+            players[currentPlayer].setInJail(false);
             paintBoardPanel();
             paintPlayerSidePanel();
             paintStandardButtonFrame();
@@ -306,7 +307,7 @@ public class GUI extends JPanel {
                 JOptionPane.showMessageDialog(this, "You landed on an owned property, but it is mortgaged. So you do not have to pay rent");
             } else {
                 JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue(property.getHouseAmount()) + " to " + property.getOwner().getName() + " in order stay here.");
-                boolean bankrupt = player.subMoney(property.getRentValue(property.getHouseAmount())); // TODO bankruptcy
+                boolean bankrupt = player.subMoney(property.getRentValue(property.getHouseAmount()));
                 // Take money from player and check if they are bankrupt
                 if (bankrupt) {
                     bankruptcy();
@@ -636,7 +637,6 @@ public class GUI extends JPanel {
         } else {
             JOptionPane.showMessageDialog(this, "You changed your mind to mortgage the property " + selectedProperty.getName() + ".");
         }
-
     }
 
     /**
@@ -663,6 +663,51 @@ public class GUI extends JPanel {
         } else {
             JOptionPane.showMessageDialog(this, "You changed your mind to unmortgage the property " + selectedProperty.getName() + ".");
         }
+    }
+
+    /**
+     * Allows player to mortgage a property to get mortgage value of the property in cash, with the downside
+     * being rent can no longer be collected from players landing on that property
+     * @param selectedUtility utility player wishes to mortgage
+     */
+    private void mortgageUtility(Utility selectedUtility) {
+        // Confirm player wishes to mortgage property
+        int choice = JOptionPane.showConfirmDialog(this, "Are you sure you wish to mortgage " + selectedUtility.getName() + " to gain " + selectedUtility.getMortgageValue() + "?");
+
+        if (choice == JOptionPane.YES_OPTION) {
+            // Give player mortgage value of the house, and prevent rent from being collected on the property
+            JOptionPane.showMessageDialog(this, "You mortgaged the utility " + selectedUtility.getName() + " to gain " + selectedUtility.getMortgageValue() + ".");
+            players[currentPlayer].addMoney(selectedUtility.getMortgageValue());
+            selectedUtility.setMortgaged(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "You changed your mind to mortgage the utility " + selectedUtility.getName() + ".");
+        }
+    }
+
+    /**
+     * Allows player to unmortgage a utility to start collecting rent again, at the cost of the mortgage value plus
+     * %10 interest the player has to pay
+     * @param selectedUtility utility players wishes to unmortgage
+     */
+    private void unmortgageUtility(Utility selectedUtility) {
+
+        // Ensure player has enough funds to unmortgage property
+        if (players[currentPlayer].getMoney() < selectedUtility.getMortgageValue() + (selectedUtility .getMortgageValue() * .10)) {
+            JOptionPane.showMessageDialog(this, "You lack the funds to unmortgage the utility " + selectedUtility.getName() + ".");
+            return;
+        }
+
+        // Confirm player wishes to unmortgage property
+        int choice = JOptionPane.showConfirmDialog(this, "Are you sure you wish to unmortgage " + selectedUtility.getName() + " for " + (selectedUtility.getMortgageValue() + (selectedUtility.getMortgageValue() * .10)) + "?");
+
+        if (choice == JOptionPane.YES_OPTION) {
+            // Mortgagee property and subtract cash from player
+            JOptionPane.showMessageDialog(this, "You unmortgaged the property " + selectedUtility.getName() + " for " + (selectedUtility.getMortgageValue() + (selectedUtility.getMortgageValue() * .10)) + ".");
+            players[currentPlayer].subMoney((int) (selectedUtility.getMortgageValue() + (selectedUtility.getMortgageValue() * .10)));
+            selectedUtility.setMortgaged(false);
+        } else {
+            JOptionPane.showMessageDialog(this, "You changed your mind to unmortgage the property " + selectedUtility.getName() + ".");
+        }
 
     }
 
@@ -676,7 +721,7 @@ public class GUI extends JPanel {
         tiles[2] = new CommunityTile(); // Draw from community chest deck
         tiles[3] = new Property(PropertyNames.BALTIC_AVE);
         tiles[4] = new TaxTile(200); // Pay tax
-        tiles[5] = new Utility(200, "RailRoad 1");
+        tiles[5] = new Utility(200, "Reading RailRoad");
         tiles[6] = new Property(PropertyNames.ORIENTAL_AVE);
         tiles[7] = new ChanceTile(); // Draw from chance deck
         tiles[8] = new Property(PropertyNames.VERMONT_AVE);
@@ -686,7 +731,7 @@ public class GUI extends JPanel {
         tiles[12] = new Utility(150, "Electric Company");
         tiles[13] = new Property(PropertyNames.STATES_AVE);
         tiles[14] = new Property(PropertyNames.VIRGINIA_AVE);
-        tiles[15] = new Utility(200, "Railroad 2");
+        tiles[15] = new Utility(200, "Pennsylvania Railroad");
         tiles[16] = new Property(PropertyNames.ST_JAMES_PL);
         tiles[17] = new CommunityTile();
         tiles[18] = new Property(PropertyNames.TENNESSEE_AVE);
@@ -696,7 +741,7 @@ public class GUI extends JPanel {
         tiles[22] = new ChanceTile();
         tiles[23] = new Property(PropertyNames.INDIANA_AVE);
         tiles[24] = new Property(PropertyNames.ILLINOIS_AVE);
-        tiles[25] = new Utility(200, "Railroad 3");
+        tiles[25] = new Utility(200, "B. & O. Railroad");
         tiles[26] = new Property(PropertyNames.ATLANTIC_AVE);
         tiles[27] = new Property(PropertyNames.VENTNOR_AVE);
         tiles[28] = new Utility(150, "Water Works");
@@ -706,7 +751,7 @@ public class GUI extends JPanel {
         tiles[32] = new Property(PropertyNames.NORTH_CAROLINA_AVE);
         tiles[33] = new CommunityTile();
         tiles[34] = new Property(PropertyNames.PENNSYLVANIA_AVE);
-        tiles[35] = new Utility(200, "Railroad 4");
+        tiles[35] = new Utility(200, "Short Line Railroad");
         tiles[36] = new ChanceTile();
         tiles[37] = new Property(PropertyNames.PARK_PL);
         tiles[38] = new TaxTile(100);
@@ -732,6 +777,10 @@ public class GUI extends JPanel {
         southPanel.removeAll();
         eastPanel.removeAll();
         westPanel.removeAll();
+
+        JLabel freeParkingLabel = new JLabel("Free Parking Money: " + freeParkingMoney);
+        freeParkingLabel.setBounds( 0,0, 200, 20);
+        northPanel.add(freeParkingLabel);
 
         // Positions player icon will be placed next to the tile they occupy
         int[][] southPanelPositions = {{700, 0},{640,0},{585,0},{535,0},{485,0},{440,0},{390,0},{340,0},{290,0},{245,0}};
@@ -760,7 +809,7 @@ public class GUI extends JPanel {
                 westPanel.add(playerLabel);
             } else if (pos >= 20 && pos <= 29) { // Top (North Panel)
                 playerLabel.setBounds(northPanelPositions[pos % 10][0], northPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
-                positionOffSets[pos] -= 10; // TODO Reverse
+                positionOffSets[pos] -= 10;
                 northPanel.add(playerLabel);
             } else if (pos >= 30 && pos <= 39) { // Right (East Panel)
                 playerLabel.setBounds(eastPanelPositions[pos % 10][0], eastPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
@@ -768,8 +817,6 @@ public class GUI extends JPanel {
                 eastPanel.add(playerLabel);
             }
         }
-
-
 
         // Refresh panels
         northPanel.revalidate();
@@ -930,8 +977,6 @@ public class GUI extends JPanel {
         actionPanel.add(mortgageButton);
         actionPanel.add(payDebtsButton);
         actionPanel.add(declareBankruptcy);
-
-        actionPanel.add(declareBankruptcy);
     }
 
     private JButton endGAMEButton() {
@@ -1083,20 +1128,35 @@ public class GUI extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                Property propertySelected = (Property) propertiesList.getSelectedValue();
-
-                // Check if player selected a property from list
-                if (propertySelected == null) {
-                    JOptionPane.showMessageDialog(boardPanel, "You must select a property from the list on the right side of the screen.");
+                // Check if player selected an item from list
+                if (propertiesList.getSelectedValue() == null) {
+                    JOptionPane.showMessageDialog(boardPanel, "You must select a property or utility from the list on the right side of the screen.");
                 } else {
-                    // Check if property is mortgaged or not, and ask if they wish to change it
-                    if (propertySelected.isMortgaged()) {
-                        JOptionPane.showConfirmDialog(boardPanel, propertySelected.getName() + "is mortgaged. Do you wish to unmortgage the property for " + (propertySelected.getMortgageValue() + (propertySelected.getMortgageValue() * .10)) + " to regain rent collection?");
-                        unmortgageProperty(propertySelected);
+                    // Check if selected item from list is property or utility
+                    if (propertiesList.getSelectedValue().getClass() == Property.class) {
+                        Property propertySelected = (Property) propertiesList.getSelectedValue();
+
+                        // Check if property is mortgaged or not, and ask if they wish to change it
+                        if (propertySelected.isMortgaged()) {
+                            JOptionPane.showConfirmDialog(boardPanel, propertySelected.getName() + "is mortgaged. Do you wish to unmortgage the property for " + (propertySelected.getMortgageValue() + (propertySelected.getMortgageValue() * .10)) + " to regain rent collection?");
+                            unmortgageProperty(propertySelected);
+                        } else {
+                            JOptionPane.showConfirmDialog(boardPanel, propertySelected.getName() + "is unmortgaged. Do you wish to mortgage the property to gain " + propertySelected.getMortgageValue() + " at the cost for losing rent collection?");
+                            mortgageProperty(propertySelected);
+                        }
                     } else {
-                        JOptionPane.showConfirmDialog(boardPanel, propertySelected.getName() + "is unmortgaged. Do you wish to mortgage the property to gain " + propertySelected.getMortgageValue() + " at the cost for losing rent collection?");
-                        mortgageProperty(propertySelected);
+                        Utility utilitySelected = (Utility) propertiesList.getSelectedValue();
+
+                        // Check if property is mortgaged or not, and ask if they wish to change it
+                        if (utilitySelected.isMortgaged()) {
+                            JOptionPane.showConfirmDialog(boardPanel, utilitySelected.getName() + "is mortgaged. Do you wish to unmortgage the property for " + (utilitySelected.getMortgageValue() + (utilitySelected.getMortgageValue() * .10)) + " to regain rent collection?");
+                            unmortgageUtility(utilitySelected);
+                        } else {
+                            JOptionPane.showConfirmDialog(boardPanel, utilitySelected.getName() + "is unmortgaged. Do you wish to mortgage the property to gain " + utilitySelected.getMortgageValue() + " at the cost for losing rent collection?");
+                            mortgageUtility(utilitySelected);
+                        }
                     }
+
                     paintPlayerSidePanel();
                 }
             }
@@ -1240,8 +1300,7 @@ public class GUI extends JPanel {
 
                     // End game if only one player remains, else continue onto next player
                     if (winnerFound) {
-                        //TODO NEEDS TO BE FIXED AS JPANEL
-//                        endGame();
+                        endGame();
                     } else {
                         endTurn();
                         paintBoardPanel();
@@ -1270,7 +1329,7 @@ public class GUI extends JPanel {
     }
 
     /**
-     * Announces the winner and allows the players to rest or exit the game
+     * Announces the winner and allows the player to exit the game
      */
     private void endGame() {
         // Find winner
@@ -1282,8 +1341,7 @@ public class GUI extends JPanel {
 
         assert winner != null; // Winner should not be null, if it is then something is wrong
         JOptionPane.showMessageDialog(boardPanel, winner.getName() + " has won the game!");
-        //TODO THIS NEEDSS TO BE FIXED AS JPANEL
-        //this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)); // Quit program
+        System.exit(0);
     }
 
     /**
