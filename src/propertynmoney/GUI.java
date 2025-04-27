@@ -114,7 +114,6 @@ public class GUI extends JPanel {
         boardPanel.setLayout(new BorderLayout());
         boardLabel.setIcon(gameBoard);
         boardLabel.setBounds(0, 0, gameBoard.getIconWidth(), gameBoard.getIconHeight());
-        System.out.println(gameBoard.getIconHeight());
         boardLabel.setVisible(true);
         boardPanel.add(boardLabel, BorderLayout.CENTER);
 

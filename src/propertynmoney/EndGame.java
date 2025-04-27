@@ -6,7 +6,12 @@ import java.util.Arrays;
 
 public class EndGame extends JPanel {
 
+    private StartGame frame;
+    private Player[] players;
+
     public EndGame(Player[] players, StartGame frame) {
+        this.players = players;
+        this.frame = frame;
         setLayout(new BorderLayout());
         setSize(200, 200);
 
@@ -39,20 +44,21 @@ public class EndGame extends JPanel {
         // Add the leaderboard to the center of the panel
         add(leaderboardPanel, BorderLayout.CENTER);
 
-        JPanel buttons = new JPanel(new BorderLayout());
-        JButton backToStart = new JButton("Done");
-        backToStart.addActionListener(e -> {
-            frame.backToMain();
-        });
-        JButton exit = new JButton("Exit");
-        exit.addActionListener(e -> {
+        JButton exitButton = new JButton("EXIT");
+        exitButton.addActionListener(e -> {
             System.exit(0);
         });
 
-        buttons.add(backToStart, BorderLayout.WEST);
-        buttons.add(exit, BorderLayout.EAST);
+        JButton restartButton = new JButton("DONE");
+        restartButton.addActionListener(e -> {
+            frame.backToStart();
+        });
 
-        add(buttons, BorderLayout.SOUTH);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        buttonPanel.add(restartButton);
+        buttonPanel.add(exitButton);
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
     /**

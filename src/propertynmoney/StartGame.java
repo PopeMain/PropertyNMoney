@@ -44,7 +44,7 @@ public class StartGame extends JFrame {
         pack();
     }
 
-    public void backToMain(){
+    public void backToStart() {
         setContentPane(new StartPanel(this));
         revalidate();
         repaint();
