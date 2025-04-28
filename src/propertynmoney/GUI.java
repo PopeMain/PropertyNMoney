@@ -304,7 +304,7 @@ public class GUI extends JPanel {
             if (property.isMortgaged()) {
                 JOptionPane.showMessageDialog(this, "You landed on an owned property, but it is mortgaged. So you do not have to pay rent");
             } else {
-                JOptionPane.showMessageDialog(this, "You must pay " + property.getRentValue(property.getHouseAmount()) + " to " + property.getOwner().getName() + " in order stay here.");
+                JOptionPane.showMessageDialog(this, "You landed on an owned property. You must pay " + property.getRentValue(property.getHouseAmount()) + " to " + property.getOwner().getName() + " in order to stay here.");
                 boolean bankrupt = player.subMoney(property.getRentValue(property.getHouseAmount()));
                 // Take money from player and check if they are bankrupt
                 if (bankrupt) {
@@ -345,7 +345,7 @@ public class GUI extends JPanel {
             if (utility.isMortgaged()) {
                 JOptionPane.showMessageDialog(this, "You landed on an owned utility, but it is mortgaged. So you do not have to pay rent");
             } else {
-                JOptionPane.showMessageDialog(this, "You must pay " + utility.getRentValue() + " to stay here.");
+                JOptionPane.showMessageDialog(this, "You landed on an owned utility. You must pay " + utility.getRentValue() + " to " + utility.getOwner().getName() + " in order to stay here.");
                 boolean bankrupt = player.subMoney(utility.getRentValue());
                 // Take money from player and check if they are bankrupt
                 if (bankrupt) {
@@ -837,10 +837,10 @@ public class GUI extends JPanel {
         // Get details about the player to display to user on the side panel
         String playerName = players[currentPlayer].getName();
         int playerMoney = players[currentPlayer].getMoney();
-        int playerPosition = players[currentPlayer].getPosition();
+
         JLabel playerNameLabel = new JLabel("Player Name: " + playerName);
         JLabel playerMoneyLabel = new JLabel("Player Money: " + playerMoney);
-        JLabel playerPositionLabel = new JLabel("Player Position: " + (playerPosition + 1));
+        JLabel playerPositionLabel = createPlayerPositionLabel();
 
         // Get properties and utilities and put them into one list to display them all
         List<Property> properties = players[currentPlayer].getProperties();
@@ -897,6 +897,48 @@ public class GUI extends JPanel {
         sideBarPanel.revalidate();
         sideBarPanel.repaint();
 
+    }
+
+    /**
+     * Creates the player position label by getting the tile the player is on and setting the text depending on the tile
+     * type of position
+     * @return JLabel with that displays the position the player is on
+     */
+    private JLabel createPlayerPositionLabel() {
+        JLabel playerPositionLabel = new JLabel();
+        int playerPosition = players[currentPlayer].getPosition();
+
+        // Change position text depending on what tile the player is on
+        if (tiles[playerPosition].getTileType() == TileTypes.PROPERTY) {
+            Property property = (Property) tiles[playerPosition];
+            playerPositionLabel.setText("Position: " + property.getName());
+        } else if (tiles[playerPosition].getTileType() == TileTypes.UTILITY) {
+            Utility utility = (Utility) tiles[playerPosition];
+            playerPositionLabel.setText("Position: " + utility.getName());
+        } else if (tiles[playerPosition].getTileType() == TileTypes.COMMUNITYCHEST) {
+            playerPositionLabel.setText("Position: Chest o Fortune");
+        } else if (tiles[playerPosition].getTileType() == TileTypes.CHANCE) {
+            playerPositionLabel.setText("Position: Chance");
+        } else if (tiles[playerPosition].getTileType() == TileTypes.PARKING){
+            playerPositionLabel.setText("Position: Free Parking");
+        } else if (tiles[playerPosition].getTileType() == TileTypes.GOTOJAIL) {
+            playerPositionLabel.setText("Position: Goto Jail");
+        } else if (playerPosition == 4) {
+            playerPositionLabel.setText("Position: Income Tax");
+        } else if (playerPosition == 11) {
+            // Say if player is in jail or not
+            if (players[currentPlayer].isInJail()) {
+                playerPositionLabel.setText("Position: In Jail");
+            } else {
+                playerPositionLabel.setText("Position: Just Visiting Jail");
+            }
+        } else if (playerPosition == 38) {
+            playerPositionLabel.setText("Position: Luxury Tax");
+        } else if (playerPosition == 0) {
+            playerPositionLabel.setText("Position: GO");
+        }
+
+        return playerPositionLabel;
     }
 
     /**
