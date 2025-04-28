@@ -15,7 +15,7 @@ public class StartGame extends JFrame {
 
         // Set size of the frame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Center the frame on screen
+        setLocation(25,25);
         setContentPane(new StartPanel(this));
 
         // Show the initial frame
@@ -46,6 +46,20 @@ public class StartGame extends JFrame {
 
     public void backToStart() {
         setContentPane(new StartPanel(this));
+        revalidate();
+        repaint();
+        pack();
+    }
+
+    public void setupHelp() {
+        setContentPane(new setupHelp(this));
+        revalidate();
+        repaint();
+        pack();
+    }
+
+    public void gameHelp() {
+        setContentPane(new gameHelp(this));
         revalidate();
         repaint();
         pack();

@@ -21,7 +21,7 @@ public class Utility extends Tile {
      * @param name Name of utility
      */
     public Utility(int value, String name) {
-        super(TileTypes.UTILITY);
+        super(TileTypes.UTILITY, name);
         this.buyValue = value;
         this.mortgageValue = value / 2;
         this.name = name;

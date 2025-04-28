@@ -25,7 +25,7 @@ public class Property extends Tile{
      *             and the color.
      */
     public Property(PropertyNames name) {
-        super(TileTypes.PROPERTY);
+        super(TileTypes.PROPERTY, name.toString());
         this.buyValue = name.getBuyValue() ;
         this.name = name;
         this.color = name.getColor();

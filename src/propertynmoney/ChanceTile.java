@@ -16,7 +16,7 @@ public class ChanceTile extends Tile{
      * Sets up card deck for the chance tile
      */
     ChanceTile() {
-        super(TileTypes.CHANCE);
+        super(TileTypes.CHANCE, "Chance");
         cards = new Card[14];
         // Set up cards in the deck
         cards[0] = new MovementCard("Advance to Go! Collect $200.", 0);

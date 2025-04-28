@@ -16,7 +16,7 @@ public class CommunityTile extends Tile{
      * Sets up card deck for community chest deck
      */
     CommunityTile() {
-        super(TileTypes.COMMUNITYCHEST);
+        super(TileTypes.COMMUNITYCHEST, "Chest of Fortune");
         cards = new Card[13];
         // Sets up card deck
         cards[0] = new SubMoneyCard("Pay Doctor fees of $50.", 50);

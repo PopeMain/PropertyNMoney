@@ -1,7 +1,14 @@
 package propertynmoney;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
@@ -36,6 +43,9 @@ public class GUI extends JPanel {
     private final JPanel westPanel;
 
     private final Random diceRand; // Random number generation for dice rolls
+    private final int IMAGE_WIDTH; // Used to paint player names to align them with the tiles on the game board
+    private final int IMAGE_HEIGHT;
+    private final ImageIcon[] playerIcons;
 
     private final Map<PropertyColors, Integer> houseAmounts = new HashMap<PropertyColors, Integer>(); // Used to see if player owns all properties of one color for buying and selling houses
 
@@ -45,8 +55,9 @@ public class GUI extends JPanel {
     GUI(StartGame frame, Player[] initialPlayers) {
         this.frame = frame;
         this.players = initialPlayers;
-        this.setSize(1000, 800);
         this.setLayout(new BorderLayout());
+
+        this.playerIcons = loadPlayerIcons();
 
         diceRand = new Random();
         final ImageIcon gameBoard = new ImageIcon("src/GameBoard_Resized.png");
@@ -66,9 +77,8 @@ public class GUI extends JPanel {
         houseAmounts.put(PropertyColors.GREEN, 3);
         houseAmounts.put(PropertyColors.BLUE, 2);
 
-        // Used to paint player names to align them with the tiles on the game board
-        int IMAGE_WIDTH = gameBoard.getIconWidth(); // Width of game board, used to align player names to tiles on board
-        int IMAGE_HEIGHT = gameBoard.getIconHeight(); // Height of game board, used to align player names to tiles on board
+        IMAGE_WIDTH = gameBoard.getIconWidth(); // Width of game board, used to align player names to tiles on board
+        IMAGE_HEIGHT = gameBoard.getIconHeight(); // Height of game board, used to align player names to tiles on board
 
         // Holders used to alter position of normal panels
         JPanel northPanelHolder = new JPanel();
@@ -79,31 +89,31 @@ public class GUI extends JPanel {
         // Construct player holders, to ensure player names are aligned with board
         northPanel = new JPanel();
         northPanel.setLayout(null);
-        northPanel.setPreferredSize(new Dimension(IMAGE_WIDTH + 300, 60));
+        northPanel.setPreferredSize(new Dimension(IMAGE_WIDTH, 40));
 
         northPanelHolder.setLayout(new BorderLayout());
-        northPanelHolder.add(northPanel, BorderLayout.WEST);
+        northPanelHolder.add(northPanel, BorderLayout.CENTER);
 
         southPanel = new JPanel();
         southPanel.setLayout(null);
-        southPanel.setPreferredSize(new Dimension(IMAGE_WIDTH + 300, 60));
+        southPanel.setPreferredSize(new Dimension(IMAGE_WIDTH, 40));
 
         southPanelHolder.setLayout(new BorderLayout());
-        southPanelHolder.add(southPanel, BorderLayout.EAST);
+        southPanelHolder.add(southPanel, BorderLayout.CENTER);
 
         eastPanel = new JPanel();
         eastPanel.setLayout(null);
-        eastPanel.setPreferredSize(new Dimension(80, IMAGE_HEIGHT - 10));
+        eastPanel.setPreferredSize(new Dimension(80, IMAGE_HEIGHT));
 
         eastPanelHolder.setLayout(new BorderLayout());
-        eastPanelHolder.add(eastPanel, BorderLayout.NORTH);
+        eastPanelHolder.add(eastPanel, BorderLayout.WEST);
 
         westPanel = new JPanel();
         westPanel.setLayout(null);
-        westPanel.setPreferredSize(new Dimension(80, IMAGE_HEIGHT - 10));
+        westPanel.setPreferredSize(new Dimension(80, IMAGE_HEIGHT));
 
         westPanelHolder.setLayout(new BorderLayout());
-        westPanelHolder.add(westPanel, BorderLayout.SOUTH);
+        westPanelHolder.add(westPanel, BorderLayout.EAST);
 
         // Construct Board Panel
         boardPanel = new JPanel();
@@ -113,6 +123,23 @@ public class GUI extends JPanel {
         boardLabel.setBounds(0, 0, gameBoard.getIconWidth(), gameBoard.getIconHeight());
         boardLabel.setVisible(true);
         boardPanel.add(boardLabel, BorderLayout.CENTER);
+
+        JPanel spacerN1 = new JPanel();
+        spacerN1.setPreferredSize(new Dimension(80, 80));
+        northPanelHolder.add(spacerN1, BorderLayout.LINE_START);
+
+        JPanel spacerN2 = new JPanel();
+        spacerN2.setPreferredSize(new Dimension(80, 80));
+        northPanelHolder.add(spacerN2, BorderLayout.LINE_END);
+
+        JPanel spacerS1 = new JPanel();
+        spacerS1.setPreferredSize(new Dimension(80, 80));
+        southPanelHolder.add(spacerS1, BorderLayout.LINE_START);
+
+        JPanel spacerS2 = new JPanel();
+        spacerS2.setPreferredSize(new Dimension(80, 80));
+        southPanelHolder.add(spacerS2, BorderLayout.LINE_END);
+
 
         // Position panels where player names are drawn to be aligned with board
         boardPanel.add(northPanelHolder, BorderLayout.NORTH);
@@ -129,7 +156,7 @@ public class GUI extends JPanel {
         // Construct Side Bar Panel
         sideBarPanel = new JPanel();
         sideBarPanel.setLayout(new BoxLayout(sideBarPanel, BoxLayout.Y_AXIS));
-        sideBarPanel.setPreferredSize(new Dimension(165, 900));
+        sideBarPanel.setPreferredSize(new Dimension(150, 760));
         paintPlayerSidePanel();
 
         this.add(sideBarPanel, BorderLayout.EAST);
@@ -145,6 +172,7 @@ public class GUI extends JPanel {
 
         this.setSize(950, 800);
         this.setVisible(true);
+        frame.setResizable(false);
 
         // Have to set focus in invoke later so that keyboard inputs work, have to use invoke later otherwise request focus won't work
         SwingUtilities.invokeLater(new Runnable() {
@@ -158,6 +186,54 @@ public class GUI extends JPanel {
             }
         });
     }
+
+    /**
+     * Loads an array of player icons from a sprite sheet.
+     * This method extracts individual icons from a sprite sheet located at a specific path.
+     *
+     * @return An array of ImageIcon objects representing the player icons.
+     */
+    private ImageIcon[] loadPlayerIcons() {
+        ImageIcon[] icons = new ImageIcon[9];
+        for (int i = 0; i < icons.length; i++) {
+            icons[i] = extractSprite("src/ppSprite.png", i);
+        }
+        return icons;
+    }
+
+    /**
+     * Extracts a specific sprite from a sprite sheet image file and scales it to a smaller size for display purposes.
+     *
+     * @param spriteSheetPath the file path of the sprite sheet image
+     * @param iconIndex the index of the sprite within the sprite sheet to extract
+     * @return an ImageIcon containing the scaled sprite, or null if an error occurs during processing
+     */
+    private ImageIcon extractSprite(String spriteSheetPath, int iconIndex) {
+        final int SPRITE_WIDTH = 300;
+        final int SPRITE_HEIGHT = 236;
+        final int SPRITES_PER_ROW = 3;
+
+        try {
+            BufferedImage spriteSheet = ImageIO.read(new File(spriteSheetPath));
+            int row = iconIndex / SPRITES_PER_ROW;
+            int col = iconIndex % SPRITES_PER_ROW;
+
+            BufferedImage sprite = spriteSheet.getSubimage(
+                    col * SPRITE_WIDTH,
+                    row * SPRITE_HEIGHT,
+                    SPRITE_WIDTH,
+                    SPRITE_HEIGHT
+            );
+
+            // Make the icons smaller for the game board
+            Image scaledSprite = sprite.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaledSprite);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
     /**
      * Rolls two dice and moves the player by the sum of the dice. If the dice have equal value, the player can roll again,
@@ -727,7 +803,7 @@ public class GUI extends JPanel {
      */
     private void setUpTiles() {
         tiles = new Tile[40];
-        tiles[0] = new Tile(TileTypes.NONE); // None means nothing happens if the player lands on the tile
+        tiles[0] = new Tile(TileTypes.NONE, "GO"); // None means nothing happens if the player lands on the tile
         tiles[1] = new Property(PropertyNames.MEDITERRANEAN_AVE); // Property tile, Property.name holds property info
         tiles[2] = new CommunityTile(); // Draw from community chest deck
         tiles[3] = new Property(PropertyNames.BALTIC_AVE);
@@ -737,7 +813,7 @@ public class GUI extends JPanel {
         tiles[7] = new ChanceTile(); // Draw from chance deck
         tiles[8] = new Property(PropertyNames.VERMONT_AVE);
         tiles[9] = new Property(PropertyNames.CONNECTICUT_AVE);
-        tiles[10] = new Tile(TileTypes.NONE);
+        tiles[10] = new Tile(TileTypes.NONE, "Jail");
         tiles[11] = new Property(PropertyNames.ST_CHARLES_PL);
         tiles[12] = new Utility(150, "Electric Company");
         tiles[13] = new Property(PropertyNames.STATES_AVE);
@@ -747,7 +823,7 @@ public class GUI extends JPanel {
         tiles[17] = new CommunityTile();
         tiles[18] = new Property(PropertyNames.TENNESSEE_AVE);
         tiles[19] = new Property(PropertyNames.NEW_YORK_AVE);
-        tiles[20] = new Tile(TileTypes.PARKING); // Player collects free parking money when landing on this tile
+        tiles[20] = new Tile(TileTypes.PARKING, "Parking"); // Player collects free parking money when landing on this tile
         tiles[21] = new Property(PropertyNames.KENTUCKY_AVE);
         tiles[22] = new ChanceTile();
         tiles[23] = new Property(PropertyNames.INDIANA_AVE);
@@ -757,7 +833,7 @@ public class GUI extends JPanel {
         tiles[27] = new Property(PropertyNames.VENTNOR_AVE);
         tiles[28] = new Utility(150, "Water Works");
         tiles[29] = new Property(PropertyNames.MARVIN_GAR);
-        tiles[30] = new Tile(TileTypes.GOTOJAIL); // Send player to jail
+        tiles[30] = new Tile(TileTypes.GOTOJAIL, "GO TO JAIL"); // Send player to jail
         tiles[31] = new Property(PropertyNames.PACIFIC_AVE);
         tiles[32] = new Property(PropertyNames.NORTH_CAROLINA_AVE);
         tiles[33] = new CommunityTile();
@@ -792,39 +868,75 @@ public class GUI extends JPanel {
         JLabel freeParkingLabel = new JLabel("Free Parking Money: " + freeParkingMoney);
         freeParkingLabel.setBounds( 0,0, 200, 20);
         northPanel.add(freeParkingLabel);
-
+        int s = 520;
+        int ds = 49;
         // Positions player icon will be placed next to the tile they occupy
-        int[][] southPanelPositions = {{700, 0},{640,0},{585,0},{535,0},{485,0},{440,0},{390,0},{340,0},{290,0},{245,0}};
-        int[][] westPanelPositions = {{40, 530},{40,465},{40,420},{40, 370},{40, 320},{40, 270},{40,220},{40,170},{40,125},{40,75}};
-        int[][] northPanelPositions = {{100, 40},{160,40},{210,40},{260,40},{310,40},{360,40},{410,40},{460,40},{510,40},{560,40}};
-        int[][] eastPanelPositions = {{0, 30},{0, 100},{0, 150},{0,190},{0,240},{0,290},{0,340},{0,390},{0,440},{0,490}};
+        int[][] southPanelPositions = {{s, 0},{s-ds,0},{s-2*ds,0},{s-3*ds,0},{s-4*ds,0},{s-5*ds,0},{s-6*ds,0},{s-7*ds,0},{s-8*ds,0},{s-9*ds,0}};
+        int[][] westPanelPositions = {{60, s-ds},{60,s-2*ds},{60,s-3*ds},{60, s-4*ds},{60, s-5*ds},{60, s-6*ds},{60,s-7*ds},{60,s-8*ds},{60,s-9*ds},{60,s-10*ds}};
+        int[][] northPanelPositions = {{s-10*ds, 60},{s-9*ds,60},{s-8*ds,60},{s-7*ds,60},{s-6*ds,60},{s-5*ds,60},{s-4*ds,60},{s-3*ds,60},{s-2*ds,60},{s-1*ds,60}};
+        int[][] eastPanelPositions = {{0, s-10*ds},{0, s-9*ds},{0, s-8*ds},{0,s-7*ds},{0,s-6*ds},{0,s-5*ds},{0,s-4*ds},{0,s-3*ds},{0,s-2*ds},{0,s-1*ds}};
 
-        int[] positionOffSets = new int[40]; // Used to offset player icons so they are not overlapping when on same tile
+        int[] positionOffSetsY = new int[40]; // Used to offset player icons so they are not overlapping when on same tile
+        int[] positionOffSetsX = new int[40]; // Used to offset player icons so they are not overlapping when on same tile
 
         // Draw all player names in game
         for (Player player : players) {
             if (player == null || player.isBankrupt()) continue; // Don't draw players who are bankrupt or don't exist
 
-            JLabel playerLabel = new JLabel(player.getName());
-            playerLabel.setPreferredSize(new Dimension(80, 20));
+            JLabel playerLabel = new JLabel(playerIcons[player.getIconIndex()]);
 
             int pos = player.getPosition();
-
-            if (pos >= 0 && pos <= 9) { // Bottom (South Panel)
-                playerLabel.setBounds(southPanelPositions[pos][0], southPanelPositions[pos][1] + positionOffSets[pos], 80, 20);
-                positionOffSets[pos] += 10; // Increase position offset at that specific position to prevent player icons from overlapping
+            if (pos == 0){
+                playerLabel.setBounds(s + positionOffSetsX[pos], 0, 20, 20);
+                positionOffSetsX[pos] += 20;
                 southPanel.add(playerLabel);
-            } else if (pos >= 10 && pos <= 19) { // Left (West Panel)
-                playerLabel.setBounds(westPanelPositions[pos % 10][0], westPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
-                positionOffSets[pos] += 10;
+            } else if (pos >= 1 && pos <= 9) { // Bottom (South Panel)
+                playerLabel.setBounds(southPanelPositions[pos][0] + positionOffSetsX[pos], southPanelPositions[pos][1] + positionOffSetsY[pos], 20, 20);
+                if(positionOffSetsX[pos] <= positionOffSetsY[pos]) {
+                    positionOffSetsX[pos] += 20; // Increase position offset at that specific position to prevent player icons from overlapping
+                } else {
+                    positionOffSetsX[pos] = 0;
+                    positionOffSetsY[pos] += 20; // Increase position offset at that specific position to prevent player icons from overlapping
+                }
+                southPanel.add(playerLabel);
+            } else if (pos == 10 && !player.isInJail()){
+                playerLabel.setBounds(positionOffSetsX[pos], 0, 20, 20);
+                positionOffSetsX[pos] += 20;
+                southPanel.add(playerLabel);
+            } else if (pos == 10 && player.isInJail()){
+                playerLabel.setBounds(60, s - positionOffSetsY[pos], 20, 20);
+                positionOffSetsY[pos] -= 20;
                 westPanel.add(playerLabel);
-            } else if (pos >= 20 && pos <= 29) { // Top (North Panel)
-                playerLabel.setBounds(northPanelPositions[pos % 10][0], northPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
-                positionOffSets[pos] -= 10;
+            } else if (pos >= 11 && pos <= 19) { // Left (West Panel)
+                playerLabel.setBounds(westPanelPositions[(pos-1) % 10][0] + positionOffSetsX[pos], westPanelPositions[(pos-1) % 10][1] + positionOffSetsY[pos], 20, 20);
+                if(positionOffSetsY[pos] <= -positionOffSetsX[pos]) {
+                    positionOffSetsY[pos] += 20; // Increase position offset at that specific position to prevent player icons from overlapping
+                } else {
+                    positionOffSetsY[pos] = 0;
+                    positionOffSetsX[pos] -= 20; // Increase position offset at that specific position to prevent player icons from overlapping
+                }
+                westPanel.add(playerLabel);
+            } else if (pos == 20) {
+                playerLabel.setBounds(positionOffSetsX[pos],60,20,20);
+                positionOffSetsX[pos] += 20;
                 northPanel.add(playerLabel);
-            } else if (pos >= 30 && pos <= 39) { // Right (East Panel)
-                playerLabel.setBounds(eastPanelPositions[pos % 10][0], eastPanelPositions[pos % 10][1] + positionOffSets[pos], 80, 20);
-                positionOffSets[pos] += 10;
+            }else if (pos >= 21 && pos <= 29) { // Top (North Panel)
+                playerLabel.setBounds(northPanelPositions[pos % 10][0] + positionOffSetsX[pos], northPanelPositions[pos % 10][1] + positionOffSetsY[pos], 20, 20);
+                if(-positionOffSetsX[pos] >= positionOffSetsY[pos]) {
+                    positionOffSetsX[pos] += 20; // Increase position offset at that specific position to prevent player icons from overlapping
+                } else {
+                    positionOffSetsX[pos] = 0;
+                    positionOffSetsY[pos] -= 20; // Increase position offset at that specific position to prevent player icons from overlapping
+                }
+                northPanel.add(playerLabel);
+            } else if (pos >= 31 && pos <= 39) { // Right (East Panel)
+                playerLabel.setBounds(eastPanelPositions[pos % 10][0] + positionOffSetsX[pos], eastPanelPositions[pos % 10][1] + positionOffSetsY[pos], 20, 20);
+                if(positionOffSetsY[pos] <= positionOffSetsX[pos]) {
+                    positionOffSetsY[pos] += 20; // Increase position offset at that specific position to prevent player icons from overlapping
+                } else {
+                    positionOffSetsY[pos] = 0;
+                    positionOffSetsX[pos] += 20; // Increase position offset at that specific position to prevent player icons from overlapping
+                }
                 eastPanel.add(playerLabel);
             }
         }
@@ -850,10 +962,11 @@ public class GUI extends JPanel {
         // Get details about the player to display to user on the side panel
         String playerName = players[currentPlayer].getName();
         int playerMoney = players[currentPlayer].getMoney();
-
-        JLabel playerNameLabel = new JLabel("Player Name: " + playerName);
-        JLabel playerMoneyLabel = new JLabel("Player Money: " + playerMoney);
-        JLabel playerPositionLabel = createPlayerPositionLabel();
+        int playerPosition = players[currentPlayer].getPosition();
+        JLabel playerNameLabel = new JLabel("Name: " + playerName);
+        JLabel playerMoneyLabel = new JLabel("Money: $" + playerMoney);
+        JLabel playerPositionLabel = new JLabel(tiles[playerPosition].toString());
+        JLabel playerIconLabel = new JLabel(playerIcons[players[currentPlayer].getIconIndex()]);
 
         // Get properties and utilities and put them into one list to display them all
         List<Property> properties = players[currentPlayer].getProperties();
@@ -902,56 +1015,20 @@ public class GUI extends JPanel {
 
         propertiesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        JPanel parallelPanel = new JPanel();
+        parallelPanel.setLayout(new BorderLayout());
+        parallelPanel.setMaximumSize(new Dimension(100, 25));
+        parallelPanel.add(playerIconLabel, BorderLayout.LINE_START);
+        parallelPanel.add(playerPositionLabel, BorderLayout.CENTER);
+
         sideBarPanel.add(playerNameLabel);
         sideBarPanel.add(playerMoneyLabel);
-        sideBarPanel.add(playerPositionLabel);
+        sideBarPanel.add(parallelPanel);
         sideBarPanel.add(new JScrollPane(propertiesList));
 
         sideBarPanel.revalidate();
         sideBarPanel.repaint();
 
-    }
-
-    /**
-     * Creates the player position label by getting the tile the player is on and setting the text depending on the tile
-     * type of position
-     * @return JLabel with that displays the position the player is on
-     */
-    private JLabel createPlayerPositionLabel() {
-        JLabel playerPositionLabel = new JLabel();
-        int playerPosition = players[currentPlayer].getPosition();
-
-        // Change position text depending on what tile the player is on
-        if (tiles[playerPosition].getTileType() == TileTypes.PROPERTY) {
-            Property property = (Property) tiles[playerPosition];
-            playerPositionLabel.setText("Position: " + property.getName());
-        } else if (tiles[playerPosition].getTileType() == TileTypes.UTILITY) {
-            Utility utility = (Utility) tiles[playerPosition];
-            playerPositionLabel.setText("Position: " + utility.getName());
-        } else if (tiles[playerPosition].getTileType() == TileTypes.COMMUNITYCHEST) {
-            playerPositionLabel.setText("Position: Chest o Fortune");
-        } else if (tiles[playerPosition].getTileType() == TileTypes.CHANCE) {
-            playerPositionLabel.setText("Position: Chance");
-        } else if (tiles[playerPosition].getTileType() == TileTypes.PARKING){
-            playerPositionLabel.setText("Position: Free Parking");
-        } else if (tiles[playerPosition].getTileType() == TileTypes.GOTOJAIL) {
-            playerPositionLabel.setText("Position: Goto Jail");
-        } else if (playerPosition == 4) {
-            playerPositionLabel.setText("Position: Income Tax");
-        } else if (playerPosition == 11) {
-            // Say if player is in jail or not
-            if (players[currentPlayer].isInJail()) {
-                playerPositionLabel.setText("Position: In Jail");
-            } else {
-                playerPositionLabel.setText("Position: Just Visiting Jail");
-            }
-        } else if (playerPosition == 38) {
-            playerPositionLabel.setText("Position: Luxury Tax");
-        } else if (playerPosition == 0) {
-            playerPositionLabel.setText("Position: GO");
-        }
-
-        return playerPositionLabel;
     }
 
     /**
@@ -1509,5 +1586,6 @@ public class GUI extends JPanel {
     private void clearActionPanel() {
         actionPanel.removeAll();
     }
+
 
 }
