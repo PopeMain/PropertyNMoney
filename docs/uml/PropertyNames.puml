@@ -1,0 +1,41 @@
+@startuml
+enum PropertyNames {
+    MEDITERRANEAN_AVE
+    BALTIC_AVE
+    ORIENTAL_AVE
+    VERMONT_AVE
+    CONNECTICUT_AVE
+    ST_CHARLES_PL
+    STATES_AVE
+    VIRGINIA_AVE
+    ST_JAMES_PL
+    TENNESSEE_AVE
+    NEW_YORK_AVE
+    KENTUCKY_AVE
+    INDIANA_AVE
+    ILLINOIS_AVE
+    ATLANTIC_AVE
+    VENTNOR_AVE
+    MARVIN_GAR
+    PACIFIC_AVE
+    NORTH_CAROLINA_AVE
+    PENNSYLVANIA_AVE
+    PARK_PL
+    BOARDWALK
+
+    - displayName: String
+    - buyValue: int
+    - pColor: PropertyColors
+    - rentValues: int[]
+    - mortgageValue: int
+    - housePrice: int
+
+    + toString(): String
+    + getBuyValue(): int
+    + getColor(): Color
+    + getColorEnum(): PropertyColors
+    + getRentValues(): int[]
+    + getMortgageValue(): int
+    + getHousePrice(): int
+}
+@enduml

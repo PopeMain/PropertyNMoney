@@ -22,7 +22,7 @@ public class GiveMoneyCard implements Card {
     /**
      * Give player money
      * @param player Player that will be effected
-     * @return Always returns false, nothing needs to be checked afterwards
+     * @return Always returns false, nothing needs to be checked afterward
      */
     @Override
     public boolean playerEffect(Player player) {

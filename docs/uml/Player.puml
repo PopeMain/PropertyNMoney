@@ -1,0 +1,34 @@
+@startuml
+class Player {
+    - money: int
+    - position: int
+    - name: String
+    - inJail: boolean
+    - turnsInJail: int
+    - bankrupt: boolean
+    - properties: List<Property>
+    - utilities: List<Utility>
+    - iconIndex: int
+
+    + Player(money: int, name: String, iconIndex: int)
+    + toString(): String
+    + getMoney(): int
+    + getName(): String
+    + addMoney(money: int): void
+    + subMoney(money: int): boolean
+    + getPosition(): int
+    + movePosition(rollValue: int): boolean
+    + moveSpecificPosition(position: int): boolean
+    + isBankrupt(): boolean
+    + setBankrupt(bankrupt: boolean): void
+    + isInJail(): boolean
+    + setInJail(inJail: boolean): void
+    + getProperties(): List<Property>
+    + addProperty(property: Property): void
+    + getUtilities(): List<Utility>
+    + addUtility(utility: Utility): void
+    + getTurnsInJail(): int
+    + setTurnsInJail(turns: int): void
+    + getIconIndex(): int
+}
+@enduml

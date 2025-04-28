@@ -1,0 +1,6 @@
+@startuml
+interface Card {
+    + playerEffect(player: Player): boolean
+    + getCardText(): String
+}
+@enduml

@@ -1,0 +1,75 @@
+@startuml
+class GUI {
+    - boardPanel: JPanel
+    - sideBarPanel: JPanel
+    - actionPanel: JPanel
+    - propertiesList: JList<Object>
+    - frame: StartGame
+    - players: Player[]
+    - currentPlayer: int
+    - amountOfPlayers: int
+    - diceRolled: boolean
+    - doubleAmount: int
+    - tiles: Tile[]
+    - freeParkingMoney: int
+    - northPanel: JPanel
+    - southPanel: JPanel
+    - eastPanel: JPanel
+    - westPanel: JPanel
+    - diceRand: Random
+    - IMAGE_WIDTH: int
+    - IMAGE_HEIGHT: int
+    - playerIcons: ImageIcon[]
+    - houseAmounts: Map<PropertyColors, Integer>
+
+    + GUI(frame: StartGame, initialPlayers: Player[])
+    + loadPlayerIcons(): ImageIcon[]
+    + extractSprite(spriteSheetPath: String, iconIndex: int): ImageIcon
+    + rollDice(): void
+    + rollJailDice(): void
+    + passedGo(): void
+    + endTurn(): void
+    + determineMovementResult(): void
+    + onProperty(property: Property, player: Player): void
+    + onUtility(utility: Utility, player: Player): void
+    + onTax(tax: TaxTile, player: Player): void
+    + onChance(chance: ChanceTile, player: Player): void
+    + onCommunityChest(community: CommunityTile, player: Player): void
+    + goToJail(player: Player): void
+    + onParking(player: Player): void
+    + buyHouse(selectedProperty: Property): void
+    + sellHouse(selectedProperty: Property): void
+    + mortgageProperty(selectedProperty: Property): void
+    + unmortgageProperty(selectedProperty: Property): void
+    + mortgageUtility(selectedUtility: Utility): void
+    + unmortgageUtility(selectedUtility: Utility): void
+    + setUpTiles(): void
+    + bankruptcy(): void
+    + paintBoardPanel(): void
+    + paintPlayerSidePanel(): void
+    + clearSideBarPanel(): void
+    + paintStandardButtonFrame(): void
+    + paintJailButtonFrame(): void
+    + paintBankruptcyButtonFrame(): void
+    + endGAMEButton(): JButton
+    + rollDiceButton(): JButton
+    + rollDiceJailButton(): JButton
+    + payFineButton(): JButton
+    + buyAndSellHouseButton(): JButton
+    + bankruptcySellHouseButton(): JButton
+    + mortgagePropertyButton(): JButton
+    + bankruptcyMortgagePropertyButton(): JButton
+    + endTurnButton(): JButton
+    + endTurnJailButton(): JButton
+    + debtsPaidButton(): JButton
+    + declareBankruptcyButton(): JButton
+    + checkForWinner(): boolean
+    + endGame(): void
+    + declareActions(): void
+    + getAllPropertiesCheat(): Action
+    + goToJailCheat(): Action
+    + giveMoneyCheat(): Action
+    + subtractMoneyCheat(): Action
+    + clearActionPanel(): void
+}
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+class Property {
+    - buyValue: int
+    - rentValues: int[]
+    - houseAmount: int
+    - housePrice: int
+    - mortgageAmount: int
+    - mortgaged: boolean
+    - name: PropertyNames
+    - color: Color
+    - owner: Player
+
+    + Property(name: PropertyNames)
+    + getName(): String
+    + getColorEnum(): PropertyColors
+    + getColor(): Color
+    + toString(): String
+    + getBuyValue(): int
+    + getRentValue(index: int): int
+    + getHouseAmount(): int
+    + incrementHouseAmount(): void
+    + decrementHouseAmount(): void
+    + getHouseCost(): int
+    + isOwned(): boolean
+    + getOwner(): Player
+    + setOwner(owner: Player): void
+    + isMortgaged(): boolean
+    + setMortgaged(mortgaged: boolean): void
+    + getMortgageValue(): int
+    + getValue(): int
+}
+
+Property --|> Tile
+@enduml
