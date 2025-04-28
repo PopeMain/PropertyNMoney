@@ -31,11 +31,24 @@ public class StartGame extends JFrame {
     }
 
     public void playGame(Player[] players) {
-        setContentPane(new GUI(players));
-        this.setSize(1000, 800);
-        this.setResizable(false);
+        setContentPane(new GUI(this, players));
         revalidate();
         repaint();
+        pack();
+    }
+
+    public void endGame(Player[] players) {
+        setContentPane(new EndGame(players, this));
+        revalidate();
+        repaint();
+        pack();
+    }
+
+    public void backToStart() {
+        setContentPane(new StartPanel(this));
+        revalidate();
+        repaint();
+        pack();
     }
 }
 

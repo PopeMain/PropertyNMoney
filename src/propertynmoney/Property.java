@@ -140,4 +140,18 @@ public class Property extends Tile{
      * @return Mortgage value of property
      */
     public int getMortgageValue() {return mortgageAmount;}
+
+    /**
+     * Get's The total value a property has including houses or Mortgage.
+     * @return the property Value
+     */
+    public int getValue() {
+        int value = 0;
+        if(!this.isMortgaged()){
+            value += this.buyValue + this.getHouseAmount()*this.getHouseCost();
+        } else {
+            value -= this.getMortgageValue();
+        }
+        return value;
+    }
 }

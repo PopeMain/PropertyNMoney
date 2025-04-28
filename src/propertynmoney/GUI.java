@@ -2,9 +2,7 @@ package propertynmoney;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
@@ -17,7 +15,9 @@ public class GUI extends JPanel {
     private final JPanel boardPanel; // Holds game board and shows player locations on board
     private final JPanel sideBarPanel; // Shows player information and allows user to select their properties
     private final JPanel actionPanel; // Shows the actions the player is able to take depending on the state they are in
-    private JList<Object> propertiesList; // Shows the current player's properties, allowing them to buy/sell houses and mortgage them
+    private JList<Object> propertiesList;// Shows the current player's properties, allowing them to buy/sell houses and mortgage them
+
+    private final StartGame frame;
 
     private final Player[] players; // Holds the players in the game
     private int currentPlayer; // The index of the current player in the array of players
@@ -36,15 +36,14 @@ public class GUI extends JPanel {
     private final JPanel westPanel;
 
     private final Random diceRand; // Random number generation for dice rolls
-    private final int IMAGE_WIDTH; // Used to paint player names to align them with the tiles on the game board
-    private final int IMAGE_HEIGHT;
 
     private final Map<PropertyColors, Integer> houseAmounts = new HashMap<PropertyColors, Integer>(); // Used to see if player owns all properties of one color for buying and selling houses
 
     /**
      * Constructor that sets up the GUI and sets up important game variables like amount of players, player names, positions
      */
-    GUI(Player[] initialPlayers) {
+    GUI(StartGame frame, Player[] initialPlayers) {
+        this.frame = frame;
         this.players = initialPlayers;
         this.setSize(1000, 800);
         this.setLayout(new BorderLayout());
@@ -67,8 +66,9 @@ public class GUI extends JPanel {
         houseAmounts.put(PropertyColors.GREEN, 3);
         houseAmounts.put(PropertyColors.BLUE, 2);
 
-        IMAGE_WIDTH = gameBoard.getIconWidth(); // Width of game board, used to align player names to tiles on board
-        IMAGE_HEIGHT = gameBoard.getIconHeight(); // Height of game board, used to align player names to tiles on board
+        // Used to paint player names to align them with the tiles on the game board
+        int IMAGE_WIDTH = gameBoard.getIconWidth(); // Width of game board, used to align player names to tiles on board
+        int IMAGE_HEIGHT = gameBoard.getIconHeight(); // Height of game board, used to align player names to tiles on board
 
         // Holders used to alter position of normal panels
         JPanel northPanelHolder = new JPanel();
@@ -111,7 +111,6 @@ public class GUI extends JPanel {
         boardPanel.setLayout(new BorderLayout());
         boardLabel.setIcon(gameBoard);
         boardLabel.setBounds(0, 0, gameBoard.getIconWidth(), gameBoard.getIconHeight());
-        System.out.println(gameBoard.getIconHeight());
         boardLabel.setVisible(true);
         boardPanel.add(boardLabel, BorderLayout.CENTER);
 
@@ -142,8 +141,18 @@ public class GUI extends JPanel {
 
         this.add(actionPanel, BorderLayout.SOUTH);
 
+        declareActions(); // Set up keyboard actions that happen when user presses key on keyboard
+
         this.setSize(950, 800);
         this.setVisible(true);
+
+        // Have to set focus in invoke later so that keyboard inputs work, have to use invoke later otherwise request focus won't work
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setFocusable(true);
+                requestFocus();
+            }
+        });
     }
 
     /**
@@ -959,12 +968,15 @@ public class GUI extends JPanel {
         JButton buyHousesButton = buyAndSellHouseButton();
         JButton mortgageButton = mortgagePropertyButton();
         JButton endTurnButton = endTurnButton();
+        JButton endGAMEButton = endGAMEButton();
 
         // Add buttons to JPanel
         actionPanel.add(rollDiceButton);
         actionPanel.add(buyHousesButton);
         actionPanel.add(mortgageButton);
         actionPanel.add(endTurnButton);
+        actionPanel.add(new JPanel());
+        actionPanel.add(endGAMEButton);
 
         // Repaint screen
         actionPanel.revalidate();
@@ -1014,6 +1026,20 @@ public class GUI extends JPanel {
         actionPanel.add(mortgageButton);
         actionPanel.add(payDebtsButton);
         actionPanel.add(declareBankruptcy);
+    }
+
+    private JButton endGAMEButton() {
+        JButton rollDiceButton = new JButton("END GAME");
+        rollDiceButton.addActionListener(e -> {
+            if (currentPlayer == amountOfPlayers){
+                frame.endGame(players);
+            } else {
+                JOptionPane.showMessageDialog(boardPanel, "Please Let everyone complete their last Turn before Ending the Game." +
+                        "Current Player is " + currentPlayer + ". Last Player is " + amountOfPlayers);
+            }
+        });
+
+        return rollDiceButton;
     }
 
     /**
@@ -1368,11 +1394,116 @@ public class GUI extends JPanel {
     }
 
     /**
+     * Creates the key listener so that the user press the designated button to use cheats
+     */
+    private void declareActions() {
+        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_1, 0), "getAllPropertiesCheat");
+        this.getActionMap().put("getAllPropertiesCheat", getAllPropertiesCheat());
+
+        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_2, 0), "goToJailCheat");
+        this.getActionMap().put("goToJailCheat", goToJailCheat());
+
+        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_3, 0), "giveMoneyCheat");
+        this.getActionMap().put("giveMoneyCheat", giveMoneyCheat());
+
+        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_4, 0), "subtractMoneyCheat");
+        this.getActionMap().put("subtractMoneyCheat", subtractMoneyCheat());
+    }
+
+    /**
+     * Gives current player all properties that are not owned
+     * @return Action that is used with java swing keybinds
+     */
+    private Action getAllPropertiesCheat() {
+        Action getAllPropertiesCheat = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(boardPanel, "Giving " + players[currentPlayer].getName() + " all unowned properties.");
+
+                Player player = players[currentPlayer];
+
+                // Add all unowned properties and utilities
+                for (Tile tile: tiles) {
+                    if (tile.getTileType() == TileTypes.PROPERTY) {
+                        Property property = (Property) tile;
+                        if (!property.isOwned()) { // Check if property is unowned
+                            player.addProperty(property);
+                            property.setOwner(player);
+                        }
+                    } else if (tile.getTileType() == TileTypes.UTILITY) {
+                        Utility utility = (Utility) tile;
+                        if (!utility.isOwned()) {
+                            player.addUtility(utility);
+                            utility.setOwner(player);
+                        }
+                    }
+                }
+                paintPlayerSidePanel();
+            }
+        };
+
+        return getAllPropertiesCheat;
+    }
+
+    /**
+     * Puts current player in jail, for testing jail mechanic
+     * @return Action that is used with java swing keybinds
+     */
+    private Action goToJailCheat() {
+        Action goToJailCheat = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(boardPanel, players[currentPlayer].getName() + " was caught loitering!");
+                goToJail(players[currentPlayer]);
+            }
+        };
+
+        return goToJailCheat;
+    }
+
+    /**
+     * Gives current player money, for testing purposes
+     * @return Action that is used with java swing keybinds
+     */
+    private Action giveMoneyCheat() {
+        Action giveMoneyCheat = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(boardPanel, "Here is an interest free loan of $200! Cheater");
+                players[currentPlayer].addMoney(200);
+                paintPlayerSidePanel();
+            }
+        };
+
+        return giveMoneyCheat;
+    }
+
+    /**
+     * Subtracts money from current player, for testing bankruptcy
+     * @return Action that is used with java swing keybinds
+     */
+    private Action subtractMoneyCheat() {
+        Action subtractMoneyCheat = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(boardPanel, "You were fined $200.");
+                boolean bankruptcy = players[currentPlayer].subMoney(200);
+
+                if(bankruptcy) {
+                    bankruptcy();
+                }
+                paintPlayerSidePanel();
+            }
+        };
+
+        return subtractMoneyCheat;
+    }
+
+    /**
      * Clears action panel so that new buttons can be drawn there
      */
     private void clearActionPanel() {
         actionPanel.removeAll();
     }
-
 
 }

@@ -94,6 +94,14 @@ public class Utility extends Tile {
      */
     public void setOwner(Player owner) {this.owner = owner;}
 
+    /**
+     * Redundancy for maintianing continuty in EndGame.Java for calculating the final player value
+     * used to get the purchase value of the utility
+     * @return the property value
+     */
+    public int getValue(){
+        return this.getBuyValue();
+    }
 }
 
 
