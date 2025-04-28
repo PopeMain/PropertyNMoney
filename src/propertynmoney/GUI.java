@@ -153,7 +153,7 @@ public class GUI extends JPanel {
                 setFocusable(true);
                 requestFocus();
                 JOptionPane.showMessageDialog(boardPanel, "Welcome to Money-n-Property! Start the game by rolling the dice. If want to speed up the game, press '1'\n" +
-                        " to give all unowned properties to current player, press '2' to put current player in jail, press '3' to \ngive current player money, and press '4' to" +
+                        "to give all unowned properties to current player, press '2' to put current player in jail, press '3' to \ngive current player money, and press '4' to" +
                         " deduct money from current player");
             }
         });
