@@ -53,6 +53,10 @@ public class PlayerSetupPanel extends JPanel {
         }
 
         add(setupPanel, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+
         JButton startButton = new JButton("Start");
         startButton.addActionListener(e -> {
             if (validatePlayers()) {
@@ -62,7 +66,21 @@ public class PlayerSetupPanel extends JPanel {
             }
         });
 
-        add(startButton, BorderLayout.SOUTH);
+        JButton helpButton = new JButton("Help");
+        helpButton.addActionListener(e -> {
+            frame.setupHelp();
+        });
+
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(e -> {
+            frame.backToStart();
+        });
+
+        buttonPanel.add(startButton);
+        buttonPanel.add(helpButton);
+        buttonPanel.add(cancelButton);
+
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
     private JPanel createPlayerSetupColumn(int playerNumber, int iconIndex) {
@@ -204,7 +222,7 @@ public class PlayerSetupPanel extends JPanel {
 
     private ImageIcon extractSprite(String spriteSheetPath, int iconIndex) {
         final int SPRITE_WIDTH = 300; // Each sprite's width (900 px / 3 sprites per row)
-        final int SPRITE_HEIGHT = 237; // Each sprite's height (711 px / 3 sprites per column)
+        final int SPRITE_HEIGHT = 236; // Each sprite's height (711 px / 3 sprites per column)
         final int SPRITES_PER_ROW = 3; // Number of sprites in each row
 
         try {
