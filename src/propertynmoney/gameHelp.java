@@ -3,8 +3,19 @@ package propertynmoney;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * @author Frank Pope
+ * @author Nevin Fullerton
+ * The gameHelp class represents a JPanel that displays a help screen for the game play loop,
+ * including an image with instructions and buttons to either proceed to the game setup
+ * or return to the start panel.
+ */
 public class gameHelp extends JPanel {
 
+    /**
+     * Constructor for gameHelp, sets up the panel and adds the components to it.
+     * @param frame gives the gameHelp access to the StartGame class, so that it can switch panels.
+     */
     public gameHelp(StartGame frame) {
         setLayout(new BorderLayout());
 

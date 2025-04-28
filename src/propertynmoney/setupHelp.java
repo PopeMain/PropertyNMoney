@@ -3,8 +3,18 @@ package propertynmoney;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * @author Frank Pope
+ * @author Nevin Fullerton
+ * setupHelp is a JPanel that displays a help screen for the setup panel, including an image with instructions and a
+ * button to return to the setup panel.
+ */
 public class setupHelp extends JPanel {
 
+    /**
+     * Constructor for setupHelp, sets up the panel and adds the components to it.
+     * @param frame gives the setupHelp access to the StartGame class, so that it can switch panels.
+     */
     public setupHelp(StartGame frame) {
         // Set BorderLayout to position components
         setLayout(new BorderLayout());
