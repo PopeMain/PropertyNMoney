@@ -10,7 +10,7 @@ public class gameHelp extends JPanel {
 
         // Create an ImageIcon and JLabel to display the image
         // Replace "your_image.png" with your actual image name
-        ImageIcon imageIcon = new ImageIcon(getClass().getResource("/SetupHelp.png"));
+        ImageIcon imageIcon = new ImageIcon(getClass().getResource("/GameHelp.png"));
         JLabel imageLabel = new JLabel(imageIcon);
 
         // Add image to the center

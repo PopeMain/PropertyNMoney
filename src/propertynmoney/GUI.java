@@ -952,7 +952,7 @@ public class GUI extends JPanel {
         JLabel playerNameLabel = new JLabel("Name: " + playerName);
         JLabel playerMoneyLabel = new JLabel("Money: $" + playerMoney);
         JLabel playerPositionLabel = new JLabel(tiles[playerPosition].toString());
-        JLabel playerIconLabel = new JLabel(playerIcons[currentPlayer]);
+        JLabel playerIconLabel = new JLabel(playerIcons[players[currentPlayer].getIconIndex()]);
 
         // Get properties and utilities and put them into one list to display them all
         List<Property> properties = players[currentPlayer].getProperties();
