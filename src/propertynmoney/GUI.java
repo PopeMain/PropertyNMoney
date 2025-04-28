@@ -149,8 +149,12 @@ public class GUI extends JPanel {
         // Have to set focus in invoke later so that keyboard inputs work, have to use invoke later otherwise request focus won't work
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                // So cheats work on start up rather than having to minimize and open tab again
                 setFocusable(true);
                 requestFocus();
+                JOptionPane.showMessageDialog(boardPanel, "Welcome to Money-n-Property! Start the game by rolling the dice. If want to speed up the game, press '1'\n" +
+                        " to give all unowned properties to current player, press '2' to put current player in jail, press '3' to \ngive current player money, and press '4' to" +
+                        " deduct money from current player");
             }
         });
     }
