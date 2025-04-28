@@ -6,8 +6,8 @@ import java.util.Arrays;
 
 public class EndGame extends JPanel {
 
-    private StartGame frame;
-    private Player[] players;
+    private final StartGame frame;
+    private final Player[] players;
 
     public EndGame(Player[] players, StartGame frame) {
         this.players = players;

@@ -28,7 +28,7 @@ public class GUI extends JPanel {
 
     private final Player[] players; // Holds the players in the game
     private int currentPlayer; // The index of the current player in the array of players
-    private int amountOfPlayers; // Amount of players - 1, used to know where end of players array is
+    private final int amountOfPlayers; // Amount of players - 1, used to know where end of players array is
     private boolean diceRolled; // If dice have been rolled this turn
     private int doubleAmount; // Used to detect if player is speeding to send them to jail
 
@@ -873,8 +873,8 @@ public class GUI extends JPanel {
         // Positions player icon will be placed next to the tile they occupy
         int[][] southPanelPositions = {{s, 0},{s-ds,0},{s-2*ds,0},{s-3*ds,0},{s-4*ds,0},{s-5*ds,0},{s-6*ds,0},{s-7*ds,0},{s-8*ds,0},{s-9*ds,0}};
         int[][] westPanelPositions = {{60, s-ds},{60,s-2*ds},{60,s-3*ds},{60, s-4*ds},{60, s-5*ds},{60, s-6*ds},{60,s-7*ds},{60,s-8*ds},{60,s-9*ds},{60,s-10*ds}};
-        int[][] northPanelPositions = {{s-10*ds, 60},{s-9*ds,60},{s-8*ds,60},{s-7*ds,60},{s-6*ds,60},{s-5*ds,60},{s-4*ds,60},{s-3*ds,60},{s-2*ds,60},{s-1*ds,60}};
-        int[][] eastPanelPositions = {{0, s-10*ds},{0, s-9*ds},{0, s-8*ds},{0,s-7*ds},{0,s-6*ds},{0,s-5*ds},{0,s-4*ds},{0,s-3*ds},{0,s-2*ds},{0,s-1*ds}};
+        int[][] northPanelPositions = {{s-10*ds, 60},{s-9*ds,60},{s-8*ds,60},{s-7*ds,60},{s-6*ds,60},{s-5*ds,60},{s-4*ds,60},{s-3*ds,60},{s-2*ds,60},{s- ds,60}};
+        int[][] eastPanelPositions = {{0, s-10*ds},{0, s-9*ds},{0, s-8*ds},{0,s-7*ds},{0,s-6*ds},{0,s-5*ds},{0,s-4*ds},{0,s-3*ds},{0,s-2*ds},{0,s- ds}};
 
         int[] positionOffSetsY = new int[40]; // Used to offset player icons so they are not overlapping when on same tile
         int[] positionOffSetsX = new int[40]; // Used to offset player icons so they are not overlapping when on same tile
@@ -991,18 +991,14 @@ public class GUI extends JPanel {
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 Component renderer = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-                if (renderer instanceof JLabel && value instanceof Property) {
-                    JLabel label = (JLabel) renderer;
-                    Property property = (Property) value;
+                if (renderer instanceof JLabel label && value instanceof Property property) {
 
                     // Set property name as the text
                     label.setText(property.toString());
 
                     // Add a colored icon to represent the property color
                     label.setIcon(new ColorIcon(property.getColor()));
-                } else if (renderer instanceof JLabel && value instanceof Utility) {
-                    JLabel label = (JLabel) renderer;
-                    Utility utility = (Utility) value;
+                } else if (renderer instanceof JLabel label && value instanceof Utility utility) {
 
                     label.setText(utility.toString());
 

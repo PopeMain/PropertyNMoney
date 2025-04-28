@@ -19,14 +19,6 @@ import java.awt.*;
  * <p>
  * - The purchase value of the property.
  * <p>
- * Key Methods:
- * <p>
- * - toString(): Overrides the toString method to return the display name associated
- *   with each property.
- * <p>
- * - getBuyValue(): returns the value of the property at the time to purchase.
- * <p>
- * <p>
  * Enumerated Property Names:
  * <p>
  * - ex: MEDITERRANEAN_AVE, BALTIC_AVE, PARK_AVE, BOARDWALK

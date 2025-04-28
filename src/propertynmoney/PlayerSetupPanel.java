@@ -7,21 +7,31 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @author Frank Pope
+ * @author Nevin Fullerton
+ * PlayerSetupPanel is the panel that allows the user to setup the number of players and their names and starting money
+ * and IconImage for each player. Then passes the information to the StartGame class to start the game.
+ */
 public class PlayerSetupPanel extends JPanel {
     private final int PLAYER_COUNT = 4; // Number of players
     private final int DEFAULT_STARTING_MONEY = 1500; // Default starting money
     private final ImageIcon[] icons; // Array of icons for the selector
     private Player[] players;
-    private JPanel[] playerPanels;
-    private JPanel setupPanel;
+    private final JPanel[] playerPanels;
+    private final JPanel setupPanel;
 
     // UI components for each player
-    private JTextField[] nameFields;
-    private JSpinner[] moneySpinners;
-    private int[] playerIconIndex;
-    private JCheckBox[] playerCheckBoxes;
-    private boolean[] iconTaken;
+    private final JTextField[] nameFields;
+    private final JSpinner[] moneySpinners;
+    private final int[] playerIconIndex;
+    private final JCheckBox[] playerCheckBoxes;
+    private final boolean[] iconTaken;
 
+    /**
+     * Constructor for PlayerSetupPanel, sets up the panel and adds the components to it.
+     * @param frame gives the PlayerSetupPanel access to the StartGame class, so that it can switch panels.
+     */
     public PlayerSetupPanel(StartGame frame) {
         // Load the sprite sheet and create an array of icons (Example Array)
         icons = loadPlayerIcons();
@@ -83,6 +93,13 @@ public class PlayerSetupPanel extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Creates a column for a single player, with a name input, a checkbox to add to the game, a starting money input,
+     * and an icon selector.
+     * @param playerNumber The player order for the column (0-3)
+     * @param iconIndex The starting icon index for the player (0-8)
+     * @return A JPanel containing the UI components for the player's setup column.
+     */
     private JPanel createPlayerSetupColumn(int playerNumber, int iconIndex) {
         JPanel playerPanel = new JPanel();
         playerPanel.setLayout(new GridLayout(4, 1, 5, 5)); // 3 Rows for Name, Playing, Money, Icon Selector
@@ -170,6 +187,13 @@ public class PlayerSetupPanel extends JPanel {
         return playerPanel;
     }
 
+    /**
+     * Updates the states of player checkboxes in the setup panel based on their dependencies.
+     *
+     * The method enforces sequential enabling and selection of checkboxes, ensuring that a
+     * player checkbox can only be enabled if the previous checkbox is selected. If a prior
+     * checkbox is deselected, all subsequent checkboxes are disabled and deselected as well.
+     */
     private void updateCheckBoxStates() {
         // Other players
         for (int i = 1; i < PLAYER_COUNT; i++) {
@@ -184,8 +208,14 @@ public class PlayerSetupPanel extends JPanel {
         }
     }
 
-
-
+    /**
+     * Creates player objects based on selected checkboxes and initializes them with the provided parameters.
+     *
+     * The method iterates through the collection of checkboxes to count the selected players. It then creates
+     * an array of players with a size equal to the number of selected checkboxes. For each selected checkbox,
+     * a Player object is instantiated using the player's starting money, name, and icon index, and is added
+     * to the array.
+     */
     private void createPlayers() {
         // Count selected players
         int selectedCount = 0;
@@ -210,7 +240,15 @@ public class PlayerSetupPanel extends JPanel {
         }
     }
 
-
+    /**
+     * Loads an array of player icons by extracting individual sprites from a sprite sheet.
+     *
+     * The method utilizes the {@code extractSprite} function to individually extract images
+     * from the source sprite sheet. It returns an array of {@code ImageIcon} objects, with
+     * each index corresponding to a different player icon.
+     *
+     * @return An array of {@code ImageIcon} objects representing player icons.
+     */
     private ImageIcon[] loadPlayerIcons() {
         // Simulated icons for demonstration (replace with actual sprites)
         ImageIcon[] icons = new ImageIcon[9];
@@ -220,6 +258,12 @@ public class PlayerSetupPanel extends JPanel {
         return icons;
     }
 
+    /**
+     * Extracts a single sprite from a sprite sheet.
+     * @param spriteSheetPath The path to the sprite sheet.
+     * @param iconIndex The index of the sprite to extract.
+     * @return An {@code ImageIcon} object representing the extracted sprite, or {@code null} if the sprite cannot be extracted.
+     */
     private ImageIcon extractSprite(String spriteSheetPath, int iconIndex) {
         final int SPRITE_WIDTH = 300; // Each sprite's width (900 px / 3 sprites per row)
         final int SPRITE_HEIGHT = 236; // Each sprite's height (711 px / 3 sprites per column)
@@ -251,6 +295,11 @@ public class PlayerSetupPanel extends JPanel {
         }
     }
 
+    /**
+     * Finds the next available icon in the array of icons.
+     * @param currentIndex The current icon index. This is used to prevent the icon from being repeated.
+     * @return The next available icon index, or the current index if no other icon is available.
+     */
     private int findNextAvailableIcon(int currentIndex) {
         int index = (currentIndex + 1) % icons.length;
         while (index != currentIndex) {
@@ -262,6 +311,11 @@ public class PlayerSetupPanel extends JPanel {
         return currentIndex; // If no other icon is available, stay on current
     }
 
+    /**
+     * Finds the previous available icon in the array of icons.
+     * @param currentIndex The current icon index. This is used to prevent the icon from being repeated.
+     * @return The previous available icon index, or the current index if no other icon is available.
+     */
     private int findPreviousAvailableIcon(int currentIndex) {
         int index = (currentIndex - 1 + icons.length) % icons.length;
         while (index != currentIndex) {
@@ -273,12 +327,19 @@ public class PlayerSetupPanel extends JPanel {
         return currentIndex; // If no other icon is available, stay on current
     }
 
+    /**
+     * Validates the given player name based on specific rules.
+     *
+     * The validation checks include:
+     * - The name must be at least 3 characters long, excluding spaces.
+     * - The name must be no more than 9 characters long.
+     * - The name must not start with a number or a space.
+     * - The name must contain only alphanumeric characters.
+     *
+     * @param name The name of the player to validate.
+     * @return true if the player name is valid, false otherwise.
+     */
     private boolean validatePlayerName(String name) {
-        // Check if name meets the criteria:
-        // - At least 3 characters long (excluding spaces)
-        // - Max 9 characters
-        // - No leading numbers or spaces
-        // - Only alphanumeric characters allowed
         if (name == null || name.isEmpty()) return false;
 
         // Remove spaces for length check
@@ -292,7 +353,17 @@ public class PlayerSetupPanel extends JPanel {
         return trimmedName.matches("^[a-zA-Z][a-zA-Z0-9]*$");
     }
 
-
+    /**
+     * Validates the selected players based on their names and displays an error message
+     * if any player's name is invalid.
+     *
+     * The method ensures:
+     * - Only selected players are validated.
+     * - Player names meet specific validation criteria defined in {@link #validatePlayerName(String)}.
+     * - An error message is displayed using a dialog if any validation fails.
+     *
+     * @return true if all selected players are valid, false otherwise.
+     */
     private boolean validatePlayers() {
         StringBuilder errorMessage = new StringBuilder();
         boolean isValid = true;

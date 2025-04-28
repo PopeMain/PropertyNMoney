@@ -3,8 +3,18 @@ package propertynmoney;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * @author Frank Pope
+ * @author Nevin Fullerton
+ * StartPanel is the first panel that is displayed when the program starts, it contains the title, and buttons to
+ * start the game into the setup panel, open the Game help panel, or exit the program.
+ */
 public class StartPanel extends JPanel {
 
+    /**
+     * Constructor for StartPanel, sets up the panel and adds the components to it.
+     * @param frame gives the StartPanel access to the StartGame class, so that it can switch panels.
+     */
     public StartPanel(StartGame frame) {
         // Set layout for this panel
         setLayout(new BorderLayout());

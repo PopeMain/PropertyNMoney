@@ -14,12 +14,12 @@ public interface Card {
      * @return a boolean used to determine if certain traits of the player need to be checked, like if they passed go or
      * are bankrupt, return false if nothing needs to be checked
      */
-    public boolean playerEffect(Player player); //
+    boolean playerEffect(Player player); //
 
     /**
      * What is displayed to user to communicate the effect on the player.
      * @return Text to display to user
      */
-    public String getCardText();
+    String getCardText();
 
 }
