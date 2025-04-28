@@ -57,6 +57,13 @@ public class StartGame extends JFrame {
         repaint();
         pack();
     }
+
+    public void gameHelp() {
+        setContentPane(new gameHelp(this));
+        revalidate();
+        repaint();
+        pack();
+    }
 }
 
 

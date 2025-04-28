@@ -786,7 +786,7 @@ public class GUI extends JPanel {
      */
     private void setUpTiles() {
         tiles = new Tile[40];
-        tiles[0] = new Tile(TileTypes.NONE); // None means nothing happens if the player lands on the tile
+        tiles[0] = new Tile(TileTypes.NONE, "GO"); // None means nothing happens if the player lands on the tile
         tiles[1] = new Property(PropertyNames.MEDITERRANEAN_AVE); // Property tile, Property.name holds property info
         tiles[2] = new CommunityTile(); // Draw from community chest deck
         tiles[3] = new Property(PropertyNames.BALTIC_AVE);
@@ -796,7 +796,7 @@ public class GUI extends JPanel {
         tiles[7] = new ChanceTile(); // Draw from chance deck
         tiles[8] = new Property(PropertyNames.VERMONT_AVE);
         tiles[9] = new Property(PropertyNames.CONNECTICUT_AVE);
-        tiles[10] = new Tile(TileTypes.NONE);
+        tiles[10] = new Tile(TileTypes.NONE, "Jail");
         tiles[11] = new Property(PropertyNames.ST_CHARLES_PL);
         tiles[12] = new Utility(150, "Electric Company");
         tiles[13] = new Property(PropertyNames.STATES_AVE);
@@ -806,7 +806,7 @@ public class GUI extends JPanel {
         tiles[17] = new CommunityTile();
         tiles[18] = new Property(PropertyNames.TENNESSEE_AVE);
         tiles[19] = new Property(PropertyNames.NEW_YORK_AVE);
-        tiles[20] = new Tile(TileTypes.PARKING); // Player collects free parking money when landing on this tile
+        tiles[20] = new Tile(TileTypes.PARKING, "Parking"); // Player collects free parking money when landing on this tile
         tiles[21] = new Property(PropertyNames.KENTUCKY_AVE);
         tiles[22] = new ChanceTile();
         tiles[23] = new Property(PropertyNames.INDIANA_AVE);
@@ -816,7 +816,7 @@ public class GUI extends JPanel {
         tiles[27] = new Property(PropertyNames.VENTNOR_AVE);
         tiles[28] = new Utility(150, "Water Works");
         tiles[29] = new Property(PropertyNames.MARVIN_GAR);
-        tiles[30] = new Tile(TileTypes.GOTOJAIL); // Send player to jail
+        tiles[30] = new Tile(TileTypes.GOTOJAIL, "GO TO JAIL"); // Send player to jail
         tiles[31] = new Property(PropertyNames.PACIFIC_AVE);
         tiles[32] = new Property(PropertyNames.NORTH_CAROLINA_AVE);
         tiles[33] = new CommunityTile();
@@ -949,9 +949,10 @@ public class GUI extends JPanel {
         String playerName = players[currentPlayer].getName();
         int playerMoney = players[currentPlayer].getMoney();
         int playerPosition = players[currentPlayer].getPosition();
-        JLabel playerNameLabel = new JLabel("Player Name: " + playerName);
-        JLabel playerMoneyLabel = new JLabel("Player Money: " + playerMoney);
-        JLabel playerPositionLabel = new JLabel("Player Position: " + (playerPosition + 1));
+        JLabel playerNameLabel = new JLabel("Name: " + playerName);
+        JLabel playerMoneyLabel = new JLabel("Money: $" + playerMoney);
+        JLabel playerPositionLabel = new JLabel(tiles[playerPosition].toString());
+        JLabel playerIconLabel = new JLabel(playerIcons[currentPlayer]);
 
         // Get properties and utilities and put them into one list to display them all
         List<Property> properties = players[currentPlayer].getProperties();
@@ -1000,9 +1001,15 @@ public class GUI extends JPanel {
 
         propertiesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        JPanel parallelPanel = new JPanel();
+        parallelPanel.setLayout(new BorderLayout());
+        parallelPanel.setMaximumSize(new Dimension(100, 25));
+        parallelPanel.add(playerIconLabel, BorderLayout.LINE_START);
+        parallelPanel.add(playerPositionLabel, BorderLayout.CENTER);
+
         sideBarPanel.add(playerNameLabel);
         sideBarPanel.add(playerMoneyLabel);
-        sideBarPanel.add(playerPositionLabel);
+        sideBarPanel.add(parallelPanel);
         sideBarPanel.add(new JScrollPane(propertiesList));
 
         sideBarPanel.revalidate();

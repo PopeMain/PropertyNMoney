@@ -13,7 +13,7 @@ public class TaxTile extends Tile {
      * @param taxAmount Tax value of the tile
      */
     TaxTile(int taxAmount) {
-        super(TileTypes.TAX);
+        super(TileTypes.TAX, "Taxes");
         this.taxAmount = taxAmount;
     }
 
